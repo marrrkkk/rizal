@@ -1,0 +1,364 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
+import Home from "./pages/Home"
+import Chapter1 from "./pages/Chapter1"
+import Chapter2 from "./pages/Chapter2"
+import Login from "./pages/Login"
+import Register from "./pages/Register"
+// Chapter 1 Games
+import JoseBirthGame from "./pages/games/JoseBirthGame"
+import FamilyBackgroundGame from "./pages/games/FamilyBackgroundGame"
+import EarlyChildhoodGame from "./pages/games/EarlyChildhoodGame"
+import FirstTeacherGame from "./pages/games/FirstTeacherGame"
+import LoveForReadingGame from "./pages/games/LoveForReadingGame"
+
+// Chapter 2 Games
+import AteneoGame from "./pages/games/AteneoGame"
+import UstGame from "./pages/games/UstGame"
+import AchievementsGame from "./pages/games/AchievementsGame"
+import LiteraryWorksGame from "./pages/games/LiteraryWorksGame"
+import EducationPuzzleGame from "./pages/games/EducationPuzzleGame"
+import Chapter3 from "./pages/Chapter3"
+
+// Chapter 3 Games
+import EuropeanJourneyGame from "./pages/games/EuropeanJourneyGame"
+import LiteraryCrosswordGame from "./pages/games/LiteraryCrosswordGame"
+import LettersAbroadGame from "./pages/games/LettersAbroadGame"
+import EuropeanQuizGame from "./pages/games/EuropeanQuizGame"
+import TravelMapGame from "./pages/games/TravelMapGame"
+
+// Chapter 4 Games
+import Chapter4 from "./pages/Chapter4"
+import CharacterConnectionsGame from "./pages/games/CharacterConnectionsGame"
+import PlotReconstructionGame from "./pages/games/PlotReconstructionGame"
+import SymbolismHuntGame from "./pages/games/SymbolismHuntGame"
+import QuoteUnscrambleGame from "./pages/games/QuoteUnscrambleGame"
+import SceneExplorerGame from "./pages/games/SceneExplorerGame"
+
+// Chapter 5 Games
+import Chapter5 from "./pages/Chapter5"
+import LigaTimelineGame from "./pages/games/LigaTimelineGame"
+import { setAuthToken } from "./utils/api"
+
+function App() {
+  const [token, setToken] = useState(localStorage.getItem("token"))
+  const [username, setUsername] = useState(null)
+
+  useEffect(() => {
+    setAuthToken(token)
+    if (!token) {
+      setUsername(null)
+      return
+    }
+
+    // fetch current user from protected endpoint
+    fetch("http://localhost/rizal/api/auth/protected.php", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Unauthorized")
+        return res.json()
+      })
+      .then((data) => {
+        // data.message is "Hello, username! ..."
+        const match = data.message.match(/Hello, (\w+)!/)
+        if (match) setUsername(match[1])
+      })
+      .catch(() => {
+        setToken(null)
+        localStorage.removeItem("token")
+      })
+  }, [token])
+
+  const handleLogout = () => {
+    setToken(null)
+    setUsername(null)
+    localStorage.removeItem("token")
+    setAuthToken(null)
+  }
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={token ? <Home username={username} onLogout={handleLogout} /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/chapter/1"
+          element={token ? <Chapter1 username={username} onLogout={handleLogout} /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/chapter/1/level/1"
+          element={token ? <JoseBirthGame username={username} onLogout={handleLogout} /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/chapter/1/level/2"
+          element={
+            token ? <FamilyBackgroundGame username={username} onLogout={handleLogout} /> : <Navigate to="/login" />
+          }
+        />
+        <Route
+          path="/chapter/1/level/3"
+          element={
+            token ? <EarlyChildhoodGame username={username} onLogout={handleLogout} /> : <Navigate to="/login" />
+          }
+        />
+        <Route
+          path="/chapter/1/level/4"
+          element={token ? <FirstTeacherGame username={username} onLogout={handleLogout} /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/chapter/1/level/5"
+          element={
+            token ? <LoveForReadingGame username={username} onLogout={handleLogout} /> : <Navigate to="/login" />
+          }
+        />
+        
+        {/* Chapter 2 Routes */}
+        <Route
+          path="/chapter/2"
+          element={
+            token ? <Chapter2 username={username} onLogout={handleLogout} /> : <Navigate to="/login" />
+          }
+        />
+        <Route
+          path="/chapter/2/level/1"
+          element={
+            token ? (
+              <AteneoGame
+                username={username}
+                onComplete={() => handleLevelComplete(2, 1)}
+              />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/chapter/2/level/2"
+          element={
+            token ? (
+              <UstGame
+                username={username}
+                onComplete={() => handleLevelComplete(2, 2)}
+              />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/chapter/2/level/3"
+          element={
+            token ? (
+              <AchievementsGame
+                username={username}
+                onComplete={() => handleLevelComplete(2, 3)}
+              />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/chapter/2/level/4"
+          element={
+            token ? (
+              <LiteraryWorksGame
+                username={username}
+                onComplete={() => handleLevelComplete(2, 4)}
+              />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/chapter/2/level/5"
+          element={
+            token ? (
+              <EducationPuzzleGame
+                username={username}
+                onComplete={() => handleLevelComplete(2, 5)}
+              />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        
+        {/* Chapter 3 Routes */}
+        <Route
+          path="/chapter/3"
+          element={
+            token ? <Chapter3 username={username} onLogout={handleLogout} /> : <Navigate to="/login" />
+          }
+        />
+        <Route
+          path="/chapter/3/level/1"
+          element={
+            token ? (
+              <EuropeanJourneyGame
+                username={username}
+                onComplete={() => handleLevelComplete(3, 1)}
+              />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/chapter/3/level/2"
+          element={
+            token ? (
+              <LiteraryCrosswordGame
+                username={username}
+                onComplete={() => handleLevelComplete(3, 2)}
+              />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/chapter/3/level/3"
+          element={
+            token ? (
+              <LettersAbroadGame
+                username={username}
+                onComplete={() => handleLevelComplete(3, 3)}
+              />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/chapter/3/level/4"
+          element={
+            token ? (
+              <EuropeanQuizGame
+                username={username}
+                onComplete={() => handleLevelComplete(3, 4)}
+              />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/chapter/3/level/5"
+          element={
+            token ? (
+              <TravelMapGame
+                username={username}
+                onComplete={() => handleLevelComplete(3, 5)}
+              />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        {/* Chapter 4 Routes */}
+        <Route
+          path="/chapter/4"
+          element={token ? <Chapter4 username={username} onLogout={handleLogout} /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/chapter/4/level/1"
+          element={
+            token ? (
+              <CharacterConnectionsGame
+                username={username}
+                onComplete={() => handleLevelComplete(4, 1)}
+              />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/chapter/4/level/2"
+          element={
+            token ? (
+              <PlotReconstructionGame
+                username={username}
+                onComplete={() => handleLevelComplete(4, 2)}
+              />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/chapter/4/level/3"
+          element={
+            token ? (
+              <SymbolismHuntGame
+                username={username}
+                onComplete={() => handleLevelComplete(4, 3)}
+              />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/chapter/4/level/4"
+          element={
+            token ? (
+              <QuoteUnscrambleGame
+                username={username}
+                onComplete={() => handleLevelComplete(4, 4)}
+              />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/chapter/4/level/5"
+          element={
+            token ? (
+              <SceneExplorerGame
+                username={username}
+                onComplete={() => handleLevelComplete(4, 5)}
+              />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        
+        {/* Chapter 5 Routes */}
+        <Route
+          path="/chapter/5"
+          element={token ? <Chapter5 username={username} onLogout={handleLogout} /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/chapter/5/level/1"
+          element={
+            token ? (
+              <LigaTimelineGame
+                username={username}
+                onComplete={() => handleLevelComplete(5, 1)}
+              />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        
+        <Route path="/login" element={!token ? <Login setToken={setToken} /> : <Navigate to="/" />} />
+        <Route path="/register" element={!token ? <Register /> : <Navigate to="/" />} />
+      </Routes>
+    </BrowserRouter>
+  )
+}
+
+export default App

@@ -1,13 +1,162 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
+
+    <!-- Enhanced viewport configuration for mobile -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover"
+    />
+
+    <!-- Performance and SEO meta tags -->
+    <meta
+      name="description"
+      content="Learn about José Rizal, the Philippines' national hero, through interactive games and educational content designed for children."
+    />
+    <meta
+      name="keywords"
+      content="José Rizal, Philippines, education, children, learning, games, national hero"
+    />
+    <meta name="author" content="José Rizal Learning Adventure" />
+
+    <!-- Mobile app configuration -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Rizal Learning" />
+
+    <!-- Theme colors for mobile browsers -->
+    <meta name="theme-color" content="#3b82f6" />
+    <meta name="msapplication-navbutton-color" content="#3b82f6" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+
+    <!-- Preconnect to improve performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- DNS prefetch for potential external resources -->
+    <link rel="dns-prefetch" href="//localhost" />
+
+    <!-- Prevent FOUC (Flash of Unstyled Content) -->
+    <style>
+      /* Critical CSS for initial render */
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, sans-serif;
+        background: linear-gradient(
+          135deg,
+          #f0f9ff 0%,
+          #e0f2fe 50%,
+          #e0e7ff 100%
+        );
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      #root {
+        min-height: 100vh;
+        width: 100%;
+      }
+
+      /* Loading spinner for initial load */
+      .initial-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          135deg,
+          #f0f9ff 0%,
+          #e0f2fe 50%,
+          #e0e7ff 100%
+        );
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      }
+
+      .initial-loader .spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #e5e7eb;
+        border-top: 3px solid #3b82f6;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      .initial-loader .text {
+        margin-top: 16px;
+        color: #6b7280;
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Hide loader when React app loads */
+      .app-loaded .initial-loader {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+    </style>
+
+    <title>José Rizal Learning Adventure</title>
   </head>
   <body>
+    <!-- Initial loading screen -->
+    <div class="initial-loader" id="initial-loader">
+      <div class="spinner"></div>
+      <div class="text">Loading José Rizal Learning Adventure...</div>
+    </div>
+
+    <!-- Main app container -->
     <div id="root"></div>
+
+    <!-- Performance monitoring script -->
+    <script>
+      // Mark the start of the app loading
+      if ("performance" in window && "mark" in performance) {
+        performance.mark("app-start");
+      }
+
+      // Hide initial loader when React app is ready
+      window.addEventListener("load", function () {
+        setTimeout(function () {
+          document.body.classList.add("app-loaded");
+          setTimeout(function () {
+            const loader = document.getElementById("initial-loader");
+            if (loader) {
+              loader.remove();
+            }
+          }, 300);
+        }, 100);
+      });
+
+      // Add focus-visible polyfill behavior
+      document.addEventListener("DOMContentLoaded", function () {
+        document.body.classList.add("js-focus-visible");
+      });
+    </script>
+
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

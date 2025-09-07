@@ -1,29 +1,30 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ScenePlaceholder } from "../../components/PlaceholderImage";
 
 export default function FirstTeacherGame({ username, onLogout }) {
-  const navigate = useNavigate()
-  const [currentGame, setCurrentGame] = useState(0)
-  const [score, setScore] = useState(0)
-  const [gameCompleted, setGameCompleted] = useState(false)
-  const [showCelebration, setShowCelebration] = useState(false)
+  const navigate = useNavigate();
+  const [currentGame, setCurrentGame] = useState(0);
+  const [score, setScore] = useState(0);
+  const [gameCompleted, setGameCompleted] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
 
   // Quiz Game State
-  const [selectedAnswer, setSelectedAnswer] = useState(null)
-  const [showQuizResult, setShowQuizResult] = useState(false)
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [showQuizResult, setShowQuizResult] = useState(false);
 
   // Lesson Simulation State
-  const [lessonProgress, setLessonProgress] = useState(0)
-  const [currentLessonStep, setCurrentLessonStep] = useState(0)
+  const [lessonProgress, setLessonProgress] = useState(0);
+  const [currentLessonStep, setCurrentLessonStep] = useState(0);
 
   // Letter Tracing State
-  const [tracedLetters, setTracedLetters] = useState([])
-  const [currentLetter, setCurrentLetter] = useState(0)
+  const [tracedLetters, setTracedLetters] = useState([]);
+  const [currentLetter, setCurrentLetter] = useState(0);
 
   // Reading Practice State
-  const [readingAnswers, setReadingAnswers] = useState({})
+  const [readingAnswers, setReadingAnswers] = useState({});
 
   const games = [
     {
@@ -31,7 +32,12 @@ export default function FirstTeacherGame({ username, onLogout }) {
       type: "quiz",
       title: "Jose's First Teacher",
       question: "Who was Jose Rizal's first teacher?",
-      options: ["A school teacher", "His father Francisco", "His mother Teodora", "His brother Paciano"],
+      options: [
+        "A school teacher",
+        "His father Francisco",
+        "His mother Teodora",
+        "His brother Paciano",
+      ],
       correct: 2,
     },
     {
@@ -43,25 +49,30 @@ export default function FirstTeacherGame({ username, onLogout }) {
           id: 1,
           instruction: "Good morning, Jose! Let's start with our prayers.",
           action: "Click to pray with Jose",
-          image: "/placeholder.svg?height=200&width=300",
+          emoji: "🙏",
+          scene: "prayer",
         },
         {
           id: 2,
           instruction: "Now, let's practice reading this story together.",
           action: "Click to read with Jose",
-          image: "/placeholder.svg?height=200&width=300",
+          emoji: "📖",
+          scene: "reading",
         },
         {
           id: 3,
           instruction: "Very good! Now let's practice writing letters.",
           action: "Click to write with Jose",
-          image: "/placeholder.svg?height=200&width=300",
+          emoji: "✍️",
+          scene: "writing",
         },
         {
           id: 4,
-          instruction: "Excellent work! Let's end with a story about good values.",
+          instruction:
+            "Excellent work! Let's end with a story about good values.",
           action: "Click to listen to the story",
-          image: "/placeholder.svg?height=200&width=300",
+          emoji: "📚",
+          scene: "storytelling",
         },
       ],
     },
@@ -100,80 +111,87 @@ export default function FirstTeacherGame({ username, onLogout }) {
         },
       ],
     },
-  ]
+  ];
 
   const handleQuizAnswer = (answerIndex) => {
-    setSelectedAnswer(answerIndex)
-    setShowQuizResult(true)
+    setSelectedAnswer(answerIndex);
+    setShowQuizResult(true);
 
     setTimeout(() => {
       if (answerIndex === games[currentGame].correct) {
-        setScore(score + 25)
-        nextGame()
+        setScore(score + 25);
+        nextGame();
       } else {
-        setSelectedAnswer(null)
-        setShowQuizResult(false)
+        setSelectedAnswer(null);
+        setShowQuizResult(false);
       }
-    }, 2000)
-  }
+    }, 2000);
+  };
 
   const handleLessonStep = () => {
     if (currentLessonStep < games[1].steps.length - 1) {
-      setCurrentLessonStep(currentLessonStep + 1)
-      setScore(score + 15)
+      setCurrentLessonStep(currentLessonStep + 1);
+      setScore(score + 15);
     } else {
-      setScore(score + 15)
-      setTimeout(() => nextGame(), 1000)
+      setScore(score + 15);
+      setTimeout(() => nextGame(), 1000);
     }
-  }
+  };
 
   const handleLetterTrace = (letterIndex) => {
     if (!tracedLetters.includes(letterIndex)) {
-      setTracedLetters([...tracedLetters, letterIndex])
-      setScore(score + 10)
+      setTracedLetters([...tracedLetters, letterIndex]);
+      setScore(score + 10);
 
       if (tracedLetters.length + 1 === games[2].letters.length) {
-        setTimeout(() => nextGame(), 1000)
+        setTimeout(() => nextGame(), 1000);
       }
     }
-  }
+  };
 
   const handleReadingAnswer = (questionIndex, answerIndex) => {
-    const newAnswers = { ...readingAnswers, [questionIndex]: answerIndex }
-    setReadingAnswers(newAnswers)
+    const newAnswers = { ...readingAnswers, [questionIndex]: answerIndex };
+    setReadingAnswers(newAnswers);
 
-    const question = games[3].questions[questionIndex]
+    const question = games[3].questions[questionIndex];
     if (answerIndex === question.correct) {
-      setScore(score + 20)
+      setScore(score + 20);
     }
 
     // Check if all questions are answered correctly
-    const allCorrect = games[3].questions.every((q, index) => newAnswers[index] === q.correct)
-    if (allCorrect && Object.keys(newAnswers).length === games[3].questions.length) {
-      setTimeout(() => nextGame(), 1000)
+    const allCorrect = games[3].questions.every(
+      (q, index) => newAnswers[index] === q.correct
+    );
+    if (
+      allCorrect &&
+      Object.keys(newAnswers).length === games[3].questions.length
+    ) {
+      setTimeout(() => nextGame(), 1000);
     }
-  }
+  };
 
   const nextGame = () => {
     if (currentGame < games.length - 1) {
-      setCurrentGame(currentGame + 1)
-      setSelectedAnswer(null)
-      setShowQuizResult(false)
-      setCurrentLessonStep(0)
-      setReadingAnswers({})
+      setCurrentGame(currentGame + 1);
+      setSelectedAnswer(null);
+      setShowQuizResult(false);
+      setCurrentLessonStep(0);
+      setReadingAnswers({});
     } else {
-      setGameCompleted(true)
-      setShowCelebration(true)
+      setGameCompleted(true);
+      setShowCelebration(true);
     }
-  }
+  };
 
   const handleBackToChapter = () => {
-    navigate("/chapter/1")
-  }
+    navigate("/chapter/1");
+  };
 
   const renderQuizGame = (game) => (
     <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl max-w-2xl mx-auto">
-      <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">{game.question}</h3>
+      <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+        {game.question}
+      </h3>
       <div className="grid grid-cols-1 gap-4">
         {game.options.map((option, index) => (
           <button
@@ -185,8 +203,8 @@ export default function FirstTeacherGame({ username, onLogout }) {
                 ? index === game.correct
                   ? "bg-green-100 border-2 border-green-400 text-green-800"
                   : index === selectedAnswer
-                    ? "bg-red-100 border-2 border-red-400 text-red-800"
-                    : "bg-gray-100 text-gray-600"
+                  ? "bg-red-100 border-2 border-red-400 text-red-800"
+                  : "bg-gray-100 text-gray-600"
                 : "bg-rose-50 hover:bg-rose-100 border-2 border-rose-200 hover:border-rose-300"
             }`}
           >
@@ -197,18 +215,24 @@ export default function FirstTeacherGame({ username, onLogout }) {
       {showQuizResult && (
         <div className="mt-6 text-center">
           {selectedAnswer === game.correct ? (
-            <div className="text-green-600 font-semibold">Correct! Teodora was Jose's first teacher! 👩‍🏫</div>
+            <div className="text-green-600 font-semibold">
+              Correct! Teodora was Jose's first teacher! 👩‍🏫
+            </div>
           ) : (
-            <div className="text-red-600 font-semibold">Try again! Think about Jose's family! 💭</div>
+            <div className="text-red-600 font-semibold">
+              Try again! Think about Jose's family! 💭
+            </div>
           )}
         </div>
       )}
     </div>
-  )
+  );
 
   const renderLessonGame = (game) => (
     <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl max-w-4xl mx-auto">
-      <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">Experience a lesson with Mother Teodora</h3>
+      <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+        Experience a lesson with Mother Teodora
+      </h3>
 
       <div className="text-center mb-8">
         <div className="inline-block bg-rose-100 rounded-full px-4 py-2 mb-4">
@@ -227,11 +251,15 @@ export default function FirstTeacherGame({ username, onLogout }) {
                   <span className="text-white font-bold">👩</span>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-800">Mother Teodora</h4>
+                  <h4 className="font-semibold text-gray-800">
+                    Mother Teodora
+                  </h4>
                   <p className="text-sm text-gray-600">Jose's First Teacher</p>
                 </div>
               </div>
-              <p className="text-gray-700 italic">"{game.steps[currentLessonStep].instruction}"</p>
+              <p className="text-gray-700 italic">
+                "{game.steps[currentLessonStep].instruction}"
+              </p>
             </div>
 
             <button
@@ -243,11 +271,19 @@ export default function FirstTeacherGame({ username, onLogout }) {
           </div>
 
           <div className="flex-shrink-0">
-            <img
-              src={game.steps[currentLessonStep].image || "/placeholder.svg"}
-              alt="Lesson scene"
-              className="w-64 h-48 object-cover rounded-xl shadow-md bg-gray-200"
-            />
+            <div className="w-64 h-48 bg-gradient-to-br from-blue-100 to-indigo-200 rounded-xl shadow-md flex items-center justify-center">
+              <div className="text-center">
+                <div className="text-8xl mb-4">
+                  {game.steps[currentLessonStep].emoji}
+                </div>
+                <div className="text-sm text-gray-600 px-4">
+                  {game.steps[currentLessonStep].scene
+                    ?.replace("_", " ")
+                    .replace(/\b\w/g, (l) => l.toUpperCase()) ||
+                    "Learning Scene"}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -264,11 +300,13 @@ export default function FirstTeacherGame({ username, onLogout }) {
         ))}
       </div>
     </div>
-  )
+  );
 
   const renderTracingGame = (game) => (
     <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl max-w-4xl mx-auto">
-      <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">Practice writing letters like Jose did</h3>
+      <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+        Practice writing letters like Jose did
+      </h3>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         {game.letters.map((letterData, index) => (
@@ -285,7 +323,9 @@ export default function FirstTeacherGame({ username, onLogout }) {
                 {letterData.letter}
               </div>
             </div>
-            <p className="text-sm text-gray-600 font-medium">{letterData.instruction}</p>
+            <p className="text-sm text-gray-600 font-medium">
+              {letterData.instruction}
+            </p>
             {tracedLetters.includes(index) && (
               <div className="mt-2">
                 <span className="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
@@ -305,11 +345,13 @@ export default function FirstTeacherGame({ username, onLogout }) {
         </div>
       </div>
     </div>
-  )
+  );
 
   const renderReadingGame = (game) => (
     <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl max-w-4xl mx-auto">
-      <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">Read and answer questions</h3>
+      <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+        Read and answer questions
+      </h3>
 
       {/* Story */}
       <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 mb-8">
@@ -350,38 +392,45 @@ export default function FirstTeacherGame({ username, onLogout }) {
         ))}
       </div>
     </div>
-  )
+  );
 
   const renderCurrentGame = () => {
-    const game = games[currentGame]
+    const game = games[currentGame];
     switch (game.type) {
       case "quiz":
-        return renderQuizGame(game)
+        return renderQuizGame(game);
       case "lesson":
-        return renderLessonGame(game)
+        return renderLessonGame(game);
       case "tracing":
-        return renderTracingGame(game)
+        return renderTracingGame(game);
       case "reading":
-        return renderReadingGame(game)
+        return renderReadingGame(game);
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   if (gameCompleted) {
     return (
       <div className="min-h-screen w-full bg-gradient-to-br from-rose-50 via-pink-50 to-red-100 flex items-center justify-center p-6">
         <div className="text-center">
           <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 shadow-xl max-w-2xl mx-auto">
-            {showCelebration && <div className="text-6xl mb-6 animate-bounce">👩‍🏫</div>}
-            <h1 className="text-4xl font-bold text-gray-800 mb-4">Learning Champion!</h1>
+            {showCelebration && (
+              <div className="text-6xl mb-6 animate-bounce">👩‍🏫</div>
+            )}
+            <h1 className="text-4xl font-bold text-gray-800 mb-4">
+              Learning Champion!
+            </h1>
             <p className="text-xl text-gray-600 mb-6">
-              You've learned about Jose's first teacher, his mother Teodora! You discovered how she taught him to read,
-              write, and become the brilliant person he was destined to be.
+              You've learned about Jose's first teacher, his mother Teodora! You
+              discovered how she taught him to read, write, and become the
+              brilliant person he was destined to be.
             </p>
             <div className="bg-gradient-to-r from-rose-400 to-pink-500 text-white rounded-2xl p-6 mb-8">
               <div className="text-3xl font-bold">Final Score: {score}/100</div>
-              <div className="text-rose-100 mt-2">Wonderful learning, {username}!</div>
+              <div className="text-rose-100 mt-2">
+                Wonderful learning, {username}!
+              </div>
             </div>
             <div className="space-y-4">
               <button
@@ -394,7 +443,7 @@ export default function FirstTeacherGame({ username, onLogout }) {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -407,21 +456,37 @@ export default function FirstTeacherGame({ username, onLogout }) {
               onClick={handleBackToChapter}
               className="w-10 h-10 bg-gradient-to-br from-gray-500 to-gray-600 rounded-full flex items-center justify-center hover:from-gray-600 hover:to-gray-700 transition-all duration-200"
             >
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <svg
+                className="w-5 h-5 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
             </button>
             <div className="w-10 h-10 bg-gradient-to-br from-rose-500 to-pink-600 rounded-full flex items-center justify-center">
               <span className="text-white font-bold">👩‍🏫</span>
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-800">First Teacher</h1>
-              <p className="text-sm text-gray-600">Level 4 - Learning with Mother Teodora</p>
+              <h1 className="text-2xl font-bold text-gray-800">
+                First Teacher
+              </h1>
+              <p className="text-sm text-gray-600">
+                Level 4 - Learning with Mother Teodora
+              </p>
             </div>
           </div>
           <div className="flex items-center space-x-4">
             <div className="bg-white/60 backdrop-blur-sm rounded-full px-4 py-2 shadow-md">
-              <span className="text-sm font-medium text-gray-700">Score: {score}</span>
+              <span className="text-sm font-medium text-gray-700">
+                Score: {score}
+              </span>
             </div>
             <button
               onClick={onLogout}
@@ -438,7 +503,9 @@ export default function FirstTeacherGame({ username, onLogout }) {
         {/* Progress */}
         <div className="mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <span className="text-sm font-medium text-gray-600">Game Progress</span>
+            <span className="text-sm font-medium text-gray-600">
+              Game Progress
+            </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-3 max-w-2xl mx-auto">
             <div
@@ -453,7 +520,9 @@ export default function FirstTeacherGame({ username, onLogout }) {
 
         {/* Game Title */}
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-800 mb-2">{games[currentGame].title}</h2>
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">
+            {games[currentGame].title}
+          </h2>
         </div>
 
         {/* Current Game */}
@@ -461,39 +530,41 @@ export default function FirstTeacherGame({ username, onLogout }) {
 
         {/* Educational Info */}
         <div className="mt-12 bg-white/60 backdrop-blur-sm rounded-3xl p-6 shadow-lg max-w-4xl mx-auto">
-          <h3 className="text-xl font-bold text-center text-gray-800 mb-4">About Teodora Alonso</h3>
+          <h3 className="text-xl font-bold text-center text-gray-800 mb-4">
+            About Teodora Alonso
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-600">
             <div className="flex items-start space-x-3">
               <span className="text-2xl">👩‍🎓</span>
               <div>
-                <strong>Educated Woman:</strong> Teodora was well-educated for her time, able to read and write in both
-                Spanish and Tagalog.
+                <strong>Educated Woman:</strong> Teodora was well-educated for
+                her time, able to read and write in both Spanish and Tagalog.
               </div>
             </div>
             <div className="flex items-start space-x-3">
               <span className="text-2xl">📚</span>
               <div>
-                <strong>First Teacher:</strong> She taught Jose to read at age 3, giving him a strong foundation for
-                learning.
+                <strong>First Teacher:</strong> She taught Jose to read at age
+                3, giving him a strong foundation for learning.
               </div>
             </div>
             <div className="flex items-start space-x-3">
               <span className="text-2xl">❤️</span>
               <div>
-                <strong>Patient & Kind:</strong> Teodora was known for her patience and gentle teaching methods with all
-                her children.
+                <strong>Patient & Kind:</strong> Teodora was known for her
+                patience and gentle teaching methods with all her children.
               </div>
             </div>
             <div className="flex items-start space-x-3">
               <span className="text-2xl">🌟</span>
               <div>
-                <strong>Strong Influence:</strong> Her love for learning and strong character greatly influenced Jose's
-                development.
+                <strong>Strong Influence:</strong> Her love for learning and
+                strong character greatly influenced Jose's development.
               </div>
             </div>
           </div>
         </div>
       </main>
     </div>
-  )
+  );
 }

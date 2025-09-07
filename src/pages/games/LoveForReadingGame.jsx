@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function LoveForReadingGame({ username, onLogout }) {
-  const navigate = useNavigate()
-  const [currentGame, setCurrentGame] = useState(0)
-  const [score, setScore] = useState(0)
-  const [gameCompleted, setGameCompleted] = useState(false)
-  const [showCelebration, setShowCelebration] = useState(false)
+export default function LoveForReadingGame({ username, onLogout, onComplete }) {
+  const navigate = useNavigate();
+  const [currentGame, setCurrentGame] = useState(0);
+  const [score, setScore] = useState(0);
+  const [gameCompleted, setGameCompleted] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
 
   // Book Creation Workshop State
   const [bookElements, setBookElements] = useState({
@@ -17,32 +17,52 @@ export default function LoveForReadingGame({ username, onLogout }) {
     setting: "",
     theme: "",
     illustration: "",
-  })
+  });
   const [availableElements, setAvailableElements] = useState({
-    titles: ["The Brave Little Bird", "Adventures in Calamba", "The Magic Mango Tree", "Stories of Friendship"],
-    characters: ["A curious boy", "A wise old man", "A talking animal", "A brave hero"],
-    settings: ["Under the mango tree", "In a magical forest", "By the river", "In a distant land"],
-    themes: ["Helping others", "Learning new things", "Being brave", "Family love"],
+    titles: [
+      "The Brave Little Bird",
+      "Adventures in Calamba",
+      "The Magic Mango Tree",
+      "Stories of Friendship",
+    ],
+    characters: [
+      "A curious boy",
+      "A wise old man",
+      "A talking animal",
+      "A brave hero",
+    ],
+    settings: [
+      "Under the mango tree",
+      "In a magical forest",
+      "By the river",
+      "In a distant land",
+    ],
+    themes: [
+      "Helping others",
+      "Learning new things",
+      "Being brave",
+      "Family love",
+    ],
     illustrations: ["🐦", "🌳", "🏞️", "⭐"],
-  })
+  });
 
   // Reading Adventure State
-  const [adventureProgress, setAdventureProgress] = useState(0)
-  const [currentScene, setCurrentScene] = useState(0)
-  const [adventureChoices, setAdventureChoices] = useState([])
+  const [adventureProgress, setAdventureProgress] = useState(0);
+  const [currentScene, setCurrentScene] = useState(0);
+  const [adventureChoices, setAdventureChoices] = useState([]);
 
   // Word Collection State
-  const [collectedWords, setCollectedWords] = useState([])
-  const [wordCombinations, setWordCombinations] = useState([])
-  const [floatingWords, setFloatingWords] = useState([])
+  const [collectedWords, setCollectedWords] = useState([]);
+  const [wordCombinations, setWordCombinations] = useState([]);
+  const [floatingWords, setFloatingWords] = useState([]);
 
   // Story Theater State
   const [theaterStory, setTheaterStory] = useState({
     characters: [],
     plot: [],
     ending: "",
-  })
-  const [theaterScene, setTheaterScene] = useState(0)
+  });
+  const [theaterScene, setTheaterScene] = useState(0);
 
   const games = [
     {
@@ -55,7 +75,8 @@ export default function LoveForReadingGame({ username, onLogout }) {
       id: 1,
       type: "adventure",
       title: "Reading Adventure Quest",
-      description: "Join Jose on a magical reading adventure where your choices matter!",
+      description:
+        "Join Jose on a magical reading adventure where your choices matter!",
       scenes: [
         {
           id: 0,
@@ -63,8 +84,16 @@ export default function LoveForReadingGame({ username, onLogout }) {
           image: "🌳📖✨",
           choices: [
             { text: "Open the book carefully", next: 1, skill: "curiosity" },
-            { text: "Ask mother for permission first", next: 2, skill: "respect" },
-            { text: "Share the discovery with siblings", next: 3, skill: "sharing" },
+            {
+              text: "Ask mother for permission first",
+              next: 2,
+              skill: "respect",
+            },
+            {
+              text: "Share the discovery with siblings",
+              next: 3,
+              skill: "sharing",
+            },
           ],
         },
         {
@@ -72,8 +101,16 @@ export default function LoveForReadingGame({ username, onLogout }) {
           text: "The book magically transports Jose to a land of living words! Letters dance around him.",
           image: "🔤💫🌈",
           choices: [
-            { text: "Try to catch the dancing letters", next: 4, skill: "action" },
-            { text: "Observe and learn their pattern", next: 5, skill: "wisdom" },
+            {
+              text: "Try to catch the dancing letters",
+              next: 4,
+              skill: "action",
+            },
+            {
+              text: "Observe and learn their pattern",
+              next: 5,
+              skill: "wisdom",
+            },
             { text: "Speak to the letters kindly", next: 6, skill: "kindness" },
           ],
         },
@@ -92,7 +129,8 @@ export default function LoveForReadingGame({ username, onLogout }) {
       id: 2,
       type: "collection",
       title: "Word Collection Garden",
-      description: "Help Jose collect magical words that grow like flowers in his reading garden!",
+      description:
+        "Help Jose collect magical words that grow like flowers in his reading garden!",
       wordCategories: {
         emotions: ["happy", "brave", "kind", "curious", "gentle"],
         nature: ["tree", "flower", "river", "mountain", "sunshine"],
@@ -104,13 +142,30 @@ export default function LoveForReadingGame({ username, onLogout }) {
       id: 3,
       type: "theater",
       title: "Story Imagination Theater",
-      description: "Direct Jose's first theatrical performance based on his favorite stories!",
+      description:
+        "Direct Jose's first theatrical performance based on his favorite stories!",
       storyElements: {
         characters: [
-          { name: "The Wise Turtle", personality: "patient and thoughtful", emoji: "🐢" },
-          { name: "The Brave Eagle", personality: "courageous and free", emoji: "🦅" },
-          { name: "The Kind Farmer", personality: "hardworking and generous", emoji: "👨‍🌾" },
-          { name: "The Curious Child", personality: "eager to learn", emoji: "👶" },
+          {
+            name: "The Wise Turtle",
+            personality: "patient and thoughtful",
+            emoji: "🐢",
+          },
+          {
+            name: "The Brave Eagle",
+            personality: "courageous and free",
+            emoji: "🦅",
+          },
+          {
+            name: "The Kind Farmer",
+            personality: "hardworking and generous",
+            emoji: "👨‍🌾",
+          },
+          {
+            name: "The Curious Child",
+            personality: "eager to learn",
+            emoji: "👶",
+          },
         ],
         conflicts: [
           "A drought threatens the village",
@@ -126,13 +181,13 @@ export default function LoveForReadingGame({ username, onLogout }) {
         ],
       },
     },
-  ]
+  ];
 
   useEffect(() => {
     if (currentGame === 2) {
       // Initialize floating words
-      const allWords = Object.values(games[2].wordCategories).flat()
-      const shuffled = allWords.sort(() => Math.random() - 0.5).slice(0, 12)
+      const allWords = Object.values(games[2].wordCategories).flat();
+      const shuffled = allWords.sort(() => Math.random() - 0.5).slice(0, 12);
       setFloatingWords(
         shuffled.map((word, index) => ({
           id: index,
@@ -140,108 +195,139 @@ export default function LoveForReadingGame({ username, onLogout }) {
           x: Math.random() * 80 + 10,
           y: Math.random() * 60 + 20,
           collected: false,
-          category: Object.keys(games[2].wordCategories).find((cat) => games[2].wordCategories[cat].includes(word)),
-        })),
-      )
+          category: Object.keys(games[2].wordCategories).find((cat) =>
+            games[2].wordCategories[cat].includes(word)
+          ),
+        }))
+      );
     }
-  }, [currentGame])
+  }, [currentGame]);
 
   const handleBookElementSelect = (elementType, value) => {
-    const newElements = { ...bookElements, [elementType]: value }
-    setBookElements(newElements)
-    setScore(score + 20)
+    const newElements = { ...bookElements, [elementType]: value };
+    setBookElements(newElements);
+    setScore(score + 20);
 
     // Check if book is complete
-    const isComplete = Object.values(newElements).every((element) => element !== "")
+    const isComplete = Object.values(newElements).every(
+      (element) => element !== ""
+    );
     if (isComplete) {
-      setTimeout(() => nextGame(), 2000)
+      setTimeout(() => nextGame(), 2000);
     }
-  }
+  };
 
   const handleAdventureChoice = (choice) => {
-    setAdventureChoices([...adventureChoices, choice])
-    setScore(score + 25)
+    setAdventureChoices([...adventureChoices, choice]);
+    setScore(score + 25);
 
     if (choice.next) {
-      setCurrentScene(choice.next)
+      setCurrentScene(choice.next);
     } else {
       // Adventure complete
-      setTimeout(() => nextGame(), 2000)
+      setTimeout(() => nextGame(), 2000);
     }
-  }
+  };
 
   const handleWordCollect = (wordId) => {
-    const word = floatingWords.find((w) => w.id === wordId)
+    const word = floatingWords.find((w) => w.id === wordId);
     if (word && !word.collected) {
-      setCollectedWords([...collectedWords, word])
-      setFloatingWords(floatingWords.map((w) => (w.id === wordId ? { ...w, collected: true } : w)))
-      setScore(score + 15)
+      setCollectedWords([...collectedWords, word]);
+      setFloatingWords(
+        floatingWords.map((w) =>
+          w.id === wordId ? { ...w, collected: true } : w
+        )
+      );
+      setScore(score + 15);
 
       // Check for word combinations
-      checkWordCombinations([...collectedWords, word])
+      checkWordCombinations([...collectedWords, word]);
 
       if (collectedWords.length + 1 >= 10) {
-        setTimeout(() => nextGame(), 1000)
+        setTimeout(() => nextGame(), 1000);
       }
     }
-  }
+  };
 
   const checkWordCombinations = (words) => {
     const combinations = [
-      { words: ["brave", "truth"], story: "A story about standing up for what's right" },
-      { words: ["kind", "sunshine"], story: "A tale about spreading joy to others" },
-      { words: ["curious", "explore"], story: "An adventure about discovering new places" },
-      { words: ["love", "family"], story: "A heartwarming story about family bonds" },
-    ]
+      {
+        words: ["brave", "truth"],
+        story: "A story about standing up for what's right",
+      },
+      {
+        words: ["kind", "sunshine"],
+        story: "A tale about spreading joy to others",
+      },
+      {
+        words: ["curious", "explore"],
+        story: "An adventure about discovering new places",
+      },
+      {
+        words: ["love", "family"],
+        story: "A heartwarming story about family bonds",
+      },
+    ];
 
     combinations.forEach((combo) => {
       if (combo.words.every((word) => words.some((w) => w.word === word))) {
         if (!wordCombinations.some((wc) => wc.story === combo.story)) {
-          setWordCombinations([...wordCombinations, combo])
-          setScore(score + 30)
+          setWordCombinations([...wordCombinations, combo]);
+          setScore(score + 30);
         }
       }
-    })
-  }
+    });
+  };
 
   const handleTheaterChoice = (elementType, choice) => {
-    const newStory = { ...theaterStory }
+    const newStory = { ...theaterStory };
 
     if (elementType === "character") {
-      newStory.characters = [...newStory.characters, choice]
+      newStory.characters = [...newStory.characters, choice];
     } else if (elementType === "plot") {
-      newStory.plot = [...newStory.plot, choice]
+      newStory.plot = [...newStory.plot, choice];
     } else if (elementType === "ending") {
-      newStory.ending = choice
+      newStory.ending = choice;
     }
 
-    setTheaterStory(newStory)
-    setScore(score + 25)
+    setTheaterStory(newStory);
+    setScore(score + 25);
 
     // Check if story is complete
-    if (newStory.characters.length >= 2 && newStory.plot.length >= 1 && newStory.ending) {
-      setTimeout(() => nextGame(), 2000)
+    if (
+      newStory.characters.length >= 2 &&
+      newStory.plot.length >= 1 &&
+      newStory.ending
+    ) {
+      setTimeout(() => nextGame(), 2000);
     }
-  }
+  };
 
   const nextGame = () => {
     if (currentGame < games.length - 1) {
-      setCurrentGame(currentGame + 1)
-      setCurrentScene(0)
-      setAdventureChoices([])
+      setCurrentGame(currentGame + 1);
+      setCurrentScene(0);
+      setAdventureChoices([]);
     } else {
-      setGameCompleted(true)
-      setShowCelebration(true)
+      setGameCompleted(true);
+      setShowCelebration(true);
+
+      // Call the onComplete callback if provided
+      if (onComplete) {
+        onComplete(score);
+      }
     }
-  }
+  };
 
   const handleBackToChapter = () => {
-    navigate("/chapter/1")
-  }
+    navigate("/chapter/1");
+  };
 
   const renderWorkshopGame = (game) => (
     <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl max-w-5xl mx-auto">
-      <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">Jose's Book Creation Workshop</h3>
+      <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+        Jose's Book Creation Workshop
+      </h3>
 
       {/* Book Preview */}
       <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-6 mb-8">
@@ -278,7 +364,9 @@ export default function LoveForReadingGame({ username, onLogout }) {
         {Object.entries(availableElements).map(([elementType, options]) => (
           <div key={elementType} className="bg-white rounded-xl p-4 shadow-md">
             <h4 className="font-semibold text-gray-800 mb-3 capitalize">
-              {elementType === "illustrations" ? "Illustration" : elementType.slice(0, -1)}
+              {elementType === "illustrations"
+                ? "Illustration"
+                : elementType.slice(0, -1)}
             </h4>
             <div className="space-y-2">
               {options.map((option, index) => (
@@ -289,13 +377,13 @@ export default function LoveForReadingGame({ username, onLogout }) {
                       elementType === "titles"
                         ? "title"
                         : elementType === "characters"
-                          ? "character"
-                          : elementType === "settings"
-                            ? "setting"
-                            : elementType === "themes"
-                              ? "theme"
-                              : "illustration",
-                      option,
+                        ? "character"
+                        : elementType === "settings"
+                        ? "setting"
+                        : elementType === "themes"
+                        ? "theme"
+                        : "illustration",
+                      option
                     )
                   }
                   disabled={
@@ -303,12 +391,12 @@ export default function LoveForReadingGame({ username, onLogout }) {
                       elementType === "titles"
                         ? "title"
                         : elementType === "characters"
-                          ? "character"
-                          : elementType === "settings"
-                            ? "setting"
-                            : elementType === "themes"
-                              ? "theme"
-                              : "illustration"
+                        ? "character"
+                        : elementType === "settings"
+                        ? "setting"
+                        : elementType === "themes"
+                        ? "theme"
+                        : "illustration"
                     ] === option
                   }
                   className={`w-full p-2 rounded-lg text-left text-sm transition-all duration-200 ${
@@ -316,18 +404,22 @@ export default function LoveForReadingGame({ username, onLogout }) {
                       elementType === "titles"
                         ? "title"
                         : elementType === "characters"
-                          ? "character"
-                          : elementType === "settings"
-                            ? "setting"
-                            : elementType === "themes"
-                              ? "theme"
-                              : "illustration"
+                        ? "character"
+                        : elementType === "settings"
+                        ? "setting"
+                        : elementType === "themes"
+                        ? "theme"
+                        : "illustration"
                     ] === option
                       ? "bg-amber-200 text-amber-800 border-2 border-amber-400"
                       : "bg-gray-50 hover:bg-amber-50 border-2 border-gray-200 hover:border-amber-300"
                   }`}
                 >
-                  {elementType === "illustrations" ? <span className="text-2xl">{option}</span> : option}
+                  {elementType === "illustrations" ? (
+                    <span className="text-2xl">{option}</span>
+                  ) : (
+                    option
+                  )}
                 </button>
               ))}
             </div>
@@ -339,25 +431,32 @@ export default function LoveForReadingGame({ username, onLogout }) {
       <div className="mt-6 text-center">
         <div className="inline-block bg-amber-100 rounded-full px-4 py-2">
           <span className="text-amber-800 font-medium">
-            Book Progress: {Object.values(bookElements).filter((e) => e !== "").length} / 5 elements
+            Book Progress:{" "}
+            {Object.values(bookElements).filter((e) => e !== "").length} / 5
+            elements
           </span>
         </div>
       </div>
     </div>
-  )
+  );
 
   const renderAdventureGame = (game) => {
-    const scene = game.scenes.find((s) => s.id === currentScene) || game.scenes[0]
+    const scene =
+      game.scenes.find((s) => s.id === currentScene) || game.scenes[0];
 
     return (
       <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl max-w-4xl mx-auto">
-        <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">Jose's Reading Adventure</h3>
+        <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+          Jose's Reading Adventure
+        </h3>
 
         {/* Adventure Scene */}
         <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-8 mb-6">
           <div className="text-center mb-6">
             <div className="text-8xl mb-4">{scene.image}</div>
-            <p className="text-lg text-gray-700 leading-relaxed">{scene.text}</p>
+            <p className="text-lg text-gray-700 leading-relaxed">
+              {scene.text}
+            </p>
           </div>
 
           {/* Choices */}
@@ -374,7 +473,9 @@ export default function LoveForReadingGame({ username, onLogout }) {
                   </div>
                   <div>
                     <p className="font-medium text-gray-800">{choice.text}</p>
-                    <p className="text-sm text-purple-600">Skill: {choice.skill}</p>
+                    <p className="text-sm text-purple-600">
+                      Skill: {choice.skill}
+                    </p>
                   </div>
                 </div>
               </button>
@@ -385,10 +486,15 @@ export default function LoveForReadingGame({ username, onLogout }) {
         {/* Adventure Progress */}
         {adventureChoices.length > 0 && (
           <div className="bg-white rounded-xl p-4 shadow-md">
-            <h4 className="font-semibold text-gray-800 mb-3">Your Adventure Journey:</h4>
+            <h4 className="font-semibold text-gray-800 mb-3">
+              Your Adventure Journey:
+            </h4>
             <div className="flex flex-wrap gap-2">
               {adventureChoices.map((choice, index) => (
-                <span key={index} className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">
+                <span
+                  key={index}
+                  className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm"
+                >
                   {choice.skill}
                 </span>
               ))}
@@ -396,12 +502,14 @@ export default function LoveForReadingGame({ username, onLogout }) {
           </div>
         )}
       </div>
-    )
-  }
+    );
+  };
 
   const renderCollectionGame = (game) => (
     <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl max-w-6xl mx-auto">
-      <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">Jose's Word Collection Garden</h3>
+      <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+        Jose's Word Collection Garden
+      </h3>
 
       {/* Word Garden */}
       <div className="relative bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl p-8 min-h-[400px] mb-6 overflow-hidden">
@@ -427,10 +535,10 @@ export default function LoveForReadingGame({ username, onLogout }) {
                       wordObj.category === "emotions"
                         ? "from-pink-400 to-red-400"
                         : wordObj.category === "nature"
-                          ? "from-green-400 to-emerald-400"
-                          : wordObj.category === "actions"
-                            ? "from-blue-400 to-indigo-400"
-                            : "from-purple-400 to-violet-400"
+                        ? "from-green-400 to-emerald-400"
+                        : wordObj.category === "actions"
+                        ? "from-blue-400 to-indigo-400"
+                        : "from-purple-400 to-violet-400"
                     } text-white hover:scale-110 hover:shadow-xl`
               }`}
             >
@@ -442,14 +550,18 @@ export default function LoveForReadingGame({ username, onLogout }) {
         {/* Garden Elements */}
         <div className="absolute bottom-4 left-4 text-4xl">🌳</div>
         <div className="absolute bottom-4 right-4 text-4xl">🌸</div>
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 text-4xl">☀️</div>
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 text-4xl">
+          ☀️
+        </div>
       </div>
 
       {/* Collection Display */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Collected Words */}
         <div className="bg-white rounded-xl p-4 shadow-md">
-          <h4 className="font-semibold text-gray-800 mb-3">Collected Words ({collectedWords.length})</h4>
+          <h4 className="font-semibold text-gray-800 mb-3">
+            Collected Words ({collectedWords.length})
+          </h4>
           <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
             {collectedWords.map((wordObj, index) => (
               <span
@@ -458,10 +570,10 @@ export default function LoveForReadingGame({ username, onLogout }) {
                   wordObj.category === "emotions"
                     ? "bg-pink-100 text-pink-800"
                     : wordObj.category === "nature"
-                      ? "bg-green-100 text-green-800"
-                      : wordObj.category === "actions"
-                        ? "bg-blue-100 text-blue-800"
-                        : "bg-purple-100 text-purple-800"
+                    ? "bg-green-100 text-green-800"
+                    : wordObj.category === "actions"
+                    ? "bg-blue-100 text-blue-800"
+                    : "bg-purple-100 text-purple-800"
                 }`}
               >
                 {wordObj.word}
@@ -472,10 +584,15 @@ export default function LoveForReadingGame({ username, onLogout }) {
 
         {/* Story Combinations */}
         <div className="bg-white rounded-xl p-4 shadow-md">
-          <h4 className="font-semibold text-gray-800 mb-3">Story Ideas Created ({wordCombinations.length})</h4>
+          <h4 className="font-semibold text-gray-800 mb-3">
+            Story Ideas Created ({wordCombinations.length})
+          </h4>
           <div className="space-y-2 max-h-32 overflow-y-auto">
             {wordCombinations.map((combo, index) => (
-              <div key={index} className="bg-yellow-50 border border-yellow-200 rounded-lg p-2">
+              <div
+                key={index}
+                className="bg-yellow-50 border border-yellow-200 rounded-lg p-2"
+              >
                 <p className="text-sm text-yellow-800">{combo.story}</p>
               </div>
             ))}
@@ -485,22 +602,33 @@ export default function LoveForReadingGame({ username, onLogout }) {
 
       <style jsx>{`
         @keyframes float {
-          0%, 100% { transform: translate(-50%, -50%) translateY(0px); }
-          50% { transform: translate(-50%, -50%) translateY(-10px); }
+          0%,
+          100% {
+            transform: translate(-50%, -50%) translateY(0px);
+          }
+          50% {
+            transform: translate(-50%, -50%) translateY(-10px);
+          }
         }
       `}</style>
     </div>
-  )
+  );
 
   const renderTheaterGame = (game) => (
     <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl max-w-6xl mx-auto">
-      <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">Jose's Story Theater</h3>
+      <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+        Jose's Story Theater
+      </h3>
 
       {/* Theater Stage */}
       <div className="bg-gradient-to-b from-red-100 to-red-200 rounded-2xl p-8 mb-6 relative">
-        <div className="absolute top-2 left-1/2 transform -translate-x-1/2 text-4xl">🎭</div>
+        <div className="absolute top-2 left-1/2 transform -translate-x-1/2 text-4xl">
+          🎭
+        </div>
         <div className="bg-white rounded-xl p-6 mt-8">
-          <h4 className="text-lg font-bold text-gray-800 mb-4 text-center">Your Story So Far:</h4>
+          <h4 className="text-lg font-bold text-gray-800 mb-4 text-center">
+            Your Story So Far:
+          </h4>
 
           <div className="space-y-4">
             {/* Characters */}
@@ -517,7 +645,9 @@ export default function LoveForReadingGame({ username, onLogout }) {
                   </span>
                 ))}
                 {theaterStory.characters.length === 0 && (
-                  <span className="text-gray-500 italic">Choose characters below...</span>
+                  <span className="text-gray-500 italic">
+                    Choose characters below...
+                  </span>
                 )}
               </div>
             </div>
@@ -531,7 +661,9 @@ export default function LoveForReadingGame({ username, onLogout }) {
                     {theaterStory.plot[0]}
                   </span>
                 ) : (
-                  <span className="text-gray-500 italic">Choose a problem below...</span>
+                  <span className="text-gray-500 italic">
+                    Choose a problem below...
+                  </span>
                 )}
               </div>
             </div>
@@ -545,7 +677,9 @@ export default function LoveForReadingGame({ username, onLogout }) {
                     {theaterStory.ending}
                   </span>
                 ) : (
-                  <span className="text-gray-500 italic">Choose an ending below...</span>
+                  <span className="text-gray-500 italic">
+                    Choose an ending below...
+                  </span>
                 )}
               </div>
             </div>
@@ -557,26 +691,33 @@ export default function LoveForReadingGame({ username, onLogout }) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Characters */}
         <div className="bg-white rounded-xl p-4 shadow-md">
-          <h4 className="font-semibold text-gray-800 mb-3">Choose Characters (Pick 2)</h4>
+          <h4 className="font-semibold text-gray-800 mb-3">
+            Choose Characters (Pick 2)
+          </h4>
           <div className="space-y-2">
             {game.storyElements.characters.map((char, index) => (
               <button
                 key={index}
                 onClick={() => handleTheaterChoice("character", char)}
-                disabled={theaterStory.characters.length >= 2 || theaterStory.characters.includes(char)}
+                disabled={
+                  theaterStory.characters.length >= 2 ||
+                  theaterStory.characters.includes(char)
+                }
                 className={`w-full p-3 rounded-lg text-left transition-all duration-200 ${
                   theaterStory.characters.includes(char)
                     ? "bg-blue-200 text-blue-800 border-2 border-blue-400"
                     : theaterStory.characters.length >= 2
-                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                      : "bg-gray-50 hover:bg-blue-50 border-2 border-gray-200 hover:border-blue-300"
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "bg-gray-50 hover:bg-blue-50 border-2 border-gray-200 hover:border-blue-300"
                 }`}
               >
                 <div className="flex items-center space-x-2">
                   <span className="text-2xl">{char.emoji}</span>
                   <div>
                     <div className="font-medium">{char.name}</div>
-                    <div className="text-sm text-gray-600">{char.personality}</div>
+                    <div className="text-sm text-gray-600">
+                      {char.personality}
+                    </div>
                   </div>
                 </div>
               </button>
@@ -627,49 +768,59 @@ export default function LoveForReadingGame({ username, onLogout }) {
         </div>
       </div>
     </div>
-  )
+  );
 
   const renderCurrentGame = () => {
-    const game = games[currentGame]
+    const game = games[currentGame];
     switch (game.type) {
       case "workshop":
-        return renderWorkshopGame(game)
+        return renderWorkshopGame(game);
       case "adventure":
-        return renderAdventureGame(game)
+        return renderAdventureGame(game);
       case "collection":
-        return renderCollectionGame(game)
+        return renderCollectionGame(game);
       case "theater":
-        return renderTheaterGame(game)
+        return renderTheaterGame(game);
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   if (gameCompleted) {
     return (
       <div className="min-h-screen w-full bg-gradient-to-br from-amber-50 via-orange-50 to-red-100 flex items-center justify-center p-6">
         <div className="text-center">
           <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 shadow-xl max-w-2xl mx-auto">
-            {showCelebration && <div className="text-6xl mb-6 animate-bounce">📚✨</div>}
-            <h1 className="text-4xl font-bold text-gray-800 mb-4">Master Storyteller!</h1>
+            {showCelebration && (
+              <div className="text-6xl mb-6 animate-bounce">📚✨</div>
+            )}
+            <h1 className="text-4xl font-bold text-gray-800 mb-4">
+              Master Storyteller!
+            </h1>
             <p className="text-xl text-gray-600 mb-6">
-              Incredible! You've helped Jose discover the magic of reading and storytelling! You created books, went on
-              reading adventures, collected magical words, and directed amazing stories. Just like Jose, you've learned
-              that books can take you anywhere and help you become anything!
+              Incredible! You've helped Jose discover the magic of reading and
+              storytelling! You created books, went on reading adventures,
+              collected magical words, and directed amazing stories. Just like
+              Jose, you've learned that books can take you anywhere and help you
+              become anything!
             </p>
             <div className="bg-gradient-to-r from-amber-400 to-orange-500 text-white rounded-2xl p-6 mb-8">
               <div className="text-3xl font-bold">Final Score: {score}/100</div>
-              <div className="text-amber-100 mt-2">Amazing creativity, {username}!</div>
+              <div className="text-amber-100 mt-2">
+                Amazing creativity, {username}!
+              </div>
             </div>
 
             {/* Chapter 1 Completion Badge */}
             <div className="bg-gradient-to-r from-green-400 to-emerald-500 text-white rounded-2xl p-6 mb-6">
               <div className="text-4xl mb-2">🏆</div>
               <h2 className="text-2xl font-bold mb-2">Chapter 1 Complete!</h2>
-              <p className="text-green-100">You've mastered Jose Rizal's childhood in Calamba!</p>
+              <p className="text-green-100">
+                You've mastered Jose Rizal's childhood in Calamba!
+              </p>
               <div className="mt-4 text-sm text-green-200">
-                🎂 Birth Expert • 👨‍👩‍👧‍👦 Family Expert • 🌱 Childhood Explorer • 👩‍🏫 Learning Champion • 📚 Master
-                Storyteller
+                🎂 Birth Expert • 👨‍👩‍👧‍👦 Family Expert • 🌱 Childhood Explorer • 👩‍🏫
+                Learning Champion • 📚 Master Storyteller
               </div>
             </div>
 
@@ -684,7 +835,7 @@ export default function LoveForReadingGame({ username, onLogout }) {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -697,21 +848,37 @@ export default function LoveForReadingGame({ username, onLogout }) {
               onClick={handleBackToChapter}
               className="w-10 h-10 bg-gradient-to-br from-gray-500 to-gray-600 rounded-full flex items-center justify-center hover:from-gray-600 hover:to-gray-700 transition-all duration-200"
             >
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <svg
+                className="w-5 h-5 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
             </button>
             <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center">
               <span className="text-white font-bold">📚</span>
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-800">Love for Reading</h1>
-              <p className="text-sm text-gray-600">Level 5 - Jose's Creative Journey</p>
+              <h1 className="text-2xl font-bold text-gray-800">
+                Love for Reading
+              </h1>
+              <p className="text-sm text-gray-600">
+                Level 5 - Jose's Creative Journey
+              </p>
             </div>
           </div>
           <div className="flex items-center space-x-4">
             <div className="bg-white/60 backdrop-blur-sm rounded-full px-4 py-2 shadow-md">
-              <span className="text-sm font-medium text-gray-700">Score: {score}</span>
+              <span className="text-sm font-medium text-gray-700">
+                Score: {score}
+              </span>
             </div>
             <button
               onClick={onLogout}
@@ -728,7 +895,9 @@ export default function LoveForReadingGame({ username, onLogout }) {
         {/* Progress */}
         <div className="mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <span className="text-sm font-medium text-gray-600">Creative Journey Progress</span>
+            <span className="text-sm font-medium text-gray-600">
+              Creative Journey Progress
+            </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-3 max-w-2xl mx-auto">
             <div
@@ -743,7 +912,9 @@ export default function LoveForReadingGame({ username, onLogout }) {
 
         {/* Game Title */}
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-800 mb-2">{games[currentGame].title}</h2>
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">
+            {games[currentGame].title}
+          </h2>
           <p className="text-gray-600">{games[currentGame].description}</p>
         </div>
 
@@ -752,39 +923,42 @@ export default function LoveForReadingGame({ username, onLogout }) {
 
         {/* Educational Info */}
         <div className="mt-12 bg-white/60 backdrop-blur-sm rounded-3xl p-6 shadow-lg max-w-4xl mx-auto">
-          <h3 className="text-xl font-bold text-center text-gray-800 mb-4">Jose's Creative Spirit</h3>
+          <h3 className="text-xl font-bold text-center text-gray-800 mb-4">
+            Jose's Creative Spirit
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-600">
             <div className="flex items-start space-x-3">
               <span className="text-2xl">📖</span>
               <div>
-                <strong>Book Creator:</strong> Reading so many stories inspired Jose to create his own tales and
-                eventually write famous novels.
+                <strong>Book Creator:</strong> Reading so many stories inspired
+                Jose to create his own tales and eventually write famous novels.
               </div>
             </div>
             <div className="flex items-start space-x-3">
               <span className="text-2xl">🎭</span>
               <div>
-                <strong>Storyteller:</strong> Jose loved to tell stories to his siblings and friends, developing his
-                narrative skills.
+                <strong>Storyteller:</strong> Jose loved to tell stories to his
+                siblings and friends, developing his narrative skills.
               </div>
             </div>
             <div className="flex items-start space-x-3">
               <span className="text-2xl">🌟</span>
               <div>
-                <strong>Imagination:</strong> Books opened up worlds of imagination that helped Jose think creatively
-                about solving problems.
+                <strong>Imagination:</strong> Books opened up worlds of
+                imagination that helped Jose think creatively about solving
+                problems.
               </div>
             </div>
             <div className="flex items-start space-x-3">
               <span className="text-2xl">💭</span>
               <div>
-                <strong>Deep Thinker:</strong> Reading taught Jose to think deeply about life, justice, and how to help
-                his country.
+                <strong>Deep Thinker:</strong> Reading taught Jose to think
+                deeply about life, justice, and how to help his country.
               </div>
             </div>
           </div>
         </div>
       </main>
     </div>
-  )
+  );
 }

@@ -1,29 +1,33 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import GameHeader from "../../components/GameHeader";
+import ProgressBar from "../../components/ProgressBar";
+import ErrorBoundary from "../../components/ErrorBoundary";
+import { getChapterTheme, getCelebrationTheme } from "../../theme/config";
 
 export default function EarlyChildhoodGame({ username, onLogout }) {
-  const navigate = useNavigate()
-  const [currentGame, setCurrentGame] = useState(0)
-  const [score, setScore] = useState(0)
-  const [gameCompleted, setGameCompleted] = useState(false)
-  const [showCelebration, setShowCelebration] = useState(false)
+  const navigate = useNavigate();
+  const [currentGame, setCurrentGame] = useState(0);
+  const [score, setScore] = useState(0);
+  const [gameCompleted, setGameCompleted] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
 
   // Quiz Game State
-  const [selectedAnswer, setSelectedAnswer] = useState(null)
-  const [showQuizResult, setShowQuizResult] = useState(false)
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [showQuizResult, setShowQuizResult] = useState(false);
 
   // Story Sequence State
-  const [storySequence, setStorySequence] = useState([])
-  const [draggedStory, setDraggedStory] = useState(null)
+  const [storySequence, setStorySequence] = useState([]);
+  const [draggedStory, setDraggedStory] = useState(null);
 
   // Interactive Scene State
-  const [sceneInteractions, setSceneInteractions] = useState({})
+  const [sceneInteractions, setSceneInteractions] = useState({});
 
   // Word Search State
-  const [foundWords, setFoundWords] = useState([])
-  const [selectedCells, setSelectedCells] = useState([])
+  const [foundWords, setFoundWords] = useState([]);
+  const [selectedCells, setSelectedCells] = useState([]);
 
   const games = [
     {
@@ -53,11 +57,41 @@ export default function EarlyChildhoodGame({ username, onLogout }) {
       title: "Explore Jose's Childhood Home",
       scene: {
         items: [
-          { id: "books", x: 20, y: 30, name: "Books", fact: "Jose loved reading even as a small child!" },
-          { id: "mango", x: 70, y: 20, name: "Mango Tree", fact: "Jose often read under this tree for shade." },
-          { id: "dog", x: 50, y: 70, name: "Pet Dog", fact: "Jose had a pet dog that he loved to play with." },
-          { id: "flowers", x: 30, y: 80, name: "Garden", fact: "Jose enjoyed drawing the beautiful flowers." },
-          { id: "mother", x: 80, y: 50, name: "Mother", fact: "Teodora taught Jose to read and write at home." },
+          {
+            id: "books",
+            x: 20,
+            y: 30,
+            name: "Books",
+            fact: "Jose loved reading even as a small child!",
+          },
+          {
+            id: "mango",
+            x: 70,
+            y: 20,
+            name: "Mango Tree",
+            fact: "Jose often read under this tree for shade.",
+          },
+          {
+            id: "dog",
+            x: 50,
+            y: 70,
+            name: "Pet Dog",
+            fact: "Jose had a pet dog that he loved to play with.",
+          },
+          {
+            id: "flowers",
+            x: 30,
+            y: 80,
+            name: "Garden",
+            fact: "Jose enjoyed drawing the beautiful flowers.",
+          },
+          {
+            id: "mother",
+            x: 80,
+            y: 50,
+            name: "Mother",
+            fact: "Teodora taught Jose to read and write at home.",
+          },
         ],
       },
     },
@@ -75,7 +109,15 @@ export default function EarlyChildhoodGame({ username, onLogout }) {
         ["L", "E", "A", "R", "N", "I", "N", "G"],
         ["X", "X", "X", "A", "N", "I", "M", "A"],
       ],
-      words: ["READING", "BOOKS", "DRAWING", "NATURE", "PLAYING", "FLOWERS", "LEARNING"],
+      words: [
+        "READING",
+        "BOOKS",
+        "DRAWING",
+        "NATURE",
+        "PLAYING",
+        "FLOWERS",
+        "LEARNING",
+      ],
       wordPositions: {
         READING: [
           [0, 0],
@@ -140,110 +182,124 @@ export default function EarlyChildhoodGame({ username, onLogout }) {
         ],
       },
     },
-  ]
+  ];
 
   useEffect(() => {
     if (currentGame === 1) {
       // Initialize story sequence
-      const shuffled = [...games[1].stories].sort(() => Math.random() - 0.5)
-      setStorySequence(shuffled.map((story, index) => ({ ...story, placed: false, position: null })))
+      const shuffled = [...games[1].stories].sort(() => Math.random() - 0.5);
+      setStorySequence(
+        shuffled.map((story, index) => ({
+          ...story,
+          placed: false,
+          position: null,
+        }))
+      );
     }
-  }, [currentGame])
+  }, [currentGame]);
 
   const handleQuizAnswer = (answerIndex) => {
-    setSelectedAnswer(answerIndex)
-    setShowQuizResult(true)
+    setSelectedAnswer(answerIndex);
+    setShowQuizResult(true);
 
     setTimeout(() => {
       if (answerIndex === games[currentGame].correct) {
-        setScore(score + 25)
-        nextGame()
+        setScore(score + 25);
+        nextGame();
       } else {
-        setSelectedAnswer(null)
-        setShowQuizResult(false)
+        setSelectedAnswer(null);
+        setShowQuizResult(false);
       }
-    }, 2000)
-  }
+    }, 2000);
+  };
 
   const handleStoryDrop = (e, position) => {
-    e.preventDefault()
+    e.preventDefault();
     if (draggedStory !== null) {
-      const newSequence = [...storySequence]
-      const story = newSequence.find((s) => s.id === draggedStory)
+      const newSequence = [...storySequence];
+      const story = newSequence.find((s) => s.id === draggedStory);
       if (story && story.order === position) {
-        story.placed = true
-        story.position = position
-        setStorySequence(newSequence)
-        setScore(score + 15)
+        story.placed = true;
+        story.position = position;
+        setStorySequence(newSequence);
+        setScore(score + 15);
 
         // Check if all stories are placed correctly
         if (newSequence.every((s) => s.placed)) {
-          setTimeout(() => nextGame(), 1000)
+          setTimeout(() => nextGame(), 1000);
         }
       }
     }
-    setDraggedStory(null)
-  }
+    setDraggedStory(null);
+  };
 
   const handleSceneClick = (item) => {
-    const newInteractions = { ...sceneInteractions, [item.id]: true }
-    setSceneInteractions(newInteractions)
-    setScore(score + 20)
+    const newInteractions = { ...sceneInteractions, [item.id]: true };
+    setSceneInteractions(newInteractions);
+    setScore(score + 20);
 
     // Check if all items have been clicked
     if (Object.keys(newInteractions).length === games[2].scene.items.length) {
-      setTimeout(() => nextGame(), 2000)
+      setTimeout(() => nextGame(), 2000);
     }
-  }
+  };
 
   const handleWordSearchClick = (row, col) => {
-    const cellKey = `${row}-${col}`
+    const cellKey = `${row}-${col}`;
     const newSelected = selectedCells.includes(cellKey)
       ? selectedCells.filter((c) => c !== cellKey)
-      : [...selectedCells, cellKey]
+      : [...selectedCells, cellKey];
 
-    setSelectedCells(newSelected)
+    setSelectedCells(newSelected);
 
     // Check if selected cells form a word
-    const game = games[3]
+    const game = games[3];
     for (const [word, positions] of Object.entries(game.wordPositions)) {
       if (!foundWords.includes(word)) {
-        const wordCells = positions.map(([r, c]) => `${r}-${c}`)
-        if (wordCells.every((cell) => newSelected.includes(cell)) && wordCells.length === newSelected.length) {
-          setFoundWords([...foundWords, word])
-          setSelectedCells([])
-          setScore(score + 10)
+        const wordCells = positions.map(([r, c]) => `${r}-${c}`);
+        if (
+          wordCells.every((cell) => newSelected.includes(cell)) &&
+          wordCells.length === newSelected.length
+        ) {
+          setFoundWords([...foundWords, word]);
+          setSelectedCells([]);
+          setScore(score + 10);
 
           if (foundWords.length + 1 === game.words.length) {
-            setTimeout(() => nextGame(), 1000)
+            setTimeout(() => nextGame(), 1000);
           }
-          return
+          return;
         }
       }
     }
-  }
+  };
 
   const nextGame = () => {
     if (currentGame < games.length - 1) {
-      setCurrentGame(currentGame + 1)
-      setSelectedAnswer(null)
-      setShowQuizResult(false)
-      setSceneInteractions({})
-      setFoundWords([])
-      setSelectedCells([])
+      setCurrentGame(currentGame + 1);
+      setSelectedAnswer(null);
+      setShowQuizResult(false);
+      setSceneInteractions({});
+      setFoundWords([]);
+      setSelectedCells([]);
     } else {
-      setGameCompleted(true)
-      setShowCelebration(true)
+      setGameCompleted(true);
+      setShowCelebration(true);
     }
-  }
+  };
 
   const handleBackToChapter = () => {
-    navigate("/chapter/1")
-  }
+    navigate("/chapter/1");
+  };
+
+  const chapterTheme = getChapterTheme(1);
+  const celebrationTheme = getCelebrationTheme("completion");
 
   const renderQuizGame = (game) => (
     <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl max-w-2xl mx-auto">
-      <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">{game.question}</h3>
+      <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+        {game.question}
+      </h3>
       <div className="grid grid-cols-1 gap-4">
         {game.options.map((option, index) => (
           <button
@@ -255,8 +311,8 @@ export default function EarlyChildhoodGame({ username, onLogout }) {
                 ? index === game.correct
                   ? "bg-green-100 border-2 border-green-400 text-green-800"
                   : index === selectedAnswer
-                    ? "bg-red-100 border-2 border-red-400 text-red-800"
-                    : "bg-gray-100 text-gray-600"
+                  ? "bg-red-100 border-2 border-red-400 text-red-800"
+                  : "bg-gray-100 text-gray-600"
                 : "bg-green-50 hover:bg-green-100 border-2 border-green-200 hover:border-green-300"
             }`}
           >
@@ -267,14 +323,18 @@ export default function EarlyChildhoodGame({ username, onLogout }) {
       {showQuizResult && (
         <div className="mt-6 text-center">
           {selectedAnswer === game.correct ? (
-            <div className="text-green-600 font-semibold">Perfect! Jose was very smart! 🌟</div>
+            <div className="text-green-600 font-semibold">
+              Perfect! Jose was very smart! 🌟
+            </div>
           ) : (
-            <div className="text-red-600 font-semibold">Try again! Think about young Jose! 🤔</div>
+            <div className="text-red-600 font-semibold">
+              Try again! Think about young Jose! 🤔
+            </div>
           )}
         </div>
       )}
     </div>
-  )
+  );
 
   const renderStoryGame = (game) => (
     <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl max-w-4xl mx-auto">
@@ -291,7 +351,9 @@ export default function EarlyChildhoodGame({ username, onLogout }) {
             onDragOver={(e) => e.preventDefault()}
             className="min-h-[60px] bg-yellow-50 border-2 border-dashed border-yellow-300 rounded-xl flex items-center justify-center p-4"
           >
-            <span className="text-yellow-600 font-medium mr-3">{position}.</span>
+            <span className="text-yellow-600 font-medium mr-3">
+              {position}.
+            </span>
             {storySequence.find((s) => s.position === position)?.text || (
               <span className="text-yellow-500 italic">Drop activity here</span>
             )}
@@ -301,7 +363,9 @@ export default function EarlyChildhoodGame({ username, onLogout }) {
 
       {/* Draggable stories */}
       <div className="space-y-2">
-        <h4 className="text-lg font-semibold text-gray-700 mb-3">Jose's Daily Activities:</h4>
+        <h4 className="text-lg font-semibold text-gray-700 mb-3">
+          Jose's Daily Activities:
+        </h4>
         {storySequence
           .filter((s) => !s.placed)
           .map((story) => (
@@ -316,7 +380,7 @@ export default function EarlyChildhoodGame({ username, onLogout }) {
           ))}
       </div>
     </div>
-  )
+  );
 
   const renderSceneGame = (game) => (
     <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl max-w-5xl mx-auto">
@@ -351,7 +415,9 @@ export default function EarlyChildhoodGame({ username, onLogout }) {
               </span>
             </div>
             <div className="text-center mt-2">
-              <span className="text-sm font-medium text-gray-700">{item.name}</span>
+              <span className="text-sm font-medium text-gray-700">
+                {item.name}
+              </span>
             </div>
           </div>
         ))}
@@ -362,7 +428,10 @@ export default function EarlyChildhoodGame({ username, onLogout }) {
         {game.scene.items
           .filter((item) => sceneInteractions[item.id])
           .map((item) => (
-            <div key={item.id} className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+            <div
+              key={item.id}
+              className="bg-yellow-50 border border-yellow-200 rounded-xl p-4"
+            >
               <div className="flex items-center space-x-2 mb-2">
                 <span className="text-xl">
                   {item.id === "books" && "📚"}
@@ -378,11 +447,13 @@ export default function EarlyChildhoodGame({ username, onLogout }) {
           ))}
       </div>
     </div>
-  )
+  );
 
   const renderWordSearchGame = (game) => (
     <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl max-w-4xl mx-auto">
-      <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">Find Jose's childhood interests</h3>
+      <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+        Find Jose's childhood interests
+      </h3>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Word Search Grid */}
@@ -390,11 +461,13 @@ export default function EarlyChildhoodGame({ username, onLogout }) {
           <div className="grid grid-cols-8 gap-1 bg-orange-50 p-4 rounded-xl">
             {game.grid.map((row, rowIndex) =>
               row.map((letter, colIndex) => {
-                const cellKey = `${rowIndex}-${colIndex}`
-                const isSelected = selectedCells.includes(cellKey)
+                const cellKey = `${rowIndex}-${colIndex}`;
+                const isSelected = selectedCells.includes(cellKey);
                 const isPartOfFoundWord = foundWords.some((word) =>
-                  game.wordPositions[word].some(([r, c]) => r === rowIndex && c === colIndex),
-                )
+                  game.wordPositions[word].some(
+                    ([r, c]) => r === rowIndex && c === colIndex
+                  )
+                );
 
                 return (
                   <button
@@ -404,21 +477,23 @@ export default function EarlyChildhoodGame({ username, onLogout }) {
                       isPartOfFoundWord
                         ? "bg-green-400 text-white"
                         : isSelected
-                          ? "bg-blue-400 text-white"
-                          : "bg-white hover:bg-orange-100 border border-orange-200"
+                        ? "bg-blue-400 text-white"
+                        : "bg-white hover:bg-orange-100 border border-orange-200"
                     }`}
                   >
                     {letter}
                   </button>
-                )
-              }),
+                );
+              })
             )}
           </div>
         </div>
 
         {/* Words List */}
         <div>
-          <h4 className="text-lg font-semibold text-gray-700 mb-4">Find these words:</h4>
+          <h4 className="text-lg font-semibold text-gray-700 mb-4">
+            Find these words:
+          </h4>
           <div className="space-y-2">
             {game.words.map((word) => (
               <div
@@ -440,38 +515,45 @@ export default function EarlyChildhoodGame({ username, onLogout }) {
         </div>
       </div>
     </div>
-  )
+  );
 
   const renderCurrentGame = () => {
-    const game = games[currentGame]
+    const game = games[currentGame];
     switch (game.type) {
       case "quiz":
-        return renderQuizGame(game)
+        return renderQuizGame(game);
       case "story":
-        return renderStoryGame(game)
+        return renderStoryGame(game);
       case "scene":
-        return renderSceneGame(game)
+        return renderSceneGame(game);
       case "wordsearch":
-        return renderWordSearchGame(game)
+        return renderWordSearchGame(game);
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   if (gameCompleted) {
     return (
       <div className="min-h-screen w-full bg-gradient-to-br from-green-50 via-yellow-50 to-orange-100 flex items-center justify-center p-6">
         <div className="text-center">
           <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 shadow-xl max-w-2xl mx-auto">
-            {showCelebration && <div className="text-6xl mb-6 animate-bounce">🌟</div>}
-            <h1 className="text-4xl font-bold text-gray-800 mb-4">Childhood Explorer!</h1>
+            {showCelebration && (
+              <div className="text-6xl mb-6 animate-bounce">🌟</div>
+            )}
+            <h1 className="text-4xl font-bold text-gray-800 mb-4">
+              Childhood Explorer!
+            </h1>
             <p className="text-xl text-gray-600 mb-6">
-              You've discovered Jose's early childhood experiences! You learned about his daily life, interests, and the
-              things that made him special.
+              You've discovered Jose's early childhood experiences! You learned
+              about his daily life, interests, and the things that made him
+              special.
             </p>
             <div className="bg-gradient-to-r from-green-400 to-emerald-500 text-white rounded-2xl p-6 mb-8">
               <div className="text-3xl font-bold">Final Score: {score}/100</div>
-              <div className="text-green-100 mt-2">Amazing exploration, {username}!</div>
+              <div className="text-green-100 mt-2">
+                Amazing exploration, {username}!
+              </div>
             </div>
             <div className="space-y-4">
               <button
@@ -484,7 +566,7 @@ export default function EarlyChildhoodGame({ username, onLogout }) {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -497,21 +579,37 @@ export default function EarlyChildhoodGame({ username, onLogout }) {
               onClick={handleBackToChapter}
               className="w-10 h-10 bg-gradient-to-br from-gray-500 to-gray-600 rounded-full flex items-center justify-center hover:from-gray-600 hover:to-gray-700 transition-all duration-200"
             >
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <svg
+                className="w-5 h-5 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
             </button>
             <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
               <span className="text-white font-bold">🌱</span>
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-800">Early Childhood</h1>
-              <p className="text-sm text-gray-600">Level 3 - Jose's First Years</p>
+              <h1 className="text-2xl font-bold text-gray-800">
+                Early Childhood
+              </h1>
+              <p className="text-sm text-gray-600">
+                Level 3 - Jose's First Years
+              </p>
             </div>
           </div>
           <div className="flex items-center space-x-4">
             <div className="bg-white/60 backdrop-blur-sm rounded-full px-4 py-2 shadow-md">
-              <span className="text-sm font-medium text-gray-700">Score: {score}</span>
+              <span className="text-sm font-medium text-gray-700">
+                Score: {score}
+              </span>
             </div>
             <button
               onClick={onLogout}
@@ -528,7 +626,9 @@ export default function EarlyChildhoodGame({ username, onLogout }) {
         {/* Progress */}
         <div className="mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <span className="text-sm font-medium text-gray-600">Game Progress</span>
+            <span className="text-sm font-medium text-gray-600">
+              Game Progress
+            </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-3 max-w-2xl mx-auto">
             <div
@@ -543,7 +643,9 @@ export default function EarlyChildhoodGame({ username, onLogout }) {
 
         {/* Game Title */}
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-800 mb-2">{games[currentGame].title}</h2>
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">
+            {games[currentGame].title}
+          </h2>
         </div>
 
         {/* Current Game */}
@@ -551,39 +653,43 @@ export default function EarlyChildhoodGame({ username, onLogout }) {
 
         {/* Educational Info */}
         <div className="mt-12 bg-white/60 backdrop-blur-sm rounded-3xl p-6 shadow-lg max-w-4xl mx-auto">
-          <h3 className="text-xl font-bold text-center text-gray-800 mb-4">Jose's Early Childhood</h3>
+          <h3 className="text-xl font-bold text-center text-gray-800 mb-4">
+            Jose's Early Childhood
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-600">
             <div className="flex items-start space-x-3">
               <span className="text-2xl">📚</span>
               <div>
-                <strong>Love for Reading:</strong> Jose learned to read at age 3 and spent hours reading books under the
-                mango tree in their yard.
+                <strong>Love for Reading:</strong> Jose learned to read at age 3
+                and spent hours reading books under the mango tree in their
+                yard.
               </div>
             </div>
             <div className="flex items-start space-x-3">
               <span className="text-2xl">🎨</span>
               <div>
-                <strong>Artistic Nature:</strong> Young Jose loved to draw and paint, especially flowers, birds, and
-                scenes from nature.
+                <strong>Artistic Nature:</strong> Young Jose loved to draw and
+                paint, especially flowers, birds, and scenes from nature.
               </div>
             </div>
             <div className="flex items-start space-x-3">
               <span className="text-2xl">🐕</span>
               <div>
-                <strong>Animal Lover:</strong> Jose had several pets including dogs and birds, showing his gentle and
-                caring nature.
+                <strong>Animal Lover:</strong> Jose had several pets including
+                dogs and birds, showing his gentle and caring nature.
               </div>
             </div>
             <div className="flex items-start space-x-3">
               <span className="text-2xl">🌱</span>
               <div>
-                <strong>Nature Explorer:</strong> He spent time exploring the gardens and fields around Calamba,
-                developing his love for nature.
+                <strong>Nature Explorer:</strong> He spent time exploring the
+                gardens and fields around Calamba, developing his love for
+                nature.
               </div>
             </div>
           </div>
         </div>
       </main>
     </div>
-  )
+  );
 }

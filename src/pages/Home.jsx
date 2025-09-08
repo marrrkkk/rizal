@@ -17,6 +17,7 @@ import {
 import { usePerformanceOptimization } from "../hooks/usePerformanceOptimization";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ResponsiveContainer from "../components/ResponsiveContainer";
+import UserProgressManager from "../components/UserProgressManager";
 
 export default function Home({ username, onLogout }) {
   const navigate = useNavigate();
@@ -194,17 +195,31 @@ export default function Home({ username, onLogout }) {
                 </p>
               </div>
             </div>
-            <button
-              onClick={onLogout}
-              className={`bg-gradient-to-r from-red-500 to-red-600 text-white px-3 sm:px-4 md:px-6 py-2 rounded-full hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex-shrink-0 ${
-                isTouchDevice ? "min-w-[44px] min-h-[44px]" : ""
-              }`}
-              {...touchProps}
-            >
-              <span className={`${isMobile ? "text-sm" : "text-base"}`}>
-                {isMobile ? "Out" : "Logout"}
-              </span>
-            </button>
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={() => navigate("/admin")}
+                className={`bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 sm:px-4 md:px-6 py-2 rounded-full hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex-shrink-0 ${
+                  isTouchDevice ? "min-w-[44px] min-h-[44px]" : ""
+                }`}
+                {...touchProps}
+                title="Admin Dashboard"
+              >
+                <span className={`${isMobile ? "text-sm" : "text-base"}`}>
+                  👨‍🏫 {isMobile ? "Admin" : "Dashboard"}
+                </span>
+              </button>
+              <button
+                onClick={onLogout}
+                className={`bg-gradient-to-r from-red-500 to-red-600 text-white px-3 sm:px-4 md:px-6 py-2 rounded-full hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex-shrink-0 ${
+                  isTouchDevice ? "min-w-[44px] min-h-[44px]" : ""
+                }`}
+                {...touchProps}
+              >
+                <span className={`${isMobile ? "text-sm" : "text-base"}`}>
+                  {isMobile ? "Out" : "Logout"}
+                </span>
+              </button>
+            </div>
           </ResponsiveContainer>
         </header>
 
@@ -249,6 +264,11 @@ export default function Home({ username, onLogout }) {
                   through interactive chapters
                 </p>
               </div>
+            </div>
+
+            {/* User Progress Manager */}
+            <div className={`${isMobile ? "mb-8" : "mb-12"} max-w-4xl mx-auto`}>
+              <UserProgressManager username={username} />
             </div>
 
             {/* Enhanced Progress Section */}

@@ -8,6 +8,7 @@ import Chapter1 from "./pages/Chapter1";
 import Chapter2 from "./pages/Chapter2";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import AdminDashboard from "./pages/AdminDashboard";
 // Chapter 1 Games
 import JoseBirthGame from "./pages/games/JoseBirthGame";
 import FamilyBackgroundGame from "./pages/games/FamilyBackgroundGame";
@@ -51,6 +52,7 @@ import { initializeProgress } from "./utils/initializeProgress";
 import { BadgeNotification } from "./components/BadgeSystem";
 import CelebrationAnimation from "./components/CelebrationAnimation";
 import { usePerformanceOptimization } from "./hooks/usePerformanceOptimization";
+import { useUserProgress } from "./hooks/useUserProgress";
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem("token"));
@@ -58,6 +60,15 @@ function App() {
   const [newBadges, setNewBadges] = useState([]);
   const [showCelebration, setShowCelebration] = useState(null);
   const { preloadResource, isLowEndDevice } = usePerformanceOptimization();
+
+  // Use the new user-specific progress system
+  const {
+    progress: userProgress,
+    completeLevel: completeUserLevel,
+    statistics: userStatistics,
+    loading: progressLoading,
+    error: progressError,
+  } = useUserProgress(username);
 
   useEffect(() => {
     setAuthToken(token);
@@ -110,12 +121,24 @@ function App() {
     setAuthToken(null);
   };
 
-  const handleLevelComplete = (chapter, level, score = 0) => {
+  const handleLevelComplete = async (
+    chapter,
+    level,
+    score = 0,
+    timeSpent = 0
+  ) => {
+    if (!username) {
+      console.error("No user logged in");
+      return;
+    }
+
     try {
-      const result = completeLevel(chapter, level, score);
+      // Use the new user-specific progress system
+      const result = await completeUserLevel(chapter, level, score, timeSpent);
+
       if (result.success) {
         console.log(
-          `Level ${level} of Chapter ${chapter} completed with score ${score}!`
+          `User ${username}: Level ${level} of Chapter ${chapter} completed with score ${score}!`
         );
 
         // Show celebration animation
@@ -125,9 +148,19 @@ function App() {
         if (result.newBadges && result.newBadges.length > 0) {
           setNewBadges(result.newBadges);
         }
+
+        // Log progress to console for debugging
+        console.log(`Progress saved for user ${username}:`, {
+          chapter,
+          level,
+          score,
+          timeSpent,
+          totalCompleted: result.progress?.overall?.completedLevels || 0,
+        });
       } else {
         console.error(
-          `Failed to save completion for Level ${level} of Chapter ${chapter}`
+          `Failed to save completion for Level ${level} of Chapter ${chapter}:`,
+          result.error
         );
       }
     } catch (error) {
@@ -574,6 +607,16 @@ function App() {
           <Route
             path="/register"
             element={!token ? <Register /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/admin"
+            element={
+              token ? (
+                <AdminDashboard username={username} onLogout={handleLogout} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
           />
         </Routes>
       </BrowserRouter>

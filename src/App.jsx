@@ -51,6 +51,11 @@ import { completeLevel, resetSessionTracking } from "./utils/progressManager";
 import { initializeProgress } from "./utils/initializeProgress";
 import { BadgeNotification } from "./components/BadgeSystem";
 import CelebrationAnimation from "./components/CelebrationAnimation";
+import BadgeNotificationSystem, {
+  useBadgeNotifications,
+} from "./components/BadgeNotificationSystem";
+import BadgeTestComponent from "./components/BadgeTestComponent";
+import GameIntegrationExample from "./components/GameIntegrationExample";
 import { usePerformanceOptimization } from "./hooks/usePerformanceOptimization";
 import { useUserProgress } from "./hooks/useUserProgress";
 
@@ -60,6 +65,14 @@ function App() {
   const [newBadges, setNewBadges] = useState([]);
   const [showCelebration, setShowCelebration] = useState(null);
   const { preloadResource, isLowEndDevice } = usePerformanceOptimization();
+
+  // Enhanced badge notification system
+  const {
+    notifications,
+    showBadgeNotification,
+    showLevelCompleteNotification,
+    clearNotification,
+  } = useBadgeNotifications();
 
   // Use the new user-specific progress system
   const {
@@ -141,11 +154,19 @@ function App() {
           `User ${username}: Level ${level} of Chapter ${chapter} completed with score ${score}!`
         );
 
+        // Show level completion notification
+        showLevelCompleteNotification(chapter, level, score);
+
         // Show celebration animation
         setShowCelebration("level");
 
-        // Show new badges if any
+        // Show new badge notifications
         if (result.newBadges && result.newBadges.length > 0) {
+          result.newBadges.forEach((badge, index) => {
+            setTimeout(() => {
+              showBadgeNotification(badge);
+            }, (index + 1) * 1000); // Stagger badge notifications
+          });
           setNewBadges(result.newBadges);
         }
 
@@ -156,6 +177,7 @@ function App() {
           score,
           timeSpent,
           totalCompleted: result.progress?.overall?.completedLevels || 0,
+          newBadges: result.newBadges,
         });
       } else {
         console.error(
@@ -187,7 +209,13 @@ function App() {
           />
         )}
 
-        {/* Badge Notifications */}
+        {/* Enhanced Badge Notification System */}
+        <BadgeNotificationSystem
+          notifications={notifications}
+          onClearNotification={clearNotification}
+        />
+
+        {/* Legacy Badge Notifications (for backward compatibility) */}
         {newBadges.length > 0 && (
           <BadgeNotification
             badge={newBadges[0]}
@@ -617,6 +645,11 @@ function App() {
                 <Navigate to="/login" />
               )
             }
+          />
+          <Route path="/badge-test" element={<BadgeTestComponent />} />
+          <Route
+            path="/game-example"
+            element={<GameIntegrationExample username={username} />}
           />
         </Routes>
       </BrowserRouter>

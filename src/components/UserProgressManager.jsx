@@ -5,6 +5,7 @@
 
 import { useState } from "react";
 import { useUserProgress } from "../hooks/useUserProgress";
+import BadgeGallery from "./BadgeGallery";
 
 const UserProgressManager = ({ username, className = "" }) => {
   const {
@@ -199,24 +200,10 @@ const UserProgressManager = ({ username, className = "" }) => {
         </div>
       </div>
 
-      {/* Badges */}
-      {badges.length > 0 && (
-        <div className="mb-6">
-          <h4 className="font-semibold text-gray-800 mb-3">🏆 Badges Earned</h4>
-          <div className="flex flex-wrap gap-2">
-            {badges.map((badge, index) => (
-              <span
-                key={index}
-                className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium"
-              >
-                {badge
-                  .replace(/_/g, " ")
-                  .replace(/\b\w/g, (l) => l.toUpperCase())}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Enhanced Badge Gallery */}
+      <div className="mb-6">
+        <BadgeGallery badges={badges} />
+      </div>
 
       {/* File Operations */}
       <div className="border-t pt-4">

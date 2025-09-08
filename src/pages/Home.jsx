@@ -271,6 +271,53 @@ export default function Home({ username, onLogout }) {
               <UserProgressManager username={username} />
             </div>
 
+            {/* Development & Testing Section */}
+            <div className={`${isMobile ? "mb-8" : "mb-12"} max-w-4xl mx-auto`}>
+              <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-200">
+                <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                  <span className="text-2xl mr-2">🧪</span>
+                  Development & Testing
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  Test the enhanced badge notification system and see how it
+                  integrates with games.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <button
+                    onClick={() => navigate("/badge-test")}
+                    className="bg-gradient-to-r from-purple-500 to-pink-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200 text-left"
+                  >
+                    <div className="flex items-center">
+                      <span className="text-2xl mr-3">🏆</span>
+                      <div>
+                        <div className="font-bold">Badge System Demo</div>
+                        <div className="text-sm opacity-90">
+                          Test badge notifications and gallery
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => navigate("/game-example")}
+                    className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200 text-left"
+                  >
+                    <div className="flex items-center">
+                      <span className="text-2xl mr-3">🎮</span>
+                      <div>
+                        <div className="font-bold">
+                          Game Integration Example
+                        </div>
+                        <div className="text-sm opacity-90">
+                          See badges in action with a quiz game
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+
             {/* Enhanced Progress Section */}
             <div className={`${isMobile ? "mb-8" : "mb-12"} max-w-4xl mx-auto`}>
               <ProgressDashboard

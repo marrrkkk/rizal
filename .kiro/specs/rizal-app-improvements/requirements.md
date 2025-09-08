@@ -82,3 +82,27 @@ This document outlines the requirements for improving the José Rizal educationa
 2. WHEN the user interacts with touch or mouse THEN the system SHALL respond correctly to both input methods
 3. WHEN the user rotates their device THEN the system SHALL maintain usability and readability
 4. WHEN the user has slower internet THEN the system SHALL load efficiently without long delays
+
+### Requirement 8
+
+**User Story:** As a child user, I want my progress to be saved permanently and securely, so that I never lose my learning achievements even if I switch devices or browsers.
+
+#### Acceptance Criteria
+
+1. WHEN the user completes any level THEN the system SHALL save progress data to a persistent SQLite database
+2. WHEN the user returns to the app THEN the system SHALL load their complete progress history from the database
+3. WHEN the user switches devices THEN the system SHALL maintain their progress through proper data storage
+4. WHEN the system experiences errors THEN the database SHALL maintain data integrity and prevent corruption
+5. WHEN the user requests data export THEN the system SHALL provide backup functionality for their progress
+
+### Requirement 9
+
+**User Story:** As a child user, I want levels to unlock in proper order, so that I learn about José Rizal's life chronologically and build knowledge progressively.
+
+#### Acceptance Criteria
+
+1. WHEN the user starts the app THEN the system SHALL only allow access to Chapter 1, Level 1
+2. WHEN the user completes a level THEN the system SHALL unlock the next level in sequence
+3. WHEN the user completes all levels in a chapter THEN the system SHALL unlock the first level of the next chapter
+4. WHEN the user tries to access locked content THEN the system SHALL display clear messaging about completion requirements
+5. WHEN the user unlocks new content THEN the system SHALL show celebratory notifications and visual indicators

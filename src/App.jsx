@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Home from "./pages/Home";
@@ -47,8 +47,7 @@ import RizalCorrespondenceGame from "./pages/games/RizalCorrespondenceGame";
 import TrialMartyrdomGame from "./pages/games/TrialMartyrdomGame";
 import LegacyBuilderGame from "./pages/games/LegacyBuilderGame";
 import { setAuthToken } from "./utils/api";
-import { completeLevel, resetSessionTracking } from "./utils/progressManager";
-import { initializeProgress } from "./utils/initializeProgress";
+import { resetSessionTracking } from "./utils/progressManager";
 import { BadgeNotification } from "./components/BadgeSystem";
 import CelebrationAnimation from "./components/CelebrationAnimation";
 import BadgeNotificationSystem, {
@@ -56,14 +55,25 @@ import BadgeNotificationSystem, {
 } from "./components/BadgeNotificationSystem";
 import BadgeTestComponent from "./components/BadgeTestComponent";
 import GameIntegrationExample from "./components/GameIntegrationExample";
+import LevelUnlockNotification from "./components/LevelUnlockNotification";
+import LevelCompletionModal from "./components/LevelCompletionModal";
+import QuickNextLevelButton from "./components/QuickNextLevelButton";
+import ProgressDebugger from "./components/ProgressDebugger";
+import ToastManager, { useToast } from "./components/ToastManager";
 import { usePerformanceOptimization } from "./hooks/usePerformanceOptimization";
-import { useUserProgress } from "./hooks/useUserProgress";
+import { useProgressAPI } from "./hooks/useProgressAPI";
+import { useAnalytics } from "./hooks/useAnalytics";
+import AnalyticsDashboard from "./components/AnalyticsDashboard";
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [username, setUsername] = useState(null);
   const [newBadges, setNewBadges] = useState([]);
   const [showCelebration, setShowCelebration] = useState(null);
+  const [levelUnlockNotification, setLevelUnlockNotification] = useState(null);
+  const [showAnalyticsDashboard, setShowAnalyticsDashboard] = useState(false);
+  const [levelCompletionModal, setLevelCompletionModal] = useState(null);
+  const [showNextLevelButton, setShowNextLevelButton] = useState(null);
   const { preloadResource, isLowEndDevice } = usePerformanceOptimization();
 
   // Enhanced badge notification system
@@ -74,20 +84,45 @@ function App() {
     clearNotification,
   } = useBadgeNotifications();
 
-  // Use the new user-specific progress system
+  // Analytics system
+  const { trackLevelComplete } = useAnalytics(username);
+
+  // Toast notifications
+  const { showSuccess, showInfo, setToastManager } = useToast();
+  const toastManagerRef = useRef(null);
+
+  // Connect toast manager
+  useEffect(() => {
+    if (toastManagerRef.current) {
+      setToastManager(toastManagerRef.current);
+    }
+  }, [setToastManager]);
+
+  // Use the database-backed progress system
   const {
-    progress: userProgress,
-    completeLevel: completeUserLevel,
-    statistics: userStatistics,
+    progressData,
     loading: progressLoading,
     error: progressError,
-  } = useUserProgress(username);
+    completeLevel: completeUserLevel,
+    refreshProgress,
+    isLevelUnlocked,
+    isLevelCompleted,
+  } = useProgressAPI(username);
 
   useEffect(() => {
     setAuthToken(token);
 
-    // Initialize progress system
-    initializeProgress();
+    // Add developer testing functions to window (only in development)
+    if (process.env.NODE_ENV === "development") {
+      // Add progress data to window for debugging
+      window.getProgressData = () => progressData;
+      window.refreshProgress = refreshProgress;
+      console.log("🧪 Developer tools available:");
+      console.log("  - window.getProgressData() - View current progress data");
+      console.log(
+        "  - window.refreshProgress() - Refresh progress from database"
+      );
+    }
 
     // Performance optimizations
     if (!isLowEndDevice) {
@@ -134,6 +169,11 @@ function App() {
     setAuthToken(null);
   };
 
+  const handleGoToLevel = (chapter, level) => {
+    // Navigate to the specific level
+    window.location.href = `/chapter/${chapter}/level/${level}`;
+  };
+
   const handleLevelComplete = async (
     chapter,
     level,
@@ -146,19 +186,80 @@ function App() {
     }
 
     try {
+      console.log(
+        `🎮 Attempting to complete Level ${level} of Chapter ${chapter} with score ${score}`
+      );
+
       // Use the new user-specific progress system
       const result = await completeUserLevel(chapter, level, score, timeSpent);
 
+      console.log("🔍 Complete level result:", result);
+
       if (result.success) {
         console.log(
-          `User ${username}: Level ${level} of Chapter ${chapter} completed with score ${score}!`
+          `✅ User ${username}: Level ${level} of Chapter ${chapter} completed with score ${score}!`
         );
+        console.log("🔓 Next level unlocked:", result.nextLevelUnlocked);
+        console.log("🚀 Next chapter unlocked:", result.nextChapterUnlocked);
+
+        // Track analytics for level completion
+        trackLevelComplete(chapter, level, {
+          score,
+          timeSpent,
+          attempts: 1, // Could be enhanced to track actual attempts
+          perfectScore: score === 100,
+        });
 
         // Show level completion notification
         showLevelCompleteNotification(chapter, level, score);
 
+        // Show immediate success notification
+        showSuccess(`🎉 Level ${level} completed! Score: ${score}%`, {
+          duration: 3000,
+          icon: "✅",
+        });
+
         // Show celebration animation
         setShowCelebration("level");
+
+        // Show toast notifications for unlocks
+        if (result.nextLevelUnlocked) {
+          setTimeout(() => {
+            showSuccess(
+              `🔓 Level ${result.nextLevelUnlocked.level} unlocked in Chapter ${result.nextLevelUnlocked.chapter}!`,
+              { duration: 4000, icon: "🆕" }
+            );
+          }, 1500);
+        }
+
+        if (result.nextChapterUnlocked) {
+          setTimeout(() => {
+            showInfo(
+              `🚀 New Chapter ${result.nextChapterUnlocked.chapter} unlocked!`,
+              { duration: 5000, icon: "📚" }
+            );
+          }, 2500);
+        }
+
+        // Show quick next level button immediately after celebration
+        const nextLevel =
+          result.nextLevelUnlocked || result.nextChapterUnlocked;
+        if (nextLevel) {
+          setTimeout(() => {
+            setShowNextLevelButton(nextLevel);
+          }, 1000);
+        }
+
+        // Show comprehensive completion modal after celebration
+        setTimeout(() => {
+          setLevelCompletionModal({
+            completedLevel: { chapter, level },
+            score,
+            nextLevelUnlocked: result.nextLevelUnlocked,
+            nextChapterUnlocked: result.nextChapterUnlocked,
+            newBadges: result.newBadges || [],
+          });
+        }, 2000);
 
         // Show new badge notifications
         if (result.newBadges && result.newBadges.length > 0) {
@@ -223,12 +324,26 @@ function App() {
           />
         )}
 
+        {/* Level Unlock Notification */}
+        {levelUnlockNotification && (
+          <LevelUnlockNotification
+            chapter={levelUnlockNotification.chapter}
+            level={levelUnlockNotification.level}
+            onClose={() => setLevelUnlockNotification(null)}
+            onGoToLevel={handleGoToLevel}
+          />
+        )}
+
         <Routes>
           <Route
             path="/"
             element={
               token ? (
-                <Home username={username} onLogout={handleLogout} />
+                <Home
+                  username={username}
+                  onLogout={handleLogout}
+                  onShowAnalytics={() => setShowAnalyticsDashboard(true)}
+                />
               ) : (
                 <Navigate to="/login" />
               )
@@ -251,7 +366,9 @@ function App() {
                 <JoseBirthGame
                   username={username}
                   onLogout={handleLogout}
-                  onComplete={() => handleLevelComplete(1, 1)}
+                  onComplete={(score, timeSpent) =>
+                    handleLevelComplete(1, 1, score, timeSpent)
+                  }
                 />
               ) : (
                 <Navigate to="/login" />
@@ -265,7 +382,9 @@ function App() {
                 <FamilyBackgroundGame
                   username={username}
                   onLogout={handleLogout}
-                  onComplete={() => handleLevelComplete(1, 2)}
+                  onComplete={(score, timeSpent) =>
+                    handleLevelComplete(1, 2, score, timeSpent)
+                  }
                 />
               ) : (
                 <Navigate to="/login" />
@@ -279,7 +398,9 @@ function App() {
                 <EarlyChildhoodGame
                   username={username}
                   onLogout={handleLogout}
-                  onComplete={() => handleLevelComplete(1, 3)}
+                  onComplete={(score, timeSpent) =>
+                    handleLevelComplete(1, 3, score, timeSpent)
+                  }
                 />
               ) : (
                 <Navigate to="/login" />
@@ -293,7 +414,9 @@ function App() {
                 <FirstTeacherGame
                   username={username}
                   onLogout={handleLogout}
-                  onComplete={() => handleLevelComplete(1, 4)}
+                  onComplete={(score, timeSpent) =>
+                    handleLevelComplete(1, 4, score, timeSpent)
+                  }
                 />
               ) : (
                 <Navigate to="/login" />
@@ -332,7 +455,9 @@ function App() {
               token ? (
                 <AteneoGame
                   username={username}
-                  onComplete={() => handleLevelComplete(2, 1)}
+                  onComplete={(score, timeSpent) =>
+                    handleLevelComplete(2, 1, score, timeSpent)
+                  }
                 />
               ) : (
                 <Navigate to="/login" />
@@ -652,6 +777,44 @@ function App() {
             element={<GameIntegrationExample username={username} />}
           />
         </Routes>
+
+        {/* Quick Next Level Button */}
+        {showNextLevelButton && (
+          <QuickNextLevelButton
+            nextLevel={showNextLevelButton}
+            onClose={() => setShowNextLevelButton(null)}
+          />
+        )}
+
+        {/* Level Completion Modal */}
+        {levelCompletionModal && (
+          <LevelCompletionModal
+            isOpen={!!levelCompletionModal}
+            onClose={() => {
+              setLevelCompletionModal(null);
+              setShowNextLevelButton(null); // Hide next level button when modal closes
+            }}
+            completedLevel={levelCompletionModal.completedLevel}
+            score={levelCompletionModal.score}
+            nextLevelUnlocked={levelCompletionModal.nextLevelUnlocked}
+            nextChapterUnlocked={levelCompletionModal.nextChapterUnlocked}
+            newBadges={levelCompletionModal.newBadges}
+          />
+        )}
+
+        {/* Analytics Dashboard */}
+        {showAnalyticsDashboard && (
+          <AnalyticsDashboard
+            username={username}
+            onClose={() => setShowAnalyticsDashboard(false)}
+          />
+        )}
+
+        {/* Progress Debugger (temporary) */}
+        {username && <ProgressDebugger username={username} />}
+
+        {/* Toast Notifications */}
+        <ToastManager ref={toastManagerRef} />
       </BrowserRouter>
     </ErrorBoundary>
   );

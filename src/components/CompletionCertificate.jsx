@@ -18,47 +18,61 @@ const CompletionCertificate = ({
 
   const handlePrint = () => {
     const printContent = certificateRef.current;
-    const printWindow = window.open("", "_blank");
+    if (!printContent) return;
 
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>Certificate of Completion</title>
-          <style>
-            body { 
-              font-family: 'Georgia', serif; 
-              margin: 0; 
-              padding: 20px; 
-              background: white;
-            }
-            .certificate {
-              max-width: 800px;
-              margin: 0 auto;
-              padding: 40px;
-              border: 8px solid #d4af37;
-              background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-              text-align: center;
-            }
-            .header { color: #d4af37; font-size: 36px; font-weight: bold; margin-bottom: 20px; }
-            .title { color: #2c3e50; font-size: 24px; margin-bottom: 30px; }
-            .recipient { color: #e74c3c; font-size: 32px; font-weight: bold; margin: 20px 0; }
-            .chapter { color: #3498db; font-size: 20px; margin: 20px 0; }
-            .date { color: #7f8c8d; font-size: 16px; margin-top: 30px; }
-            .signature { margin-top: 40px; }
-            @media print {
-              body { margin: 0; }
-              .certificate { border: 8px solid #d4af37; }
-            }
-          </style>
-        </head>
-        <body>
-          ${printContent.innerHTML}
-        </body>
-      </html>
-    `);
+    // Modern approach: Create a temporary print stylesheet and use window.print()
+    const printStyles = `
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+        .print-certificate, .print-certificate * {
+          visibility: visible;
+        }
+        .print-certificate {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          font-family: 'Georgia', serif;
+        }
+        .certificate-content {
+          max-width: 800px;
+          margin: 0 auto;
+          padding: 40px;
+          border: 8px solid #d4af37;
+          background: white;
+          text-align: center;
+        }
+        .no-print {
+          display: none !important;
+        }
+      }
+    `;
 
-    printWindow.document.close();
-    printWindow.print();
+    // Create and inject print styles
+    const styleSheet = document.createElement("style");
+    styleSheet.textContent = printStyles;
+    document.head.appendChild(styleSheet);
+
+    // Clone the certificate content for printing
+    const printDiv = document.createElement("div");
+    printDiv.className = "print-certificate";
+    printDiv.innerHTML = `
+      <div class="certificate-content">
+        ${printContent.innerHTML}
+      </div>
+    `;
+
+    // Add to body temporarily
+    document.body.appendChild(printDiv);
+
+    // Print using the browser's native print dialog
+    window.print();
+
+    // Clean up
+    document.body.removeChild(printDiv);
+    document.head.removeChild(styleSheet);
   };
 
   const formatDate = (dateString) => {

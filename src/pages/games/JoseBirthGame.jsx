@@ -28,6 +28,7 @@ import {
   ChildFriendlyError,
   EncouragingMessage,
 } from "../../components/ChildFriendlyMessages";
+import { useAnalytics } from "../../hooks/useAnalytics";
 import {
   VisualFeedback,
   FeedbackButton,
@@ -47,6 +48,9 @@ export default function JoseBirthGame({ username, onLogout, onComplete }) {
   const { getOptimizedTouchProps, debounce } = usePerformanceOptimization();
   const touchProps = getOptimizedTouchProps();
   const mobileClasses = getMobileOptimizedClasses(isMobile, isTablet);
+
+  // Analytics tracking
+  const { trackLevelStart, trackInteraction } = useAnalytics(username);
 
   const [currentGame, setCurrentGame] = useState(0);
   const [score, setScore] = useState(0);
@@ -73,6 +77,12 @@ export default function JoseBirthGame({ username, onLogout, onComplete }) {
   const [childFriendlyContext] = useState(
     createChildFriendlyContext({ age: 8 })
   );
+
+  // Track level start and set start time
+  useEffect(() => {
+    trackLevelStart(1, 1);
+    window.gameStartTime = Date.now(); // Track start time for completion
+  }, [trackLevelStart]);
 
   const games = [
     {
@@ -231,6 +241,14 @@ export default function JoseBirthGame({ username, onLogout, onComplete }) {
   };
 
   const nextGame = () => {
+    // Track mini-game completion
+    trackInteraction(1, 1, "mini_game_complete", {
+      gameIndex: currentGame,
+      score: score,
+      attempts: attempts,
+      hintsUsed: hintsUsed,
+    });
+
     if (currentGame < games.length - 1) {
       setCurrentGame(currentGame + 1);
       setSelectedAnswer(null);
@@ -249,94 +267,52 @@ export default function JoseBirthGame({ username, onLogout, onComplete }) {
     setGameCompleted(true);
     setShowCelebration(true);
 
+    // Calculate time spent (you can enhance this with actual timing)
+    const timeSpent = Date.now() - (window.gameStartTime || Date.now());
+
     // Call the onComplete callback if provided
     if (onComplete) {
-      onComplete(score);
+      onComplete(score, timeSpent);
     }
   };
 
   const renderQuizGame = (game) => (
-    <ResponsiveContainer size="2xl">
-      <div
-        className={`bg-white/90 backdrop-blur-sm rounded-3xl ${
-          isMobile ? "p-6" : "p-8"
-        } shadow-2xl border border-white/20`}
-      >
-        <div className="text-center mb-4 sm:mb-6">
-          <div
-            className={`inline-flex items-center space-x-2 sm:space-x-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-2xl px-4 sm:px-6 py-2 sm:py-3 shadow-lg`}
-          >
-            <span className={`${isMobile ? "text-xl" : "text-2xl"}`}>❓</span>
-            <span className={`font-bold ${isMobile ? "text-sm" : "text-base"}`}>
-              Quiz Time!
-            </span>
-          </div>
-        </div>
-        <h3
-          className={`${
-            isMobile ? "text-lg" : "text-xl sm:text-2xl"
-          } font-bold text-gray-800 ${
-            isMobile ? "mb-6" : "mb-8"
-          } text-center leading-relaxed`}
-        >
+    <div className="max-w-2xl mx-auto">
+      <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border-4 border-blue-200">
+        <h3 className="text-2xl font-black text-gray-800 mb-8 text-center leading-relaxed">
           {game.question}
         </h3>
-        <div className="grid grid-cols-1 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 gap-4">
           {game.options.map((option, index) => (
             <button
               key={index}
               onClick={() => handleQuizAnswer(index)}
               disabled={showQuizResult}
-              className={`group ${
-                isMobile ? "p-4" : "p-5"
-              } rounded-2xl text-left transition-all duration-300 transform ${
-                isTouchDevice ? "active:scale-95" : "hover:-translate-y-1"
-              } ${isTouchDevice ? "min-h-[60px]" : ""} ${
+              className={`group p-5 rounded-2xl text-left transition-all duration-300 transform hover:scale-105 border-4 ${
                 showQuizResult
                   ? index === game.correct
-                    ? "bg-gradient-to-r from-green-100 to-emerald-100 border-2 border-green-400 text-green-800 shadow-lg scale-105"
+                    ? "bg-gradient-to-r from-green-400 to-green-500 border-green-600 text-white shadow-xl animate-bounce"
                     : index === selectedAnswer
-                    ? "bg-gradient-to-r from-red-100 to-pink-100 border-2 border-red-400 text-red-800 shadow-lg"
-                    : "bg-gray-100 text-gray-600 border-2 border-gray-200"
-                  : `bg-gradient-to-r from-blue-50 to-indigo-50 ${
-                      isTouchDevice
-                        ? "active:from-blue-100 active:to-indigo-100"
-                        : "hover:from-blue-100 hover:to-indigo-100"
-                    } border-2 border-blue-200 ${
-                      isTouchDevice
-                        ? "active:border-blue-400 active:shadow-xl"
-                        : "hover:border-blue-400 hover:shadow-xl"
-                    }`
+                    ? "bg-gradient-to-r from-red-400 to-red-500 border-red-600 text-white shadow-xl"
+                    : "bg-gray-100 border-gray-300 text-gray-600"
+                  : "bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 hover:from-blue-100 hover:to-indigo-100 hover:border-blue-400 hover:shadow-xl"
               }`}
-              {...touchProps}
             >
-              <div className="flex items-center space-x-2 sm:space-x-3">
+              <div className="flex items-center space-x-4">
                 <div
-                  className={`${
-                    isTouchDevice ? "w-10 h-10" : "w-8 h-8"
-                  } rounded-full flex items-center justify-center font-bold text-white transition-all duration-300 flex-shrink-0 ${
+                  className={`w-12 h-12 rounded-full flex items-center justify-center font-black text-lg transition-all duration-300 ${
                     showQuizResult && index === game.correct
-                      ? "bg-green-500 animate-bounce"
+                      ? "bg-white text-green-500 animate-pulse"
                       : showQuizResult && index === selectedAnswer
-                      ? "bg-red-500"
-                      : `bg-blue-500 ${
-                          isTouchDevice
-                            ? "group-active:bg-blue-600"
-                            : "group-hover:bg-blue-600"
-                        }`
+                      ? "bg-white text-red-500"
+                      : showQuizResult
+                      ? "bg-gray-300 text-gray-500"
+                      : "bg-blue-500 text-white group-hover:bg-blue-600"
                   }`}
                 >
-                  <span
-                    className={`${isTouchDevice ? "text-base" : "text-sm"}`}
-                  >
-                    {String.fromCharCode(65 + index)}
-                  </span>
+                  {String.fromCharCode(65 + index)}
                 </div>
-                <span
-                  className={`font-medium ${
-                    isMobile ? "text-sm" : "text-base"
-                  } leading-tight`}
-                >
+                <span className="font-bold text-lg leading-tight">
                   {option}
                 </span>
               </div>
@@ -344,66 +320,27 @@ export default function JoseBirthGame({ username, onLogout, onComplete }) {
           ))}
         </div>
         {showQuizResult && (
-          <div className={`${isMobile ? "mt-6" : "mt-8"} text-center`}>
+          <div className="mt-8 text-center">
             <div
-              className={`inline-flex items-center space-x-2 px-4 sm:px-6 py-2 sm:py-3 rounded-2xl font-bold ${
-                isMobile ? "text-base" : "text-lg"
-              } ${
+              className={`inline-flex items-center space-x-3 px-6 py-4 rounded-2xl font-black text-lg shadow-lg ${
                 selectedAnswer === game.correct
                   ? "bg-gradient-to-r from-green-400 to-emerald-500 text-white animate-bounce"
-                  : "bg-gradient-to-r from-orange-400 to-red-500 text-white animate-pulse"
+                  : "bg-gradient-to-r from-orange-400 to-red-500 text-white"
               }`}
             >
-              <span className={`${isMobile ? "text-xl" : "text-2xl"}`}>
-                {selectedAnswer === game.correct ? "🎉" : "🤗"}
+              <span className="text-2xl">
+                {selectedAnswer === game.correct ? "🎉" : "💪"}
               </span>
-              <span className={`${isMobile ? "text-sm" : "text-base"}`}>
+              <span>
                 {selectedAnswer === game.correct
-                  ? childFriendlyContext.getResponse("correct")
-                  : childFriendlyContext.getResponse("incorrect")}
+                  ? "Awesome! You got it right!"
+                  : "Good try! Keep learning!"}
               </span>
-            </div>
-
-            {/* Additional encouragement for incorrect answers */}
-            {selectedAnswer !== game.correct && attempts > 1 && (
-              <div className="mt-4">
-                <EncouragingMessage
-                  situation="trying"
-                  playerName={username}
-                  className="max-w-md mx-auto"
-                />
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Visual feedback overlay */}
-        {feedbackMessage && (
-          <VisualFeedback
-            type={feedbackMessage.type}
-            message={feedbackMessage.message}
-            duration={feedbackMessage.duration}
-            onComplete={() => setFeedbackMessage(null)}
-          />
-        )}
-
-        {/* Encouragement overlay */}
-        {showEncouragement && (
-          <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-            <div className="bg-white rounded-2xl p-6 mx-4 max-w-sm text-center shadow-2xl">
-              <div className="text-4xl mb-3">💪</div>
-              <h3 className="text-lg font-bold text-gray-800 mb-2">
-                You're Doing Great!
-              </h3>
-              <p className="text-gray-600 text-sm">
-                José Rizal had to practice a lot too. Keep trying - you're
-                learning so much!
-              </p>
             </div>
           </div>
         )}
       </div>
-    </ResponsiveContainer>
+    </div>
   );
 
   const renderPuzzleGame = (game) => (
@@ -695,287 +632,130 @@ export default function JoseBirthGame({ username, onLogout, onComplete }) {
   }
 
   return (
-    <MobileOptimizedGame
-      title="Jose's Birth"
-      onBack={handleBackToChapter}
-      loading={isLoading}
-      className={`bg-gradient-to-br ${chapterTheme.background}`}
-    >
-      <GameHeader
-        title="Jose's Birth"
-        level={1}
-        chapter={1}
-        score={score}
-        onBack={handleBackToChapter}
-        onLogout={onLogout}
-        username={username}
-        theme="blue"
-        showScore={true}
-        maxScore={100}
-      />
+    <div className="min-h-screen w-full bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 relative overflow-hidden">
+      {/* Duolingo-style floating elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-16 h-16 bg-yellow-300 rounded-full opacity-10 animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-12 h-12 bg-pink-300 rounded-full opacity-15 animate-bounce"></div>
+        <div className="absolute bottom-32 left-20 w-20 h-20 bg-blue-300 rounded-full opacity-10"></div>
+        <div className="absolute bottom-20 right-10 w-14 h-14 bg-green-300 rounded-full opacity-15 animate-pulse"></div>
+        <div className="absolute top-1/2 left-1/4 w-10 h-10 bg-purple-300 rounded-full opacity-10"></div>
+      </div>
 
-      {/* Main Content */}
-      <main className="w-full">
-        <ResponsiveContainer className="py-6 sm:py-8">
-          {/* Progress */}
-          <div className={`${isMobile ? "mb-6" : "mb-8"}`}>
-            <ProgressBar
-              current={currentGame + 1}
-              total={games.length}
-              theme="blue"
-              showLabels={true}
-              showPercentage={true}
-              animated={true}
-              className="max-w-2xl mx-auto"
-            />
-          </div>
-
-          {/* Game Title */}
-          <div className={`text-center ${isMobile ? "mb-6" : "mb-8"}`}>
-            <div
-              className={`inline-flex items-center space-x-2 sm:space-x-3 bg-white/80 backdrop-blur-sm rounded-2xl px-4 sm:px-6 py-3 sm:py-4 shadow-lg border border-white/20`}
+      {/* Duolingo-style Header */}
+      <header className="bg-white shadow-lg sticky top-0 z-10 border-b-4 border-blue-400">
+        <div className="w-full px-6 py-4 flex justify-between items-center">
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={handleBackToChapter}
+              className="w-12 h-12 bg-gray-500 hover:bg-gray-600 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg border-b-2 border-gray-700 active:border-b-0"
             >
-              <span className={`${isMobile ? "text-2xl" : "text-3xl"}`}>
-                🎂
-              </span>
+              <svg
+                className="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </button>
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                <span className="text-white font-bold text-xl">🎂</span>
+              </div>
               <div>
-                <h2
-                  className={`${
-                    isMobile ? "text-lg" : "text-xl sm:text-2xl"
-                  } font-bold text-gray-800`}
-                >
-                  {games[currentGame].title}
-                </h2>
-                <p
-                  className={`${
-                    isMobile ? "text-xs" : "text-sm"
-                  } text-gray-600`}
-                >
-                  Learn about Jose's beginning
+                <h1 className="text-2xl font-black text-gray-800">
+                  Jose's Birth
+                </h1>
+                <p className="text-sm text-gray-600 font-medium">
+                  Level 1 • Chapter 1
                 </p>
               </div>
             </div>
           </div>
-
-          {/* Current Game */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {/* Main Game Area */}
-            <div className="lg:col-span-3">{renderCurrentGame()}</div>
-
-            {/* Sidebar with Hints and Educational Content */}
-            <div className="lg:col-span-1 space-y-4">
-              {/* Contextual Hints */}
-              <ContextualHints
-                gameType="quiz"
-                currentScore={score}
-                attempts={attempts}
-                onHintUsed={() => {
-                  setHintsUsed((prev) => prev + 1);
-                  setFeedbackMessage({
-                    type: "hint",
-                    message: getRandomResponse("hints"),
-                    duration: 2000,
-                  });
-                }}
-                className="lg:block hidden"
-              />
-
-              {/* Educational Facts */}
-              <KidsEducationalFact
-                topic="childhood"
-                showAnimation={true}
-                className="lg:block hidden"
-              />
-
-              {/* Contextual Educational Content */}
-              <ContextualEducationalContent
-                gameType="quiz"
-                level={1}
-                chapter={1}
-                playerProgress={(currentGame / games.length) * 100}
-                className="lg:block hidden"
-              />
+          <div className="flex items-center space-x-3">
+            <div className="bg-white/90 rounded-full px-4 py-2 shadow-md border-2 border-blue-200">
+              <span className="text-blue-600 font-bold">Score: {score}</span>
             </div>
-          </div>
-
-          {/* Mobile Hints and Educational Content */}
-          <div className="lg:hidden mt-6 space-y-4">
-            <ContextualHints
-              gameType="quiz"
-              currentScore={score}
-              attempts={attempts}
-              onHintUsed={() => {
-                setHintsUsed((prev) => prev + 1);
-                setFeedbackMessage({
-                  type: "hint",
-                  message: getRandomResponse("hints"),
-                  duration: 2000,
-                });
-              }}
-            />
-
-            <KidsEducationalFact topic="childhood" showAnimation={true} />
-          </div>
-
-          {/* Educational Info */}
-          <div
-            className={`${
-              isMobile ? "mt-8" : "mt-12"
-            } bg-white/80 backdrop-blur-sm rounded-3xl ${
-              isMobile ? "p-6" : "p-8"
-            } shadow-xl max-w-4xl mx-auto border border-white/20`}
-          >
-            <div className={`text-center ${isMobile ? "mb-4" : "mb-6"}`}>
-              <div
-                className={`inline-flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full px-3 sm:px-4 py-2`}
-              >
-                <span className={`${isMobile ? "text-lg" : "text-xl"}`}>
-                  💡
-                </span>
-                <span
-                  className={`font-bold ${isMobile ? "text-sm" : "text-base"}`}
-                >
-                  Did You Know?
-                </span>
-              </div>
-            </div>
-            <div
-              className={`grid gap-4 sm:gap-6 ${
-                isMobile ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2"
-              }`}
+            <button
+              onClick={onLogout}
+              className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-full font-bold transition-all duration-200 shadow-lg border-b-2 border-red-700 active:border-b-0"
             >
+              Exit
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="w-full px-6 py-8 relative z-10">
+        {/* Progress Bar */}
+        <div className="mb-8">
+          <div className="max-w-2xl mx-auto">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-bold text-gray-700">Progress</span>
+              <span className="text-sm font-bold text-blue-600">
+                {currentGame + 1}/{games.length}
+              </span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden shadow-inner">
               <div
-                className={`bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl ${
-                  isMobile ? "p-3" : "p-4"
-                } border border-blue-100`}
-              >
-                <div className={`flex items-start space-x-2 sm:space-x-3`}>
-                  <span
-                    className={`${
-                      isMobile ? "text-2xl" : "text-3xl"
-                    } flex-shrink-0`}
-                  >
-                    📅
-                  </span>
-                  <div className="min-w-0">
-                    <h4
-                      className={`font-bold text-blue-800 ${
-                        isMobile ? "text-sm" : "text-base"
-                      } mb-1`}
-                    >
-                      Birth Date
-                    </h4>
-                    <p
-                      className={`${
-                        isMobile ? "text-xs" : "text-sm"
-                      } text-blue-700 leading-tight`}
-                    >
-                      Jose Rizal was born on June 19, 1861, during the Spanish
-                      colonial period.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div
-                className={`bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl ${
-                  isMobile ? "p-3" : "p-4"
-                } border border-green-100`}
-              >
-                <div className={`flex items-start space-x-2 sm:space-x-3`}>
-                  <span
-                    className={`${
-                      isMobile ? "text-2xl" : "text-3xl"
-                    } flex-shrink-0`}
-                  >
-                    🏠
-                  </span>
-                  <div className="min-w-0">
-                    <h4
-                      className={`font-bold text-green-800 ${
-                        isMobile ? "text-sm" : "text-base"
-                      } mb-1`}
-                    >
-                      Birthplace
-                    </h4>
-                    <p
-                      className={`${
-                        isMobile ? "text-xs" : "text-sm"
-                      } text-green-700 leading-tight`}
-                    >
-                      He was born in Calamba, Laguna, in a house that still
-                      stands today as a shrine.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div
-                className={`bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl ${
-                  isMobile ? "p-3" : "p-4"
-                } border border-purple-100`}
-              >
-                <div className={`flex items-start space-x-2 sm:space-x-3`}>
-                  <span
-                    className={`${
-                      isMobile ? "text-2xl" : "text-3xl"
-                    } flex-shrink-0`}
-                  >
-                    👨‍👩‍👧‍👦
-                  </span>
-                  <div className="min-w-0">
-                    <h4
-                      className={`font-bold text-purple-800 ${
-                        isMobile ? "text-sm" : "text-base"
-                      } mb-1`}
-                    >
-                      Family
-                    </h4>
-                    <p
-                      className={`${
-                        isMobile ? "text-xs" : "text-sm"
-                      } text-purple-700 leading-tight`}
-                    >
-                      He was the seventh of eleven children in the Mercado-Rizal
-                      family.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div
-                className={`bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl ${
-                  isMobile ? "p-3" : "p-4"
-                } border border-amber-100`}
-              >
-                <div className={`flex items-start space-x-2 sm:space-x-3`}>
-                  <span
-                    className={`${
-                      isMobile ? "text-2xl" : "text-3xl"
-                    } flex-shrink-0`}
-                  >
-                    📜
-                  </span>
-                  <div className="min-w-0">
-                    <h4
-                      className={`font-bold text-amber-800 ${
-                        isMobile ? "text-sm" : "text-base"
-                      } mb-1`}
-                    >
-                      Full Name
-                    </h4>
-                    <p
-                      className={`${
-                        isMobile ? "text-xs" : "text-sm"
-                      } text-amber-700 leading-tight`}
-                    >
-                      His complete name was José Protasio Rizal Mercado y Alonso
-                      Realonda.
-                    </p>
-                  </div>
-                </div>
-              </div>
+                className="h-full bg-gradient-to-r from-blue-400 to-blue-500 rounded-full transition-all duration-500"
+                style={{
+                  width: `${((currentGame + 1) / games.length) * 100}%`,
+                }}
+              ></div>
             </div>
           </div>
-        </ResponsiveContainer>
+        </div>
+
+        {/* Game Title */}
+        <div className="text-center mb-8">
+          <div className="inline-block bg-white/95 backdrop-blur-sm rounded-3xl p-6 shadow-xl border-4 border-blue-200">
+            <div className="text-6xl mb-4">🎂</div>
+            <h2 className="text-3xl font-black text-gray-800 mb-2">
+              {games[currentGame].title}
+            </h2>
+            <p className="text-gray-600 font-medium">
+              Learn about Jose's beginning
+            </p>
+          </div>
+        </div>
+
+        {/* Current Game */}
+        {renderCurrentGame()}
+
+        {/* Educational Fact */}
+        <div className="mt-12 max-w-4xl mx-auto">
+          <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-6 shadow-xl border-4 border-yellow-200">
+            <div className="flex items-center space-x-4 mb-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                <span className="text-2xl">💡</span>
+              </div>
+              <div>
+                <h3 className="text-xl font-black text-gray-800">
+                  Did You Know?
+                </h3>
+                <p className="text-gray-600">
+                  Fun facts about Jose Rizal's birth
+                </p>
+              </div>
+            </div>
+            <div className="bg-yellow-50 rounded-2xl p-4 border-2 border-yellow-200">
+              <p className="text-gray-700 font-medium">
+                Jose Rizal was born on June 19, 1861, in Calamba, Laguna. He was
+                the seventh child in a family of eleven children. His full name
+                was José Protasio Rizal Mercado y Alonso Realonda!
+              </p>
+            </div>
+          </div>
+        </div>
       </main>
-    </MobileOptimizedGame>
+    </div>
   );
 }

@@ -293,43 +293,69 @@ export default function FamilyBackgroundGame({ username, onLogout }) {
   const celebrationTheme = getCelebrationTheme("completion");
 
   const renderQuizGame = (game) => (
-    <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl max-w-2xl mx-auto">
-      <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-        {game.question}
-      </h3>
-      <div className="grid grid-cols-1 gap-4">
-        {game.options.map((option, index) => (
-          <button
-            key={index}
-            onClick={() => handleQuizAnswer(index)}
-            disabled={showQuizResult}
-            className={`p-4 rounded-xl text-left transition-all duration-200 ${
-              showQuizResult
-                ? index === game.correct
-                  ? "bg-green-100 border-2 border-green-400 text-green-800"
-                  : index === selectedAnswer
-                  ? "bg-red-100 border-2 border-red-400 text-red-800"
-                  : "bg-gray-100 text-gray-600"
-                : "bg-purple-50 hover:bg-purple-100 border-2 border-purple-200 hover:border-purple-300"
-            }`}
-          >
-            {option}
-          </button>
-        ))}
-      </div>
-      {showQuizResult && (
-        <div className="mt-6 text-center">
-          {selectedAnswer === game.correct ? (
-            <div className="text-green-600 font-semibold">
-              Excellent! You know Jose's family! 🎉
-            </div>
-          ) : (
-            <div className="text-red-600 font-semibold">
-              Try again! Think about Jose's parents! 💪
-            </div>
-          )}
+    <div className="max-w-2xl mx-auto">
+      <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border-4 border-purple-200">
+        <h3 className="text-2xl font-black text-gray-800 mb-8 text-center leading-relaxed">
+          {game.question}
+        </h3>
+        <div className="grid grid-cols-1 gap-4">
+          {game.options.map((option, index) => (
+            <button
+              key={index}
+              onClick={() => handleQuizAnswer(index)}
+              disabled={showQuizResult}
+              className={`group p-5 rounded-2xl text-left transition-all duration-300 transform hover:scale-105 border-4 ${
+                showQuizResult
+                  ? index === game.correct
+                    ? "bg-gradient-to-r from-green-400 to-green-500 border-green-600 text-white shadow-xl animate-bounce"
+                    : index === selectedAnswer
+                    ? "bg-gradient-to-r from-red-400 to-red-500 border-red-600 text-white shadow-xl"
+                    : "bg-gray-100 border-gray-300 text-gray-600"
+                  : "bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200 hover:from-purple-100 hover:to-pink-100 hover:border-purple-400 hover:shadow-xl"
+              }`}
+            >
+              <div className="flex items-center space-x-4">
+                <div
+                  className={`w-12 h-12 rounded-full flex items-center justify-center font-black text-lg transition-all duration-300 ${
+                    showQuizResult && index === game.correct
+                      ? "bg-white text-green-500 animate-pulse"
+                      : showQuizResult && index === selectedAnswer
+                      ? "bg-white text-red-500"
+                      : showQuizResult
+                      ? "bg-gray-300 text-gray-500"
+                      : "bg-purple-500 text-white group-hover:bg-purple-600"
+                  }`}
+                >
+                  {String.fromCharCode(65 + index)}
+                </div>
+                <span className="font-bold text-lg leading-tight">
+                  {option}
+                </span>
+              </div>
+            </button>
+          ))}
         </div>
-      )}
+        {showQuizResult && (
+          <div className="mt-8 text-center">
+            <div
+              className={`inline-flex items-center space-x-3 px-6 py-4 rounded-2xl font-black text-lg shadow-lg ${
+                selectedAnswer === game.correct
+                  ? "bg-gradient-to-r from-green-400 to-emerald-500 text-white animate-bounce"
+                  : "bg-gradient-to-r from-orange-400 to-red-500 text-white"
+              }`}
+            >
+              <span className="text-2xl">
+                {selectedAnswer === game.correct ? "🎉" : "💪"}
+              </span>
+              <span>
+                {selectedAnswer === game.correct
+                  ? "Excellent! You know Jose's family!"
+                  : "Good try! Think about Jose's parents!"}
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 
@@ -607,96 +633,145 @@ export default function FamilyBackgroundGame({ username, onLogout }) {
   }
 
   return (
-    <ErrorBoundary onGoBack={handleBackToChapter}>
-      <div
-        className={`min-h-screen w-full bg-gradient-to-br ${chapterTheme.background}`}
-      >
-        <GameHeader
-          title="Family Background"
-          level={2}
-          chapter={1}
-          score={score}
-          onBack={handleBackToChapter}
-          onLogout={onLogout}
-          username={username}
-          theme="purple"
-          showScore={true}
-          maxScore={100}
-        />
+    <div className="min-h-screen w-full bg-gradient-to-br from-purple-100 via-pink-100 to-rose-100 relative overflow-hidden">
+      {/* Duolingo-style floating elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-16 h-16 bg-yellow-300 rounded-full opacity-10 animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-12 h-12 bg-blue-300 rounded-full opacity-15 animate-bounce"></div>
+        <div className="absolute bottom-32 left-20 w-20 h-20 bg-purple-300 rounded-full opacity-10"></div>
+        <div className="absolute bottom-20 right-10 w-14 h-14 bg-pink-300 rounded-full opacity-15 animate-pulse"></div>
+        <div className="absolute top-1/2 left-1/4 w-10 h-10 bg-rose-300 rounded-full opacity-10"></div>
+      </div>
 
-        {/* Main Content */}
-        <main className="w-full px-6 py-8">
-          {/* Progress */}
-          <div className="mb-8">
-            <ProgressBar
-              current={currentGame + 1}
-              total={games.length}
-              theme="purple"
-              showLabels={true}
-              showPercentage={true}
-              animated={true}
-              className="max-w-2xl mx-auto"
-            />
-          </div>
-
-          {/* Game Title */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center space-x-3 bg-white/80 backdrop-blur-sm rounded-2xl px-6 py-4 shadow-lg border border-white/20">
-              <span className="text-3xl">👨‍👩‍👧‍👦</span>
+      {/* Duolingo-style Header */}
+      <header className="bg-white shadow-lg sticky top-0 z-10 border-b-4 border-purple-400">
+        <div className="w-full px-6 py-4 flex justify-between items-center">
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={handleBackToChapter}
+              className="w-12 h-12 bg-gray-500 hover:bg-gray-600 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg border-b-2 border-gray-700 active:border-b-0"
+            >
+              <svg
+                className="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </button>
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                <span className="text-white font-bold text-xl">👨‍👩‍👧‍👦</span>
+              </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-800">
-                  {games[currentGame].title}
-                </h2>
-                <p className="text-sm text-gray-600">
-                  Discover Jose's loving family
+                <h1 className="text-2xl font-black text-gray-800">
+                  Family Background
+                </h1>
+                <p className="text-sm text-gray-600 font-medium">
+                  Level 2 • Chapter 1
                 </p>
               </div>
             </div>
           </div>
+          <div className="flex items-center space-x-3">
+            <div className="bg-white/90 rounded-full px-4 py-2 shadow-md border-2 border-purple-200">
+              <span className="text-purple-600 font-bold">Score: {score}</span>
+            </div>
+            <button
+              onClick={onLogout}
+              className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-full font-bold transition-all duration-200 shadow-lg border-b-2 border-red-700 active:border-b-0"
+            >
+              Exit
+            </button>
+          </div>
+        </div>
+      </header>
 
-          {/* Current Game */}
-          {renderCurrentGame()}
+      {/* Main Content */}
+      <main className="w-full px-6 py-8 relative z-10">
+        {/* Progress Bar */}
+        <div className="mb-8">
+          <div className="max-w-2xl mx-auto">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-bold text-gray-700">Progress</span>
+              <span className="text-sm font-bold text-purple-600">
+                {currentGame + 1}/{games.length}
+              </span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden shadow-inner">
+              <div
+                className="h-full bg-gradient-to-r from-purple-400 to-pink-500 rounded-full transition-all duration-500"
+                style={{
+                  width: `${((currentGame + 1) / games.length) * 100}%`,
+                }}
+              ></div>
+            </div>
+          </div>
+        </div>
 
-          {/* Educational Info */}
-          <div className="mt-12 bg-white/60 backdrop-blur-sm rounded-3xl p-6 shadow-lg max-w-4xl mx-auto">
-            <h3 className="text-xl font-bold text-center text-gray-800 mb-4">
-              Jose's Family Facts
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-600">
-              <div className="flex items-start space-x-3">
-                <span className="text-2xl">👨</span>
-                <div>
-                  <strong>Father - Francisco Mercado:</strong> A successful
-                  farmer and businessman who owned land in Calamba. He was
-                  well-respected in the community.
-                </div>
+        {/* Game Title */}
+        <div className="text-center mb-8">
+          <div className="inline-block bg-white/95 backdrop-blur-sm rounded-3xl p-6 shadow-xl border-4 border-purple-200">
+            <div className="text-6xl mb-4">👨‍👩‍👧‍👦</div>
+            <h2 className="text-3xl font-black text-gray-800 mb-2">
+              {games[currentGame].title}
+            </h2>
+            <p className="text-gray-600 font-medium">
+              Discover Jose's loving family
+            </p>
+          </div>
+        </div>
+
+        {/* Current Game */}
+        {renderCurrentGame()}
+
+        {/* Educational Fact */}
+        <div className="mt-12 max-w-4xl mx-auto">
+          <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-6 shadow-xl border-4 border-yellow-200">
+            <div className="flex items-center space-x-4 mb-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                <span className="text-2xl">💡</span>
               </div>
-              <div className="flex items-start space-x-3">
-                <span className="text-2xl">👩</span>
-                <div>
-                  <strong>Mother - Teodora Alonso:</strong> An educated woman
-                  who became Jose's first teacher. She taught him to read and
-                  write.
-                </div>
+              <div>
+                <h3 className="text-xl font-black text-gray-800">
+                  Family Facts
+                </h3>
+                <p className="text-gray-600">Learn about Jose's family</p>
               </div>
-              <div className="flex items-start space-x-3">
-                <span className="text-2xl">👨‍🎓</span>
-                <div>
-                  <strong>Brother - Paciano:</strong> Jose's older brother who
-                  supported his education and later joined the revolution.
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-blue-50 rounded-2xl p-4 border-2 border-blue-200">
+                <div className="flex items-center space-x-2 mb-2">
+                  <span className="text-2xl">👨</span>
+                  <span className="font-bold text-gray-800">
+                    Father - Francisco
+                  </span>
                 </div>
+                <p className="text-gray-700 text-sm">
+                  A successful farmer and businessman in Calamba
+                </p>
               </div>
-              <div className="flex items-start space-x-3">
-                <span className="text-2xl">👨‍👩‍👧‍👦</span>
-                <div>
-                  <strong>Large Family:</strong> Jose had 10 siblings, making
-                  them a family of 11 children total. He was the 7th child.
+              <div className="bg-pink-50 rounded-2xl p-4 border-2 border-pink-200">
+                <div className="flex items-center space-x-2 mb-2">
+                  <span className="text-2xl">👩</span>
+                  <span className="font-bold text-gray-800">
+                    Mother - Teodora
+                  </span>
                 </div>
+                <p className="text-gray-700 text-sm">
+                  An educated woman who became Jose's first teacher
+                </p>
               </div>
             </div>
           </div>
-        </main>
-      </div>
-    </ErrorBoundary>
+        </div>
+      </main>
+    </div>
   );
 }

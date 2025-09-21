@@ -35,238 +35,162 @@ export default function Login({ setToken }) {
   };
 
   return (
-    <div
-      className={`min-h-screen w-full bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 flex items-center justify-center ${
-        isMobile ? "p-4" : "p-6"
-      }`}
-    >
-      {/* Background decorative elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div
-          className={`absolute ${
-            isMobile ? "top-10 left-10 w-24 h-24" : "top-20 left-20 w-32 h-32"
-          } bg-blue-200/30 rounded-full blur-xl`}
-        ></div>
-        <div
-          className={`absolute ${
-            isMobile
-              ? "bottom-10 right-10 w-28 h-28"
-              : "bottom-20 right-20 w-40 h-40"
-          } bg-purple-200/30 rounded-full blur-xl`}
-        ></div>
-        <div
-          className={`absolute top-1/2 left-1/4 ${
-            isMobile ? "w-16 h-16" : "w-24 h-24"
-          } bg-indigo-200/30 rounded-full blur-xl`}
-        ></div>
+    <div className="min-h-screen bg-gradient-to-br from-green-400 via-blue-500 to-purple-600 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Duolingo-style floating elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-16 h-16 bg-yellow-300 rounded-full opacity-20 animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-12 h-12 bg-pink-300 rounded-full opacity-30 animate-bounce"></div>
+        <div className="absolute bottom-32 left-20 w-20 h-20 bg-blue-300 rounded-full opacity-25"></div>
+        <div className="absolute bottom-20 right-10 w-14 h-14 bg-green-300 rounded-full opacity-20 animate-pulse"></div>
+        <div className="absolute top-1/2 left-1/4 w-8 h-8 bg-purple-300 rounded-full opacity-30"></div>
       </div>
 
-      <div className={`relative w-full ${isMobile ? "max-w-sm" : "max-w-md"}`}>
-        {/* Header Section */}
-        <div className={`text-center ${isMobile ? "mb-6" : "mb-8"}`}>
-          <div
-            className={`inline-block ${
-              isMobile ? "p-3" : "p-4"
-            } bg-white/60 backdrop-blur-sm rounded-3xl shadow-lg ${
-              isMobile ? "mb-3" : "mb-4"
-            }`}
-          >
-            <div
-              className={`${
-                isMobile ? "w-16 h-16" : "w-20 h-20"
-              } bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full mx-auto ${
-                isMobile ? "mb-2" : "mb-3"
-              } flex items-center justify-center shadow-lg`}
-            >
-              <span
-                className={`text-white font-bold ${
-                  isMobile ? "text-xl" : "text-2xl"
-                }`}
-              >
-                JR
-              </span>
+      <div
+        className={`relative w-full ${isMobile ? "max-w-sm" : "max-w-md"} z-10`}
+      >
+        {/* Header with Duolingo-style mascot */}
+        <div className="text-center mb-8">
+          <div className="relative inline-block mb-6">
+            {/* Mascot container */}
+            <div className="w-24 h-24 mx-auto mb-4 relative">
+              <div className="w-full h-full bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg border-4 border-white">
+                <div className="text-white text-3xl font-bold">📚</div>
+              </div>
+              {/* Speech bubble */}
+              <div className="absolute -top-2 -right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full shadow-md animate-bounce">
+                Hi!
+              </div>
             </div>
-            <h1
-              className={`${
-                isMobile ? "text-2xl" : "text-3xl"
-              } font-bold text-gray-800 ${isMobile ? "mb-1" : "mb-2"}`}
-            >
-              Welcome Back!
+            <h1 className="text-3xl font-black text-white mb-2 drop-shadow-lg">
+              Welcome back!
             </h1>
-            <p
-              className={`text-gray-600 ${isMobile ? "text-sm" : "text-base"}`}
-            >
-              Continue your journey with Jose Rizal
+            <p className="text-white/90 font-medium">
+              Ready to continue learning?
             </p>
           </div>
         </div>
 
-        {/* Login Form */}
-        <div
-          className={`bg-white/70 backdrop-blur-sm rounded-3xl shadow-xl ${
-            isMobile ? "p-6" : "p-8"
-          }`}
-        >
-          <form
-            onSubmit={handleLogin}
-            className={`space-y-${isMobile ? "5" : "6"}`}
-          >
+        {/* Login Card */}
+        <div className="bg-white rounded-3xl shadow-2xl p-8 border-4 border-white/20">
+          <form onSubmit={handleLogin} className="space-y-6">
+            {/* Username Field */}
             <div>
-              <label
-                className={`block ${
-                  isMobile ? "text-xs" : "text-sm"
-                } font-semibold text-gray-700 mb-2`}
-              >
+              <label className="block text-gray-700 font-bold mb-3 text-lg">
                 Username
               </label>
               <div className="relative">
                 <input
                   type="text"
                   placeholder="Enter your username"
-                  className={`w-full px-4 ${
-                    isTouchDevice ? "py-4" : "py-3"
-                  } bg-white/80 border-2 border-blue-200 rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none focus:border-blue-400 focus:bg-white transition-all duration-200 ${
-                    isMobile ? "text-base" : "text-base"
-                  }`}
+                  className={`w-full px-6 ${
+                    isTouchDevice ? "py-5" : "py-4"
+                  } bg-gray-50 border-3 border-gray-200 rounded-2xl text-gray-800 placeholder-gray-400 focus:outline-none focus:border-green-400 focus:bg-white transition-all duration-300 text-lg font-medium shadow-inner`}
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
                   disabled={isLoading}
                 />
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  <svg
-                    className={`${
-                      isMobile ? "w-4 h-4" : "w-5 h-5"
-                    } text-gray-400`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                    />
-                  </svg>
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                  <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                    <span className="text-green-600 text-sm">👤</span>
+                  </div>
                 </div>
               </div>
             </div>
 
+            {/* Password Field */}
             <div>
-              <label
-                className={`block ${
-                  isMobile ? "text-xs" : "text-sm"
-                } font-semibold text-gray-700 mb-2`}
-              >
+              <label className="block text-gray-700 font-bold mb-3 text-lg">
                 Password
               </label>
               <div className="relative">
                 <input
                   type="password"
                   placeholder="Enter your password"
-                  className={`w-full px-4 ${
-                    isTouchDevice ? "py-4" : "py-3"
-                  } bg-white/80 border-2 border-blue-200 rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none focus:border-blue-400 focus:bg-white transition-all duration-200 ${
-                    isMobile ? "text-base" : "text-base"
-                  }`}
+                  className={`w-full px-6 ${
+                    isTouchDevice ? "py-5" : "py-4"
+                  } bg-gray-50 border-3 border-gray-200 rounded-2xl text-gray-800 placeholder-gray-400 focus:outline-none focus:border-green-400 focus:bg-white transition-all duration-300 text-lg font-medium shadow-inner`}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   disabled={isLoading}
                 />
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  <svg
-                    className={`${
-                      isMobile ? "w-4 h-4" : "w-5 h-5"
-                    } text-gray-400`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                    />
-                  </svg>
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                  <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                    <span className="text-green-600 text-sm">🔒</span>
+                  </div>
                 </div>
               </div>
             </div>
 
+            {/* Login Button */}
             <button
               type="submit"
               disabled={isLoading}
-              className={`w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white ${
-                isTouchDevice ? "py-4" : "py-3"
-              } rounded-xl font-semibold ${
+              className={`w-full bg-gradient-to-r from-green-500 to-green-600 text-white ${
+                isTouchDevice ? "py-5" : "py-4"
+              } rounded-2xl font-black text-lg ${
                 isLoading
                   ? "opacity-50 cursor-not-allowed"
                   : `${
                       isTouchDevice
-                        ? "active:from-blue-600 active:to-indigo-700"
-                        : "hover:from-blue-600 hover:to-indigo-700"
-                    } transition-all duration-200 shadow-lg ${
-                      isTouchDevice
-                        ? "active:shadow-xl active:scale-95"
-                        : "hover:shadow-xl hover:-translate-y-0.5"
-                    }`
-              } ${isTouchDevice ? "min-h-[48px]" : ""}`}
+                        ? "active:from-green-600 active:to-green-700 active:scale-95"
+                        : "hover:from-green-600 hover:to-green-700 hover:scale-105"
+                    } transition-all duration-200 shadow-lg hover:shadow-xl`
+              } border-b-4 border-green-700 active:border-b-2 uppercase tracking-wide`}
               {...touchProps}
             >
               {isLoading ? (
-                <div className="flex items-center justify-center space-x-2">
+                <div className="flex items-center justify-center space-x-3">
                   <LoadingSpinner size="sm" showMessage={false} />
-                  <span>Signing In...</span>
+                  <span>Logging in...</span>
                 </div>
               ) : (
-                "Start Learning"
+                <div className="flex items-center justify-center space-x-2">
+                  <span>Continue</span>
+                  <span className="text-xl">🚀</span>
+                </div>
               )}
             </button>
           </form>
 
+          {/* Error Message */}
           {error && (
-            <div
-              className={`mt-4 p-3 bg-red-100 border border-red-300 rounded-xl`}
-            >
-              <p
-                className={`text-red-700 ${
-                  isMobile ? "text-xs" : "text-sm"
-                } font-medium`}
-              >
-                {error}
-              </p>
+            <div className="mt-6 p-4 bg-red-50 border-2 border-red-200 rounded-2xl">
+              <div className="flex items-center space-x-2">
+                <span className="text-red-500 text-lg">😞</span>
+                <p className="text-red-700 font-semibold">{error}</p>
+              </div>
             </div>
           )}
 
-          <div className={`${isMobile ? "mt-5" : "mt-6"} text-center`}>
-            <p
-              className={`text-gray-600 ${isMobile ? "text-sm" : "text-base"}`}
-            >
-              New to our learning platform?{" "}
-              <Link
-                to="/register"
-                className={`text-blue-600 hover:text-blue-700 font-semibold hover:underline transition-colors ${
-                  isTouchDevice ? "active:text-blue-800" : ""
-                }`}
-                {...touchProps}
-              >
-                Create Account
-              </Link>
+          {/* Register Link */}
+          <div className="mt-8 text-center">
+            <p className="text-gray-600 font-medium mb-4">
+              New to our learning adventure?
             </p>
+            <Link
+              to="/register"
+              className="inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-2xl transition-all duration-200 hover:scale-105 shadow-lg border-b-4 border-blue-700 active:border-b-2"
+              {...touchProps}
+            >
+              Create Account 🎯
+            </Link>
           </div>
         </div>
 
         {/* Fun Fact */}
-        <div className={`${isMobile ? "mt-6" : "mt-8"} text-center`}>
-          <div
-            className={`inline-block bg-white/50 backdrop-blur-sm rounded-2xl px-4 sm:px-6 py-2 sm:py-3 shadow-md`}
-          >
-            <p className={`${isMobile ? "text-xs" : "text-sm"} text-gray-600`}>
-              <span className="font-semibold text-blue-600">Did you know?</span>{" "}
-              Jose Rizal could speak 22 languages!
-            </p>
+        <div className="mt-8 text-center">
+          <div className="inline-block bg-white/90 backdrop-blur-sm rounded-2xl px-6 py-4 shadow-lg border-2 border-white/50">
+            <div className="flex items-center space-x-2">
+              <span className="text-2xl">💡</span>
+              <div>
+                <p className="text-sm font-bold text-gray-800">Did you know?</p>
+                <p className="text-xs text-gray-600">
+                  Jose Rizal could speak 22 languages!
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

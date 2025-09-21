@@ -81,17 +81,26 @@ export default function Chapter1({ username, onLogout }) {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 via-sky-50 to-indigo-100">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm shadow-sm sticky top-0 z-10">
+    <div className="min-h-screen w-full bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 relative overflow-hidden">
+      {/* Duolingo-style floating elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-16 h-16 bg-yellow-300 rounded-full opacity-10 animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-12 h-12 bg-pink-300 rounded-full opacity-15 animate-bounce"></div>
+        <div className="absolute bottom-32 left-20 w-20 h-20 bg-blue-300 rounded-full opacity-10"></div>
+        <div className="absolute bottom-20 right-10 w-14 h-14 bg-green-300 rounded-full opacity-15 animate-pulse"></div>
+        <div className="absolute top-1/2 left-1/4 w-10 h-10 bg-purple-300 rounded-full opacity-10"></div>
+      </div>
+
+      {/* Duolingo-style Header */}
+      <header className="bg-white shadow-lg sticky top-0 z-10 border-b-4 border-blue-400">
         <div className="w-full px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-4">
             <button
               onClick={handleBackToHome}
-              className="w-10 h-10 bg-gradient-to-br from-gray-500 to-gray-600 rounded-full flex items-center justify-center hover:from-gray-600 hover:to-gray-700 transition-all duration-200"
+              className="w-12 h-12 bg-gray-500 hover:bg-gray-600 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg border-b-2 border-gray-700 active:border-b-0"
             >
               <svg
-                className="w-5 h-5 text-white"
+                className="w-6 h-6 text-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -104,42 +113,68 @@ export default function Chapter1({ username, onLogout }) {
                 />
               </svg>
             </button>
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-lg">1</span>
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800">
-                Chapter 1: Childhood in Calamba
-              </h1>
-              <p className="text-sm text-gray-600">
-                Choose a level to continue learning
-              </p>
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                <span className="text-white font-bold text-xl">1</span>
+              </div>
+              <div>
+                <h1 className="text-2xl font-black text-gray-800">
+                  Childhood in Calamba
+                </h1>
+                <p className="text-sm text-gray-600 font-medium">
+                  5 lessons • Chapter 1
+                </p>
+              </div>
             </div>
           </div>
           <button
             onClick={onLogout}
-            className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-2 rounded-full hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-full font-bold transition-all duration-200 shadow-lg border-b-2 border-red-700 active:border-b-0"
           >
-            Logout
+            Exit
           </button>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="w-full px-6 py-8">
-        {/* Chapter Hero */}
-        <div className="text-center mb-12">
-          <div className="inline-block p-6 bg-white/60 backdrop-blur-sm rounded-3xl shadow-lg mb-6">
-            <div className="w-32 h-32 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg">
-              <span className="text-5xl">🏠</span>
+        {/* Duolingo-style Chapter Hero */}
+        <div className="text-center mb-12 relative z-10">
+          <div className="relative inline-block mb-6">
+            <div className="w-40 h-40 mx-auto mb-6 relative">
+              <div className="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-xl border-4 border-white">
+                <div className="text-white text-6xl">🏠</div>
+              </div>
+              {/* Floating elements around mascot */}
+              <div className="absolute -top-2 -right-2 bg-yellow-400 text-yellow-900 text-sm font-bold px-3 py-2 rounded-full shadow-lg animate-bounce">
+                Start here!
+              </div>
+              <div className="absolute -bottom-1 -left-1 bg-green-400 text-white text-xs font-bold px-2 py-1 rounded-full shadow-md">
+                👶
+              </div>
             </div>
-            <h2 className="text-4xl font-bold text-gray-800 mb-2">
+            <h2 className="text-4xl font-black text-gray-800 mb-4">
               Childhood in Calamba
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 font-medium max-w-2xl mx-auto mb-6">
               Discover the early years of Jose Rizal in his hometown of Calamba,
               Laguna
             </p>
+
+            {/* Progress indicator */}
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg max-w-md mx-auto border-2 border-blue-200">
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-bold text-gray-800">
+                  Chapter Progress
+                </span>
+                <span className="text-blue-600 font-bold text-sm">
+                  3/5 complete
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                <div className="w-3/5 h-full bg-gradient-to-r from-blue-400 to-blue-500 rounded-full transition-all duration-500"></div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -148,8 +183,8 @@ export default function Chapter1({ username, onLogout }) {
           <ProgressDashboard type="chapter" chapterId={1} showBadges={true} />
         </div>
 
-        {/* Levels Grid - Now showing 5 levels in a better layout */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 max-w-6xl mx-auto">
+        {/* Duolingo-style Levels Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto relative z-10">
           {levels.map((level, index) => {
             const isUnlocked = isLevelUnlocked(1, level.id);
             const isCompleted = isLevelCompleted(1, level.id);
@@ -157,129 +192,137 @@ export default function Chapter1({ username, onLogout }) {
             return (
               <div
                 key={level.id}
-                className={`group relative overflow-hidden rounded-2xl shadow-lg transition-all duration-300 transform cursor-pointer ${
+                className={`group relative bg-white rounded-3xl shadow-lg transition-all duration-300 transform cursor-pointer border-4 border-white/50 overflow-hidden ${
                   isUnlocked
-                    ? "bg-white hover:shadow-2xl hover:-translate-y-2"
-                    : "bg-gray-100 opacity-60"
+                    ? "hover:shadow-2xl hover:scale-105"
+                    : "opacity-60 cursor-not-allowed"
                 }`}
-                style={{ animationDelay: `${index * 50}ms` }}
+                style={{ animationDelay: `${index * 100}ms` }}
                 onClick={() => handleLevelClick(level)}
               >
-                {/* Lock/Unlock Indicator */}
-                <div className="absolute top-4 right-4 z-10">
-                  {isCompleted ? (
-                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center shadow-md">
-                      <svg
-                        className="w-5 h-5 text-white"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                    </div>
-                  ) : isUnlocked ? (
-                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center shadow-md">
-                      <svg
-                        className="w-4 h-4 text-white"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
-                    </div>
-                  ) : (
-                    <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center shadow-md">
-                      <svg
-                        className="w-4 h-4 text-white"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                        />
-                      </svg>
-                    </div>
-                  )}
+                {/* Progress indicator */}
+                <div className="absolute top-0 left-0 right-0 h-2 bg-gray-200">
+                  <div
+                    className={`h-full transition-all duration-500 ${
+                      isCompleted
+                        ? "w-full bg-gradient-to-r from-green-400 to-green-500"
+                        : isUnlocked
+                        ? "w-1/2 bg-gradient-to-r from-blue-400 to-blue-500"
+                        : "w-0 bg-gray-300"
+                    }`}
+                  ></div>
                 </div>
 
-                {/* Level Number */}
-                <div className="absolute top-4 left-4 z-10">
-                  <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center shadow-md ${
-                      isUnlocked ? "bg-white/90" : "bg-gray-300/90"
-                    }`}
-                  >
-                    <span
-                      className={`text-lg font-bold ${
-                        isUnlocked ? "text-gray-800" : "text-gray-500"
+                {/* Status indicator */}
+                <div
+                  className={`absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center shadow-md ${
+                    isCompleted
+                      ? "bg-green-400"
+                      : isUnlocked
+                      ? "bg-blue-400"
+                      : "bg-gray-400"
+                  }`}
+                >
+                  <span className="text-white text-sm font-bold">
+                    {isCompleted ? "✓" : isUnlocked ? "▶" : "🔒"}
+                  </span>
+                </div>
+
+                {/* NEW indicator for recently unlocked levels */}
+                {isUnlocked && !isCompleted && level.id > 1 && (
+                  <div className="absolute top-4 left-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg animate-pulse">
+                    NEW!
+                  </div>
+                )}
+
+                <div className="p-6">
+                  {/* Level icon with Duolingo-style design */}
+                  <div className="relative mb-4">
+                    <div
+                      className={`w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg mx-auto border-4 border-white ${
+                        isUnlocked ? "group-hover:scale-110" : ""
+                      } transition-transform duration-300`}
+                    >
+                      <span className="text-white font-black text-2xl">
+                        {level.id}
+                      </span>
+                    </div>
+                    {/* Completion stars */}
+                    {isCompleted && (
+                      <div className="absolute -bottom-1 -right-1 bg-yellow-400 rounded-full w-6 h-6 flex items-center justify-center shadow-md">
+                        <span className="text-xs">⭐</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Level info */}
+                  <div className="text-center">
+                    <h3
+                      className={`text-xl font-black mb-2 transition-colors ${
+                        isUnlocked
+                          ? "text-gray-800 group-hover:text-gray-900"
+                          : "text-gray-500"
                       }`}
                     >
-                      {level.id}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="relative p-6 pt-16">
-                  {/* Title */}
-                  <h3
-                    className={`text-lg font-bold mb-2 transition-colors ${
-                      isUnlocked
-                        ? "text-gray-800 group-hover:text-gray-900"
-                        : "text-gray-500"
-                    }`}
-                  >
-                    {level.title}
-                  </h3>
-
-                  {/* Description */}
-                  <p
-                    className={`text-sm leading-relaxed ${
-                      isUnlocked ? "text-gray-600" : "text-gray-400"
-                    }`}
-                  >
-                    {level.description}
-                  </p>
-
-                  {/* Status Badge */}
-                  <div className="mt-4">
-                    <span
-                      className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
-                        isCompleted
-                          ? "bg-green-100 text-green-800"
-                          : isUnlocked
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-gray-100 text-gray-500"
+                      {level.title}
+                    </h3>
+                    <p
+                      className={`text-sm mb-4 leading-relaxed ${
+                        isUnlocked ? "text-gray-600" : "text-gray-400"
                       }`}
+                    >
+                      {level.description}
+                    </p>
+
+                    {/* Status badge */}
+                    <div className="mb-4">
+                      <span
+                        className={`text-xs font-bold uppercase tracking-wide ${
+                          isCompleted
+                            ? "text-green-600"
+                            : isUnlocked
+                            ? "text-blue-600"
+                            : "text-gray-500"
+                        }`}
+                      >
+                        {isCompleted
+                          ? "Complete"
+                          : isUnlocked
+                          ? "Ready"
+                          : "Locked"}
+                      </span>
+                    </div>
+
+                    {/* Action button */}
+                    <button
+                      className={`w-full font-black py-3 px-6 rounded-2xl transition-all duration-200 border-b-4 active:border-b-2 uppercase tracking-wide text-sm ${
+                        isCompleted
+                          ? "bg-gradient-to-r from-green-500 to-green-600 text-white border-green-700 hover:shadow-lg hover:scale-105"
+                          : isUnlocked
+                          ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white border-blue-700 hover:shadow-lg hover:scale-105"
+                          : "bg-gray-300 text-gray-500 border-gray-400 cursor-not-allowed opacity-60"
+                      }`}
+                      disabled={!isUnlocked}
                     >
                       {isCompleted
-                        ? "Completed"
+                        ? "✓ Review"
                         : isUnlocked
-                        ? "Available"
-                        : "Locked"}
-                    </span>
+                        ? "▶ Start"
+                        : "🔒 Complete Previous Level"}
+                    </button>
                   </div>
                 </div>
 
-                {/* Hover Effect Border */}
-                {isUnlocked && (
-                  <div className="absolute inset-0 border-2 border-transparent group-hover:border-blue-200 rounded-2xl transition-all duration-300"></div>
+                {/* Locked overlay */}
+                {!isUnlocked && (
+                  <div className="absolute inset-0 bg-gray-900/50 rounded-3xl flex items-center justify-center">
+                    <div className="text-center text-white">
+                      <div className="text-4xl mb-2">🔒</div>
+                      <p className="text-sm font-bold">
+                        Complete Level {level.id - 1}
+                      </p>
+                    </div>
+                  </div>
                 )}
               </div>
             );

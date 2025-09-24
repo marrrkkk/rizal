@@ -476,7 +476,7 @@ export default function RizalCorrespondenceGame({
                   className={`px-6 py-3 rounded-lg font-medium transition-colors ${
                     isLetterComplete()
                       ? "bg-amber-600 text-white hover:bg-amber-700"
-                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : "bg-gray-300 text-black cursor-not-allowed"
                   }`}
                 >
                   Send Letter

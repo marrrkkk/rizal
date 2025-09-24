@@ -250,7 +250,7 @@ export default function UstGame({ username, onLogout, onComplete }) {
                 {/* Score Display */}
                 <div className="text-center mb-8">
                   <div className="inline-block bg-gradient-to-r from-orange-100 to-amber-100 rounded-2xl p-6 border-2 border-orange-200">
-                    <p className="text-sm text-gray-600 mb-2">Your Score</p>
+                    <p className="text-sm text-black mb-2">Your Score</p>
                     <p className="text-5xl font-black text-orange-600 mb-2">
                       {Math.max(finalScore, 0)}%
                     </p>

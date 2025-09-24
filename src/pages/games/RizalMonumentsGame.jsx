@@ -252,7 +252,7 @@ export default function RizalMonumentsGame({ username, onLogout, onComplete }) {
                       ? "bg-green-100 border-green-400 text-green-800"
                       : index === selectedAnswer
                       ? "bg-red-100 border-red-400 text-red-800"
-                      : "bg-gray-100 border-gray-300 text-gray-600"
+                      : "bg-gray-100 border-gray-300 text-black"
                     : selectedAnswer === index
                     ? "bg-purple-100 border-purple-400 text-purple-800"
                     : "bg-gray-50 border-gray-200 text-black hover:bg-purple-50 hover:border-purple-300"
@@ -266,15 +266,15 @@ export default function RizalMonumentsGame({ username, onLogout, onComplete }) {
                           ? "bg-green-500 text-white"
                           : index === selectedAnswer
                           ? "bg-red-500 text-white"
-                          : "bg-gray-300 text-gray-600"
+                          : "bg-gray-300 text-black"
                         : selectedAnswer === index
                         ? "bg-purple-500 text-white"
-                        : "bg-gray-300 text-gray-600"
+                        : "bg-gray-300 text-black"
                     }`}
                   >
                     {String.fromCharCode(65 + index)}
                   </div>
-                  <span className="text-lg">{option}</span>
+                  <span className="text-lg text-black">{option}</span>
                 </div>
               </button>
             ))}
@@ -296,7 +296,7 @@ export default function RizalMonumentsGame({ username, onLogout, onComplete }) {
               className={`px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-200 ${
                 selectedAnswer !== null
                   ? "bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:shadow-lg transform hover:-translate-y-1"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-gray-300 text-black cursor-not-allowed"
               }`}
             >
               {currentMonument === monuments.length - 1

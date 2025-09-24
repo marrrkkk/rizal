@@ -310,7 +310,7 @@ export default function FamilyBackgroundGame({ username, onLogout }) {
                     ? "bg-gradient-to-r from-green-400 to-green-500 border-green-600 text-white shadow-xl animate-bounce"
                     : index === selectedAnswer
                     ? "bg-gradient-to-r from-red-400 to-red-500 border-red-600 text-white shadow-xl"
-                    : "bg-gray-100 border-gray-300 text-gray-600"
+                    : "bg-gray-100 border-gray-300 text-black"
                   : "bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200 hover:from-purple-100 hover:to-pink-100 hover:border-purple-400 hover:shadow-xl"
               }`}
             >
@@ -322,7 +322,7 @@ export default function FamilyBackgroundGame({ username, onLogout }) {
                       : showQuizResult && index === selectedAnswer
                       ? "bg-white text-red-500"
                       : showQuizResult
-                      ? "bg-gray-300 text-gray-500"
+                      ? "bg-gray-300 text-black"
                       : "bg-purple-500 text-white group-hover:bg-purple-600"
                   }`}
                 >

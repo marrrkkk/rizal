@@ -707,7 +707,7 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
                   theaterStory.characters.includes(char)
                     ? "bg-blue-200 text-blue-800 border-2 border-blue-400"
                     : theaterStory.characters.length >= 2
-                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    ? "bg-gray-100 text-black cursor-not-allowed"
                     : "bg-gray-50 hover:bg-blue-50 border-2 border-gray-200 hover:border-blue-300"
                 }`}
               >

@@ -204,7 +204,7 @@ export default function FirstTeacherGame({ username, onLogout }) {
                   ? "bg-green-100 border-2 border-green-400 text-green-800"
                   : index === selectedAnswer
                   ? "bg-red-100 border-2 border-red-400 text-red-800"
-                  : "bg-gray-100 text-gray-600"
+                  : "bg-gray-100 text-black"
                 : "bg-rose-50 hover:bg-rose-100 border-2 border-rose-200 hover:border-rose-300"
             }`}
           >

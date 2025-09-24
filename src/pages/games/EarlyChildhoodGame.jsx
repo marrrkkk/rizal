@@ -312,7 +312,7 @@ export default function EarlyChildhoodGame({ username, onLogout }) {
                   ? "bg-green-100 border-2 border-green-400 text-green-800"
                   : index === selectedAnswer
                   ? "bg-red-100 border-2 border-red-400 text-red-800"
-                  : "bg-gray-100 text-gray-600"
+                  : "bg-gray-100 text-black"
                 : "bg-green-50 hover:bg-green-100 border-2 border-green-200 hover:border-green-300"
             }`}
           >

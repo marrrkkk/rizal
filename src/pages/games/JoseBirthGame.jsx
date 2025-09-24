@@ -294,7 +294,7 @@ export default function JoseBirthGame({ username, onLogout, onComplete }) {
                     ? "bg-gradient-to-r from-green-400 to-green-500 border-green-600 text-white shadow-xl animate-bounce"
                     : index === selectedAnswer
                     ? "bg-gradient-to-r from-red-400 to-red-500 border-red-600 text-white shadow-xl"
-                    : "bg-gray-100 border-gray-300 text-gray-600"
+                    : "bg-gray-100 border-gray-300 text-black"
                   : "bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 hover:from-blue-100 hover:to-indigo-100 hover:border-blue-400 hover:shadow-xl"
               }`}
             >
@@ -306,7 +306,7 @@ export default function JoseBirthGame({ username, onLogout, onComplete }) {
                       : showQuizResult && index === selectedAnswer
                       ? "bg-white text-red-500"
                       : showQuizResult
-                      ? "bg-gray-300 text-gray-500"
+                      ? "bg-gray-300 text-black"
                       : "bg-blue-500 text-white group-hover:bg-blue-600"
                   }`}
                 >
@@ -369,7 +369,7 @@ export default function JoseBirthGame({ username, onLogout, onComplete }) {
                   (p) => p.text === game.pieces[index] && p.placed
                 )
                   ? "bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow-lg scale-105 animate-pulse"
-                  : "bg-white border-2 border-gray-300 text-gray-500 hover:border-blue-400 hover:bg-blue-50"
+                  : "bg-white border-2 border-gray-300 text-black hover:border-blue-400 hover:bg-blue-50"
               }`}
             >
               {puzzlePieces.find(

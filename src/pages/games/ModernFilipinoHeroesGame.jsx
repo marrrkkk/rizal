@@ -279,7 +279,7 @@ export default function ModernFilipinoHeroesGame({
                         ? "bg-green-100 border-green-400 text-green-800"
                         : index === selectedMatch
                         ? "bg-red-100 border-red-400 text-red-800"
-                        : "bg-gray-100 border-gray-300 text-gray-600"
+                        : "bg-gray-100 border-gray-300 text-black"
                       : selectedMatch === index
                       ? "bg-orange-100 border-orange-400 text-orange-800"
                       : "bg-gray-50 border-gray-200 text-black hover:bg-orange-50 hover:border-orange-300"
@@ -293,15 +293,15 @@ export default function ModernFilipinoHeroesGame({
                             ? "bg-green-500 text-white"
                             : index === selectedMatch
                             ? "bg-red-500 text-white"
-                            : "bg-gray-300 text-gray-600"
+                            : "bg-gray-300 text-black"
                           : selectedMatch === index
                           ? "bg-orange-500 text-white"
-                          : "bg-gray-300 text-gray-600"
+                          : "bg-gray-300 text-black"
                       }`}
                     >
                       {String.fromCharCode(65 + index)}
                     </div>
-                    <span className="text-lg">{value}</span>
+                    <span className="text-lg text-black">{value}</span>
                   </div>
                 </button>
               ))}
@@ -326,7 +326,7 @@ export default function ModernFilipinoHeroesGame({
               className={`px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-200 ${
                 selectedMatch !== null
                   ? "bg-gradient-to-r from-orange-500 to-red-600 text-white hover:shadow-lg transform hover:-translate-y-1"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-gray-300 text-black cursor-not-allowed"
               }`}
             >
               {currentHero === heroes.length - 1

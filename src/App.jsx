@@ -46,6 +46,14 @@ import DapitanLifeGame from "./pages/games/DapitanLifeGame";
 import RizalCorrespondenceGame from "./pages/games/RizalCorrespondenceGame";
 import TrialMartyrdomGame from "./pages/games/TrialMartyrdomGame";
 import LegacyBuilderGame from "./pages/games/LegacyBuilderGame";
+
+// Chapter 6 Games
+import Chapter6 from "./pages/Chapter6";
+import RizalGlobalImpactGame from "./pages/games/RizalGlobalImpactGame";
+import RizalDigitalAgeGame from "./pages/games/RizalDigitalAgeGame";
+import RizalMonumentsGame from "./pages/games/RizalMonumentsGame";
+import ModernFilipinoHeroesGame from "./pages/games/ModernFilipinoHeroesGame";
+import RizalEternalLegacyGame from "./pages/games/RizalEternalLegacyGame";
 import { setAuthToken } from "./utils/api";
 import { resetSessionTracking } from "./utils/progressManager";
 import { BadgeNotification } from "./components/BadgeSystem";
@@ -470,7 +478,9 @@ function App() {
               token ? (
                 <UstGame
                   username={username}
-                  onComplete={() => handleLevelComplete(2, 2)}
+                  onComplete={(score, timeSpent) =>
+                    handleLevelComplete(2, 2, score, timeSpent)
+                  }
                 />
               ) : (
                 <Navigate to="/login" />
@@ -744,6 +754,98 @@ function App() {
                   username={username}
                   onLogout={handleLogout}
                   onComplete={(score) => handleLevelComplete(5, 5, score)}
+                />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+
+          {/* Chapter 6 Routes */}
+          <Route
+            path="/chapter/6"
+            element={
+              token ? (
+                <Chapter6 username={username} onLogout={handleLogout} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/chapter/6/level/1"
+            element={
+              token ? (
+                <RizalGlobalImpactGame
+                  username={username}
+                  onLogout={handleLogout}
+                  onComplete={(score, timeSpent) =>
+                    handleLevelComplete(6, 1, score, timeSpent)
+                  }
+                />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/chapter/6/level/2"
+            element={
+              token ? (
+                <RizalDigitalAgeGame
+                  username={username}
+                  onLogout={handleLogout}
+                  onComplete={(score, timeSpent) =>
+                    handleLevelComplete(6, 2, score, timeSpent)
+                  }
+                />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/chapter/6/level/3"
+            element={
+              token ? (
+                <RizalMonumentsGame
+                  username={username}
+                  onLogout={handleLogout}
+                  onComplete={(score, timeSpent) =>
+                    handleLevelComplete(6, 3, score, timeSpent)
+                  }
+                />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/chapter/6/level/4"
+            element={
+              token ? (
+                <ModernFilipinoHeroesGame
+                  username={username}
+                  onLogout={handleLogout}
+                  onComplete={(score, timeSpent) =>
+                    handleLevelComplete(6, 4, score, timeSpent)
+                  }
+                />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/chapter/6/level/5"
+            element={
+              token ? (
+                <RizalEternalLegacyGame
+                  username={username}
+                  onLogout={handleLogout}
+                  onComplete={(score, timeSpent) =>
+                    handleLevelComplete(6, 5, score, timeSpent)
+                  }
                 />
               ) : (
                 <Navigate to="/login" />

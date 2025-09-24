@@ -124,7 +124,7 @@ export default function Chapter4({ username, onLogout }) {
                 <span className="text-white font-bold text-xl">4</span>
               </div>
               <div>
-                <h1 className="text-2xl font-black text-gray-800">
+                <h1 className="text-2xl font-black text-black">
                   Noli Me Tangere
                 </h1>
                 <p className="text-sm text-gray-600 font-medium">

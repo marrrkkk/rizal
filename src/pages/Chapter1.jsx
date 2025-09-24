@@ -118,10 +118,10 @@ export default function Chapter1({ username, onLogout }) {
                 <span className="text-white font-bold text-xl">1</span>
               </div>
               <div>
-                <h1 className="text-2xl font-black text-gray-800">
+                <h1 className="text-2xl font-black text-black">
                   Childhood in Calamba
                 </h1>
-                <p className="text-sm text-gray-600 font-medium">
+                <p className="text-sm text-black font-medium">
                   5 lessons • Chapter 1
                 </p>
               </div>
@@ -153,10 +153,10 @@ export default function Chapter1({ username, onLogout }) {
                 👶
               </div>
             </div>
-            <h2 className="text-4xl font-black text-gray-800 mb-4">
+            <h2 className="text-4xl font-black text-black mb-4">
               Childhood in Calamba
             </h2>
-            <p className="text-lg text-gray-600 font-medium max-w-2xl mx-auto mb-6">
+            <p className="text-lg text-black font-medium max-w-2xl mx-auto mb-6">
               Discover the early years of Jose Rizal in his hometown of Calamba,
               Laguna
             </p>
@@ -164,9 +164,7 @@ export default function Chapter1({ username, onLogout }) {
             {/* Progress indicator */}
             <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg max-w-md mx-auto border-2 border-blue-200">
               <div className="flex items-center justify-between mb-2">
-                <span className="font-bold text-gray-800">
-                  Chapter Progress
-                </span>
+                <span className="font-bold text-black">Chapter Progress</span>
                 <span className="text-blue-600 font-bold text-sm">
                   3/5 complete
                 </span>
@@ -260,7 +258,7 @@ export default function Chapter1({ username, onLogout }) {
                     <h3
                       className={`text-xl font-black mb-2 transition-colors ${
                         isUnlocked
-                          ? "text-gray-800 group-hover:text-gray-900"
+                          ? "text-black group-hover:text-gray-900"
                           : "text-gray-500"
                       }`}
                     >
@@ -268,7 +266,7 @@ export default function Chapter1({ username, onLogout }) {
                     </h3>
                     <p
                       className={`text-sm mb-4 leading-relaxed ${
-                        isUnlocked ? "text-gray-600" : "text-gray-400"
+                        isUnlocked ? "text-black" : "text-gray-400"
                       }`}
                     >
                       {level.description}

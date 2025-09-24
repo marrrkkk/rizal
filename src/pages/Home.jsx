@@ -386,16 +386,16 @@ export default function Home({ username, onLogout, onShowAnalytics }) {
 
                     {/* Chapter info */}
                     <div className="text-center">
-                      <h3 className="text-xl font-black text-gray-800 mb-2 group-hover:text-gray-900 transition-colors">
+                      <h3 className="text-xl font-black text-black mb-2 group-hover:text-gray-900 transition-colors">
                         {chapter.title}
                       </h3>
-                      <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                      <p className="text-sm text-black mb-4 leading-relaxed">
                         {chapter.description}
                       </p>
 
                       {/* Lesson count */}
                       <div className="flex items-center justify-center space-x-2 mb-4">
-                        <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">
+                        <span className="text-xs font-bold text-black uppercase tracking-wide">
                           5 Lessons
                         </span>
                         <div className="w-2 h-2 bg-gray-300 rounded-full"></div>

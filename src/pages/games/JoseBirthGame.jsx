@@ -282,39 +282,41 @@ export default function JoseBirthGame({ username, onLogout, onComplete }) {
         <h3 className="text-2xl font-black text-gray-800 mb-8 text-center leading-relaxed">
           {game.question}
         </h3>
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {game.options.map((option, index) => (
             <button
               key={index}
               onClick={() => handleQuizAnswer(index)}
               disabled={showQuizResult}
-              className={`group p-5 rounded-2xl text-left transition-all duration-300 transform hover:scale-105 border-4 ${
+              className={`p-6 rounded-2xl border-4 transition-all duration-200 text-left font-semibold ${
                 showQuizResult
                   ? index === game.correct
-                    ? "bg-gradient-to-r from-green-400 to-green-500 border-green-600 text-white shadow-xl animate-bounce"
+                    ? "bg-green-100 border-green-400 text-green-800"
                     : index === selectedAnswer
-                    ? "bg-gradient-to-r from-red-400 to-red-500 border-red-600 text-white shadow-xl"
+                    ? "bg-red-100 border-red-400 text-red-800"
                     : "bg-gray-100 border-gray-300 text-black"
-                  : "bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 hover:from-blue-100 hover:to-indigo-100 hover:border-blue-400 hover:shadow-xl"
+                  : selectedAnswer === index
+                  ? "bg-blue-100 border-blue-400 text-blue-800"
+                  : "bg-gray-50 border-gray-200 text-black hover:bg-blue-50 hover:border-blue-300"
               }`}
             >
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center">
                 <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center font-black text-lg transition-all duration-300 ${
-                    showQuizResult && index === game.correct
-                      ? "bg-white text-green-500 animate-pulse"
-                      : showQuizResult && index === selectedAnswer
-                      ? "bg-white text-red-500"
-                      : showQuizResult
-                      ? "bg-gray-300 text-black"
-                      : "bg-blue-500 text-white group-hover:bg-blue-600"
+                  className={`w-8 h-8 rounded-full flex items-center justify-center mr-4 font-bold ${
+                    showQuizResult
+                      ? index === game.correct
+                        ? "bg-green-500 text-white"
+                        : index === selectedAnswer
+                        ? "bg-red-500 text-white"
+                        : "bg-gray-300 text-black"
+                      : selectedAnswer === index
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-300 text-black"
                   }`}
                 >
                   {String.fromCharCode(65 + index)}
                 </div>
-                <span className="font-bold text-lg leading-tight">
-                  {option}
-                </span>
+                <span className="text-lg text-black">{option}</span>
               </div>
             </button>
           ))}

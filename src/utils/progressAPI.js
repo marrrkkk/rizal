@@ -144,6 +144,7 @@ export const getChapterProgress = (progressData, chapterId) => {
     3: "Studies Abroad",
     4: "Noli Me Tangere",
     5: "Return to the Philippines",
+    6: "Exile and Legacy",
   };
 
   return {

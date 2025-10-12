@@ -29,4 +29,37 @@ if (!$username) {
     exit;
 }
 
-echo json_encode(['message' => "Hello, $username! This is protected data."]);
+// Get user information from database
+require_once __DIR__ . '/../db.php';
+
+try {
+    $stmt = $pdo->prepare('SELECT id, username, created_at FROM users WHERE username = ?');
+    $stmt->execute([$username]);
+    $user = $stmt->fetch();
+
+    if (!$user) {
+        http_response_code(404);
+        echo json_encode(['error' => 'User not found']);
+        exit;
+    }
+
+    // Get basic progress info
+    $stmt = $pdo->prepare('SELECT COUNT(*) as total_completed FROM user_progress WHERE user_id = ? AND is_completed = 1');
+    $stmt->execute([$user['id']]);
+    $progressInfo = $stmt->fetch();
+
+    echo json_encode([
+        'message' => "Hello, $username! This is protected data.",
+        'user' => [
+            'id' => $user['id'],
+            'username' => $user['username'],
+            'created_at' => $user['created_at'],
+            'levels_completed' => (int)$progressInfo['total_completed']
+        ]
+    ]);
+} catch (Exception $e) {
+    echo json_encode([
+        'message' => "Hello, $username! This is protected data.",
+        'user' => ['username' => $username]
+    ]);
+}

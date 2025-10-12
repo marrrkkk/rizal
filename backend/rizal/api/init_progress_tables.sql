@@ -1,52 +1,66 @@
--- SQL script to create progress tracking tables
--- Run this in your MySQL database
+-- SQL script to create progress tracking tables for SQLite
+-- Run this to initialize the SQLite database
+
+-- Create users table first (if it doesn't exist)
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 
 -- Create user_progress table to track level completion and unlocking
 CREATE TABLE IF NOT EXISTS user_progress (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    chapter_id INT NOT NULL,
-    level_id INT NOT NULL,
-    is_unlocked BOOLEAN DEFAULT FALSE,
-    is_completed BOOLEAN DEFAULT FALSE,
-    score INT DEFAULT 0,
-    completion_date TIMESTAMP NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    UNIQUE KEY unique_user_chapter_level (user_id, chapter_id, level_id),
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    chapter_id INTEGER NOT NULL,
+    level_id INTEGER NOT NULL,
+    is_unlocked INTEGER DEFAULT 0,
+    is_completed INTEGER DEFAULT 0,
+    score INTEGER DEFAULT 0,
+    completion_date DATETIME NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, chapter_id, level_id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- Create user_badges table to track earned badges
 CREATE TABLE IF NOT EXISTS user_badges (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    badge_type VARCHAR(50) NOT NULL,
-    badge_name VARCHAR(100) NOT NULL,
-    earned_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE KEY unique_user_badge (user_id, badge_type),
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    badge_type TEXT NOT NULL,
+    badge_name TEXT NOT NULL,
+    earned_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, badge_type),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- Create user_statistics table for overall progress tracking
 CREATE TABLE IF NOT EXISTS user_statistics (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL UNIQUE,
-    total_levels_completed INT DEFAULT 0,
-    total_score INT DEFAULT 0,
-    average_score DECIMAL(5,2) DEFAULT 0.00,
-    current_streak INT DEFAULT 0,
-    longest_streak INT DEFAULT 0,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL UNIQUE,
+    total_levels_completed INTEGER DEFAULT 0,
+    total_score INTEGER DEFAULT 0,
+    average_score REAL DEFAULT 0.0,
+    current_streak INTEGER DEFAULT 0,
+    longest_streak INTEGER DEFAULT 0,
     last_played_date DATE NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Insert initial progress for existing users (Chapter 1, Level 1 unlocked)
-INSERT IGNORE INTO user_progress (user_id, chapter_id, level_id, is_unlocked)
-SELECT id, 1, 1, TRUE FROM users;
+-- Create trigger to update updated_at timestamp for user_progress
+CREATE TRIGGER IF NOT EXISTS update_user_progress_timestamp 
+    AFTER UPDATE ON user_progress
+BEGIN
+    UPDATE user_progress SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
+END;
 
--- Insert initial statistics for existing users
-INSERT IGNORE INTO user_statistics (user_id)
-SELECT id FROM users;
+-- Create trigger to update updated_at timestamp for user_statistics
+CREATE TRIGGER IF NOT EXISTS update_user_statistics_timestamp 
+    AFTER UPDATE ON user_statistics
+BEGIN
+    UPDATE user_statistics SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
+END;

@@ -72,6 +72,7 @@ import { usePerformanceOptimization } from "./hooks/usePerformanceOptimization";
 import { useProgressAPI } from "./hooks/useProgressAPI";
 import { useAnalytics } from "./hooks/useAnalytics";
 import AnalyticsDashboard from "./components/AnalyticsDashboard";
+import ConnectionStatus from "./components/ConnectionStatus";
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem("token"));
@@ -106,11 +107,12 @@ function App() {
     }
   }, [setToastManager]);
 
-  // Use the database-backed progress system
+  // Use the database-backed progress system with localStorage fallback
   const {
     progressData,
     loading: progressLoading,
     error: progressError,
+    usingFallback,
     completeLevel: completeUserLevel,
     refreshProgress,
     isLevelUnlocked,
@@ -310,6 +312,9 @@ function App() {
   return (
     <ErrorBoundary>
       <BrowserRouter>
+        {/* Connection Status Indicator */}
+        <ConnectionStatus usingFallback={usingFallback} error={progressError} />
+
         {/* Celebration Animation */}
         {showCelebration && (
           <CelebrationAnimation

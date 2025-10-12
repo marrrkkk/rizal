@@ -1,10 +1,10 @@
 <?php
 // api/auth/register.php
-header("Access-Control-Allow-Origin: http://localhost:5173");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Credentials: false");
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    // Preflight request, just respond with 200 OK and exit
     http_response_code(200);
     exit();
 }
@@ -29,11 +29,34 @@ if ($stmt->fetch()) {
     exit;
 }
 
-$hashed_password = password_hash($password, PASSWORD_DEFAULT);
-$stmt = $pdo->prepare('INSERT INTO users (username, password) VALUES (?, ?)');
-if ($stmt->execute([$username, $hashed_password])) {
-    echo json_encode(['message' => 'User registered successfully']);
-} else {
+try {
+    $pdo->beginTransaction();
+
+    // Create user
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+    $stmt = $pdo->prepare('INSERT INTO users (username, password) VALUES (?, ?)');
+    $stmt->execute([$username, $hashed_password]);
+
+    // Get the new user ID
+    $userId = $pdo->lastInsertId();
+
+    // Initialize progress for new user (Chapter 1, Level 1 unlocked)
+    $stmt = $pdo->prepare('INSERT INTO user_progress (user_id, chapter_id, level_id, is_unlocked) VALUES (?, 1, 1, 1)');
+    $stmt->execute([$userId]);
+
+    // Initialize user statistics
+    $stmt = $pdo->prepare('INSERT INTO user_statistics (user_id) VALUES (?)');
+    $stmt->execute([$userId]);
+
+    $pdo->commit();
+
+    echo json_encode([
+        'message' => 'User registered successfully',
+        'user_id' => $userId,
+        'progress_initialized' => true
+    ]);
+} catch (Exception $e) {
+    $pdo->rollBack();
     http_response_code(500);
-    echo json_encode(['error' => 'Registration failed']);
+    echo json_encode(['error' => 'Registration failed: ' . $e->getMessage()]);
 }

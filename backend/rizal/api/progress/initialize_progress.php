@@ -1,8 +1,9 @@
 <?php
 // api/progress/initialize_progress.php
-header("Access-Control-Allow-Origin: http://localhost:5173");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Credentials: false");
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
   http_response_code(200);
   exit();
@@ -56,13 +57,13 @@ try {
     // Initialize Chapter 1, Level 1 as unlocked
     $stmt = $pdo->prepare('
             INSERT INTO user_progress (user_id, chapter_id, level_id, is_unlocked)
-            VALUES (?, 1, 1, TRUE)
+            VALUES (?, 1, 1, 1)
         ');
     $stmt->execute([$userId]);
 
     // Initialize user statistics
     $stmt = $pdo->prepare('
-            INSERT IGNORE INTO user_statistics (user_id)
+            INSERT OR IGNORE INTO user_statistics (user_id)
             VALUES (?)
         ');
     $stmt->execute([$userId]);

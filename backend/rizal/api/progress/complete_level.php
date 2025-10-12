@@ -1,8 +1,9 @@
 <?php
 // api/progress/complete_level.php
-header("Access-Control-Allow-Origin: http://localhost:5173");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Credentials: false");
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
   http_response_code(200);
   exit();
@@ -50,7 +51,7 @@ $chapterId = (int)($data['chapter'] ?? 0);
 $levelId = (int)($data['level'] ?? 0);
 $score = (int)($data['score'] ?? 0);
 
-if ($chapterId < 1 || $chapterId > 5 || $levelId < 1 || $levelId > 5) {
+if ($chapterId < 1 || $chapterId > 6 || $levelId < 1 || $levelId > 5) {
   http_response_code(400);
   echo json_encode(['error' => 'Invalid chapter or level']);
   exit;
@@ -82,7 +83,7 @@ try {
   // Update level completion
   $stmt = $pdo->prepare('
         UPDATE user_progress 
-        SET is_completed = TRUE, score = ?, completion_date = NOW(), updated_at = NOW()
+        SET is_completed = 1, score = ?, completion_date = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
         WHERE user_id = ? AND chapter_id = ? AND level_id = ?
     ');
   $stmt->execute([$newScore, $userId, $chapterId, $levelId]);
@@ -93,9 +94,8 @@ try {
   $nextLevel = $levelId + 1;
   if ($nextLevel <= 5) {
     $stmt = $pdo->prepare('
-            INSERT INTO user_progress (user_id, chapter_id, level_id, is_unlocked)
-            VALUES (?, ?, ?, TRUE)
-            ON DUPLICATE KEY UPDATE is_unlocked = TRUE, updated_at = NOW()
+            INSERT OR REPLACE INTO user_progress (user_id, chapter_id, level_id, is_unlocked, updated_at)
+            VALUES (?, ?, ?, 1, CURRENT_TIMESTAMP)
         ');
     $stmt->execute([$userId, $chapterId, $nextLevel]);
   }
@@ -104,7 +104,7 @@ try {
   $stmt = $pdo->prepare('
         SELECT COUNT(*) as completed_count
         FROM user_progress 
-        WHERE user_id = ? AND chapter_id = ? AND is_completed = TRUE
+        WHERE user_id = ? AND chapter_id = ? AND is_completed = 1
     ');
   $stmt->execute([$userId, $chapterId]);
   $completedInChapter = $stmt->fetch()['completed_count'];
@@ -118,7 +118,7 @@ try {
     $badgeName = "Chapter {$chapterId} Master";
 
     $stmt = $pdo->prepare('
-            INSERT IGNORE INTO user_badges (user_id, badge_type, badge_name)
+            INSERT OR IGNORE INTO user_badges (user_id, badge_type, badge_name)
             VALUES (?, ?, ?)
         ');
     if ($stmt->execute([$userId, $badgeType, $badgeName])) {
@@ -129,11 +129,10 @@ try {
 
     // Unlock first level of next chapter
     $nextChapter = $chapterId + 1;
-    if ($nextChapter <= 5) {
+    if ($nextChapter <= 6) {
       $stmt = $pdo->prepare('
-                INSERT INTO user_progress (user_id, chapter_id, level_id, is_unlocked)
-                VALUES (?, ?, 1, TRUE)
-                ON DUPLICATE KEY UPDATE is_unlocked = TRUE, updated_at = NOW()
+                INSERT OR REPLACE INTO user_progress (user_id, chapter_id, level_id, is_unlocked, updated_at)
+                VALUES (?, ?, 1, 1, CURRENT_TIMESTAMP)
             ');
       $stmt->execute([$userId, $nextChapter]);
     }
@@ -142,13 +141,13 @@ try {
   // Award other badges
   if ($isFirstCompletion) {
     // First level completion badge
-    $stmt = $pdo->prepare('SELECT COUNT(*) as total FROM user_progress WHERE user_id = ? AND is_completed = TRUE');
+    $stmt = $pdo->prepare('SELECT COUNT(*) as total FROM user_progress WHERE user_id = ? AND is_completed = 1');
     $stmt->execute([$userId]);
     $totalCompleted = $stmt->fetch()['total'];
 
     if ($totalCompleted == 1) {
       $stmt = $pdo->prepare('
-                INSERT IGNORE INTO user_badges (user_id, badge_type, badge_name)
+                INSERT OR IGNORE INTO user_badges (user_id, badge_type, badge_name)
                 VALUES (?, "first_level_complete", "First Steps")
             ');
       if ($stmt->execute([$userId]) && $stmt->rowCount() > 0) {
@@ -159,7 +158,7 @@ try {
     // Perfect score badge
     if ($score >= 100) {
       $stmt = $pdo->prepare('
-                INSERT IGNORE INTO user_badges (user_id, badge_type, badge_name)
+                INSERT OR IGNORE INTO user_badges (user_id, badge_type, badge_name)
                 VALUES (?, "perfect_score", "Perfect Scholar")
             ');
       if ($stmt->execute([$userId]) && $stmt->rowCount() > 0) {
@@ -170,7 +169,7 @@ try {
     // Knowledge seeker badge (10 levels)
     if ($totalCompleted >= 10) {
       $stmt = $pdo->prepare('
-                INSERT IGNORE INTO user_badges (user_id, badge_type, badge_name)
+                INSERT OR IGNORE INTO user_badges (user_id, badge_type, badge_name)
                 VALUES (?, "knowledge_seeker", "Knowledge Seeker")
             ');
       if ($stmt->execute([$userId]) && $stmt->rowCount() > 0) {
@@ -180,16 +179,16 @@ try {
 
     // Rizal expert badge (all chapters complete)
     $stmt = $pdo->prepare('
-            SELECT COUNT(DISTINCT chapter_id) as completed_chapters
+            SELECT COUNT(*) as total_completed
             FROM user_progress 
-            WHERE user_id = ? AND is_completed = TRUE
-            GROUP BY user_id
-            HAVING COUNT(*) >= 25
+            WHERE user_id = ? AND is_completed = 1
         ');
     $stmt->execute([$userId]);
-    if ($stmt->fetch()) {
+    $totalCompleted = $stmt->fetch()['total_completed'];
+
+    if ($totalCompleted >= 30) {
       $stmt = $pdo->prepare('
-                INSERT IGNORE INTO user_badges (user_id, badge_type, badge_name)
+                INSERT OR IGNORE INTO user_badges (user_id, badge_type, badge_name)
                 VALUES (?, "rizal_expert", "Rizal Expert")
             ');
       if ($stmt->execute([$userId]) && $stmt->rowCount() > 0) {
@@ -205,20 +204,14 @@ try {
             AVG(score) as avg_score,
             SUM(score) as total_score
         FROM user_progress 
-        WHERE user_id = ? AND is_completed = TRUE
+        WHERE user_id = ? AND is_completed = 1
     ');
   $stmt->execute([$userId]);
   $stats = $stmt->fetch();
 
   $stmt = $pdo->prepare('
-        INSERT INTO user_statistics (user_id, total_levels_completed, total_score, average_score, last_played_date)
-        VALUES (?, ?, ?, ?, CURDATE())
-        ON DUPLICATE KEY UPDATE 
-            total_levels_completed = VALUES(total_levels_completed),
-            total_score = VALUES(total_score),
-            average_score = VALUES(average_score),
-            last_played_date = VALUES(last_played_date),
-            updated_at = NOW()
+        INSERT OR REPLACE INTO user_statistics (user_id, total_levels_completed, total_score, average_score, last_played_date, updated_at)
+        VALUES (?, ?, ?, ?, DATE("now"), CURRENT_TIMESTAMP)
     ');
   $stmt->execute([
     $userId,
@@ -236,7 +229,7 @@ try {
     'newBadges' => $newBadges,
     'chapterComplete' => $chapterComplete,
     'nextLevelUnlocked' => $nextLevel <= 5 ? ['chapter' => $chapterId, 'level' => $nextLevel] : null,
-    'nextChapterUnlocked' => ($chapterComplete && $chapterId < 5) ? ['chapter' => $chapterId + 1, 'level' => 1] : null
+    'nextChapterUnlocked' => ($chapterComplete && $chapterId < 6) ? ['chapter' => $chapterId + 1, 'level' => 1] : null
   ]);
 } catch (Exception $e) {
   $pdo->rollBack();

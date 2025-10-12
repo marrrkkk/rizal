@@ -210,46 +210,61 @@ export default function EuropeanQuizGame({ onComplete }) {
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-6">{currentQ.question}</h2>
 
-        <div className="space-y-3">
-          {currentQ.options.map((option, index) => {
-            let buttonClass =
-              "w-full text-left p-4 rounded-md border border-gray-300 hover:border-blue-500 transition-colors";
-
-            if (selectedAnswer !== null) {
-              if (index === currentQ.correct) {
-                buttonClass += " bg-green-100 border-green-500";
-              } else if (
-                index === selectedAnswer &&
-                index !== currentQ.correct
-              ) {
-                buttonClass += " bg-red-100 border-red-500";
-              }
-            } else {
-              buttonClass += " hover:bg-gray-50";
-            }
-
-            return (
-              <button
-                key={index}
-                onClick={() => handleAnswer(index)}
-                className={buttonClass}
-                disabled={selectedAnswer !== null}
-              >
-                {option}
-              </button>
-            );
-          })}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {currentQ.options.map((option, index) => (
+            <button
+              key={index}
+              onClick={() => handleAnswer(index)}
+              disabled={selectedAnswer !== null}
+              className={`p-6 rounded-2xl border-4 transition-all duration-200 text-left font-semibold ${
+                selectedAnswer !== null
+                  ? index === currentQ.correct
+                    ? "bg-green-100 border-green-400 text-green-800"
+                    : index === selectedAnswer
+                    ? "bg-red-100 border-red-400 text-red-800"
+                    : "bg-gray-100 border-gray-300 text-black"
+                  : selectedAnswer === index
+                  ? "bg-blue-100 border-blue-400 text-blue-800"
+                  : "bg-gray-50 border-gray-200 text-black hover:bg-blue-50 hover:border-blue-300"
+              }`}
+            >
+              <div className="flex items-center">
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center mr-4 font-bold ${
+                    selectedAnswer !== null
+                      ? index === currentQ.correct
+                        ? "bg-green-500 text-white"
+                        : index === selectedAnswer
+                        ? "bg-red-500 text-white"
+                        : "bg-gray-300 text-black"
+                      : selectedAnswer === index
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-300 text-black"
+                  }`}
+                >
+                  {String.fromCharCode(65 + index)}
+                </div>
+                <span className="text-lg text-black">{option}</span>
+              </div>
+            </button>
+          ))}
         </div>
       </div>
 
       {selectedAnswer !== null && (
-        <div className="mt-6 p-4 rounded-md bg-blue-50 border border-blue-200">
-          <p className="font-medium text-blue-800">
-            {isCorrect ? "Correct!" : "Incorrect."} {currentQ.explanation}
-          </p>
+        <div className="bg-blue-50 rounded-2xl p-6 mb-6 border-2 border-blue-200">
+          <h3 className="font-bold text-blue-800 mb-2">
+            {isCorrect ? "Correct!" : "Incorrect."}
+          </h3>
+          <p className="text-blue-700">{currentQ.explanation}</p>
+        </div>
+      )}
+
+      {selectedAnswer !== null && (
+        <div className="text-center">
           <button
             onClick={handleNextQuestion}
-            className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md"
+            className="px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-200 bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:shadow-lg transform hover:-translate-y-1"
           >
             {currentQuestion < questions.length - 1
               ? "Next Question"

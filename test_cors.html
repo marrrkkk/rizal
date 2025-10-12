@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>CORS Test</title>
+  </head>
+  <body>
+    <h1>CORS Test</h1>
+    <button onclick="testCORS()">Test CORS</button>
+    <div id="result"></div>
+
+    <script>
+      async function testCORS() {
+        const resultDiv = document.getElementById("result");
+        resultDiv.innerHTML = "Testing CORS...";
+
+        try {
+          // Test OPTIONS request first
+          const optionsResponse = await fetch(
+            "http://localhost/rizal/api/progress/get_progress.php",
+            {
+              method: "OPTIONS",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer test-token",
+              },
+            }
+          );
+
+          console.log("OPTIONS Response:", optionsResponse);
+          console.log("OPTIONS Headers:", [
+            ...optionsResponse.headers.entries(),
+          ]);
+
+          if (optionsResponse.ok) {
+            resultDiv.innerHTML += "<br>✓ OPTIONS request successful";
+
+            // Now test actual GET request
+            const getResponse = await fetch(
+              "http://localhost/rizal/api/progress/get_progress.php",
+              {
+                method: "GET",
+                headers: {
+                  Authorization: "Bearer test-token",
+                },
+              }
+            );
+
+            console.log("GET Response:", getResponse);
+
+            if (getResponse.ok || getResponse.status === 401) {
+              resultDiv.innerHTML +=
+                "<br>✓ GET request reached server (may be 401 due to invalid token, but CORS is working)";
+            } else {
+              resultDiv.innerHTML +=
+                "<br>❌ GET request failed: " + getResponse.status;
+            }
+          } else {
+            resultDiv.innerHTML +=
+              "<br>❌ OPTIONS request failed: " + optionsResponse.status;
+          }
+        } catch (error) {
+          console.error("CORS Test Error:", error);
+          resultDiv.innerHTML += "<br>❌ CORS Error: " + error.message;
+        }
+      }
+    </script>
+  </body>
+</html>

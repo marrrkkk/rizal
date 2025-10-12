@@ -361,56 +361,45 @@ export default function AteneoGame({ username, onLogout, onComplete }) {
               </div>
 
               {/* Answer Options */}
-              <div className="space-y-4 mb-8">
-                {questions[currentQuestion].options.map((option, index) => {
-                  let buttonStyle =
-                    "group w-full text-left p-5 rounded-2xl border-4 transition-all duration-300 transform hover:scale-105 ";
-
-                  if (selectedAnswer !== null) {
-                    if (index === questions[currentQuestion].correct) {
-                      buttonStyle +=
-                        "bg-green-100 border-green-400 text-green-800 shadow-lg";
-                    } else if (index === selectedAnswer && !isCorrect) {
-                      buttonStyle +=
-                        "bg-red-100 border-red-400 text-red-800 shadow-lg";
-                    } else {
-                      buttonStyle += "bg-gray-100 border-gray-300 text-black";
-                    }
-                  } else {
-                    buttonStyle +=
-                      "bg-white border-orange-200 hover:border-orange-400 hover:bg-orange-50 text-gray-800 shadow-md hover:shadow-xl";
-                  }
-
-                  return (
-                    <button
-                      key={index}
-                      onClick={() => handleAnswer(index)}
-                      disabled={selectedAnswer !== null}
-                      className={buttonStyle}
-                      {...touchProps}
-                    >
-                      <div className="flex items-center space-x-4">
-                        <div
-                          className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
-                            selectedAnswer !== null &&
-                            index === questions[currentQuestion].correct
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                {questions[currentQuestion].options.map((option, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleAnswer(index)}
+                    disabled={selectedAnswer !== null}
+                    className={`p-6 rounded-2xl border-4 transition-all duration-200 text-left font-semibold ${
+                      selectedAnswer !== null
+                        ? index === questions[currentQuestion].correct
+                          ? "bg-green-100 border-green-400 text-green-800"
+                          : index === selectedAnswer
+                          ? "bg-red-100 border-red-400 text-red-800"
+                          : "bg-gray-100 border-gray-300 text-black"
+                        : selectedAnswer === index
+                        ? "bg-orange-100 border-orange-400 text-orange-800"
+                        : "bg-gray-50 border-gray-200 text-black hover:bg-orange-50 hover:border-orange-300"
+                    }`}
+                    {...touchProps}
+                  >
+                    <div className="flex items-center">
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center mr-4 font-bold ${
+                          selectedAnswer !== null
+                            ? index === questions[currentQuestion].correct
                               ? "bg-green-500 text-white"
-                              : selectedAnswer !== null &&
-                                index === selectedAnswer &&
-                                !isCorrect
+                              : index === selectedAnswer
                               ? "bg-red-500 text-white"
-                              : "bg-orange-200 text-orange-800 group-hover:bg-orange-300"
-                          }`}
-                        >
-                          {String.fromCharCode(65 + index)}
-                        </div>
-                        <span className="font-medium text-lg text-black">
-                          {option}
-                        </span>
+                              : "bg-gray-300 text-black"
+                            : selectedAnswer === index
+                            ? "bg-orange-500 text-white"
+                            : "bg-gray-300 text-black"
+                        }`}
+                      >
+                        {String.fromCharCode(65 + index)}
                       </div>
-                    </button>
-                  );
-                })}
+                      <span className="text-lg text-black">{option}</span>
+                    </div>
+                  </button>
+                ))}
               </div>
 
               {/* Hint Button */}

@@ -192,23 +192,42 @@ export default function FirstTeacherGame({ username, onLogout }) {
       <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
         {game.question}
       </h3>
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {game.options.map((option, index) => (
           <button
             key={index}
             onClick={() => handleQuizAnswer(index)}
             disabled={showQuizResult}
-            className={`p-4 rounded-xl text-left transition-all duration-200 ${
+            className={`p-6 rounded-2xl border-4 transition-all duration-200 text-left font-semibold ${
               showQuizResult
                 ? index === game.correct
-                  ? "bg-green-100 border-2 border-green-400 text-green-800"
+                  ? "bg-green-100 border-green-400 text-green-800"
                   : index === selectedAnswer
-                  ? "bg-red-100 border-2 border-red-400 text-red-800"
-                  : "bg-gray-100 text-black"
-                : "bg-rose-50 hover:bg-rose-100 border-2 border-rose-200 hover:border-rose-300"
+                  ? "bg-red-100 border-red-400 text-red-800"
+                  : "bg-gray-100 border-gray-300 text-black"
+                : selectedAnswer === index
+                ? "bg-rose-100 border-rose-400 text-rose-800"
+                : "bg-gray-50 border-gray-200 text-black hover:bg-rose-50 hover:border-rose-300"
             }`}
           >
-            {option}
+            <div className="flex items-center">
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center mr-4 font-bold ${
+                  showQuizResult
+                    ? index === game.correct
+                      ? "bg-green-500 text-white"
+                      : index === selectedAnswer
+                      ? "bg-red-500 text-white"
+                      : "bg-gray-300 text-black"
+                    : selectedAnswer === index
+                    ? "bg-rose-500 text-white"
+                    : "bg-gray-300 text-black"
+                }`}
+              >
+                {String.fromCharCode(65 + index)}
+              </div>
+              <span className="text-lg text-black">{option}</span>
+            </div>
           </button>
         ))}
       </div>

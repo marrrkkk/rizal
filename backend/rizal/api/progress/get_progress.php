@@ -1,8 +1,9 @@
 <?php
 // api/progress/get_progress.php
-header("Access-Control-Allow-Origin: http://localhost:5173");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Methods: GET, OPTIONS");
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Credentials: false");
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
   http_response_code(200);
   exit();
@@ -99,7 +100,7 @@ try {
   }
 
   // Ensure all chapters exist in response
-  for ($i = 1; $i <= 5; $i++) {
+  for ($i = 1; $i <= 6; $i++) {
     if (!isset($chapters[$i])) {
       $chapters[$i] = [
         'unlockedLevels' => [],
@@ -113,7 +114,7 @@ try {
   $response = [
     'chapters' => $chapters,
     'overall' => [
-      'totalLevels' => 25, // 5 chapters × 5 levels
+      'totalLevels' => 30, // 6 chapters × 5 levels
       'completedLevels' => (int)($stats['total_levels_completed'] ?? 0),
       'averageScore' => (float)($stats['average_score'] ?? 0),
       'badges' => array_column($badges, 'badge_type'),

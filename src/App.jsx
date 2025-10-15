@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Home from "./pages/Home";
+import UserStats from "./pages/UserStats";
 import Chapter1 from "./pages/Chapter1";
 import Chapter2 from "./pages/Chapter2";
 import Login from "./pages/Login";
@@ -356,6 +357,22 @@ function App() {
                   username={username}
                   onLogout={handleLogout}
                   onShowAnalytics={() => setShowAnalyticsDashboard(true)}
+                  usingFallback={usingFallback}
+                />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/user-stats"
+            element={
+              token ? (
+                <UserStats
+                  username={username}
+                  onLogout={handleLogout}
+                  onShowAnalytics={() => setShowAnalyticsDashboard(true)}
+                  usingFallback={usingFallback}
                 />
               ) : (
                 <Navigate to="/login" />

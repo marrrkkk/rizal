@@ -6,8 +6,14 @@ import { useResponsive } from "../utils/responsiveUtils.jsx";
 import { usePerformanceOptimization } from "../hooks/usePerformanceOptimization";
 import { useProgressAPI } from "../hooks/useProgressAPI";
 import LoadingSpinner from "../components/LoadingSpinner";
+import Navbar from "../components/Navbar";
 
-export default function Home({ username, onLogout, onShowAnalytics }) {
+export default function Home({
+  username,
+  onLogout,
+  onShowAnalytics,
+  usingFallback,
+}) {
   const navigate = useNavigate();
   const navigationHelper = createNavigationHelper(navigate);
   const { isTouchDevice, isMobile } = useResponsive();
@@ -18,6 +24,7 @@ export default function Home({ username, onLogout, onShowAnalytics }) {
     progressData,
     loading,
     error,
+    usingFallback: progressUsingFallback,
     isLevelUnlocked,
     getChapterProgress,
     getOverallProgress,
@@ -103,11 +110,20 @@ export default function Home({ username, onLogout, onShowAnalytics }) {
   // Show loading spinner while progress is loading
   if (loading) {
     return (
-      <div className="min-h-screen w-full bg-gradient-to-br from-green-100 via-blue-100 to-purple-100 flex items-center justify-center">
-        <LoadingSpinner
-          size={isMobile ? "md" : "lg"}
-          message="Loading your progress..."
+      <div className="min-h-screen w-full bg-gradient-to-br from-green-100 via-blue-100 to-purple-100">
+        <Navbar
+          username={username}
+          onLogout={onLogout}
+          onShowAnalytics={onShowAnalytics}
+          progressData={progressData}
+          usingFallback={usingFallback || progressUsingFallback}
         />
+        <div className="flex items-center justify-center h-96">
+          <LoadingSpinner
+            size={isMobile ? "md" : "lg"}
+            message="Loading your progress..."
+          />
+        </div>
       </div>
     );
   }
@@ -115,19 +131,28 @@ export default function Home({ username, onLogout, onShowAnalytics }) {
   // Show error if progress failed to load
   if (error) {
     return (
-      <div className="min-h-screen w-full bg-gradient-to-br from-green-100 via-blue-100 to-purple-100 flex items-center justify-center">
-        <div className="bg-white rounded-3xl p-8 shadow-xl max-w-md mx-auto text-center border-4 border-red-200">
-          <div className="text-6xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-black text-black mb-4">
-            Error Loading Progress
-          </h2>
-          <p className="text-black mb-6">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-semibold"
-          >
-            Retry
-          </button>
+      <div className="min-h-screen w-full bg-gradient-to-br from-green-100 via-blue-100 to-purple-100">
+        <Navbar
+          username={username}
+          onLogout={onLogout}
+          onShowAnalytics={onShowAnalytics}
+          progressData={progressData}
+          usingFallback={usingFallback || progressUsingFallback}
+        />
+        <div className="flex items-center justify-center h-96">
+          <div className="bg-white rounded-3xl p-8 shadow-xl max-w-md mx-auto text-center border-4 border-red-200">
+            <div className="text-6xl mb-4">⚠️</div>
+            <h2 className="text-2xl font-black text-black mb-4">
+              Error Loading Progress
+            </h2>
+            <p className="text-black mb-6">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-semibold"
+            >
+              Retry
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -136,48 +161,13 @@ export default function Home({ username, onLogout, onShowAnalytics }) {
   return (
     <ErrorBoundary>
       <div className="min-h-screen w-full bg-gradient-to-br from-green-100 via-blue-100 to-purple-100">
-        {/* Clean Header */}
-        <header className="bg-white shadow-lg sticky top-0 z-10 border-b-4 border-green-400">
-          <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
-                <span className="text-white text-xl font-bold">📚</span>
-              </div>
-              <div>
-                <h1 className="text-xl font-black text-black">
-                  Hi {username}! 👋
-                </h1>
-                <p className="text-sm text-black font-medium">
-                  Choose a chapter to continue learning
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => navigate("/admin")}
-                className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full transition-all duration-200 shadow-lg"
-                title="Admin Dashboard"
-              >
-                <span className="text-lg">⚙️</span>
-              </button>
-              {onShowAnalytics && (
-                <button
-                  onClick={onShowAnalytics}
-                  className="bg-purple-500 hover:bg-purple-600 text-white p-2 rounded-full transition-all duration-200 shadow-lg"
-                  title="Learning Analytics"
-                >
-                  <span className="text-lg">📊</span>
-                </button>
-              )}
-              <button
-                onClick={onLogout}
-                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full font-bold transition-all duration-200 shadow-lg"
-              >
-                Exit
-              </button>
-            </div>
-          </div>
-        </header>
+        <Navbar
+          username={username}
+          onLogout={onLogout}
+          onShowAnalytics={onShowAnalytics}
+          progressData={progressData}
+          usingFallback={usingFallback || progressUsingFallback}
+        />
 
         {/* Main Content - Only Chapters */}
         <main className="max-w-6xl mx-auto px-6 py-8">

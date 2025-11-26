@@ -6,35 +6,35 @@ const STORAGE_KEY = "rizal_app_progress";
 const defaultProgress = {
   chapters: {
     1: {
-      unlockedLevels: [1],
+      unlockedLevels: [1, 2, 3, 4, 5],
       completedLevels: [],
       scores: {},
       badges: [],
       completionDate: null,
     },
     2: {
-      unlockedLevels: [],
+      unlockedLevels: [1, 2, 3, 4, 5],
       completedLevels: [],
       scores: {},
       badges: [],
       completionDate: null,
     },
     3: {
-      unlockedLevels: [],
+      unlockedLevels: [1, 2, 3, 4, 5],
       completedLevels: [],
       scores: {},
       badges: [],
       completionDate: null,
     },
     4: {
-      unlockedLevels: [],
+      unlockedLevels: [1, 2, 3, 4, 5],
       completedLevels: [],
       scores: {},
       badges: [],
       completionDate: null,
     },
     5: {
-      unlockedLevels: [],
+      unlockedLevels: [1, 2, 3, 4, 5],
       completedLevels: [],
       scores: {},
       badges: [],
@@ -162,25 +162,9 @@ export const completeLevel = (chapterId, levelId, score = 0) => {
     newBadges.push("perfect_score");
   }
 
-  // Unlock next level in same chapter
-  const nextLevel = levelId + 1;
+  // Check if chapter is complete and award badge
   const chapterConfig = chapterConfigs[chapterId];
-  if (
-    nextLevel <= chapterConfig.totalLevels &&
-    !chapter.unlockedLevels.includes(nextLevel)
-  ) {
-    chapter.unlockedLevels.push(nextLevel);
-  }
-
-  // If chapter is complete, unlock first level of next chapter
   if (chapter.completedLevels.length === chapterConfig.totalLevels) {
-    const nextChapter = chapterId + 1;
-    if (chapterConfigs[nextChapter] && progress.chapters[nextChapter]) {
-      if (!progress.chapters[nextChapter].unlockedLevels.includes(1)) {
-        progress.chapters[nextChapter].unlockedLevels.push(1);
-      }
-    }
-
     // Award chapter completion badge
     const chapterBadge = `chapter_${chapterId}_complete`;
     if (!chapter.badges.includes(chapterBadge)) {
@@ -189,6 +173,7 @@ export const completeLevel = (chapterId, levelId, score = 0) => {
       newBadges.push(chapterBadge);
     }
   }
+
 
   // Check for milestone badges
   checkMilestoneBadges(progress, newBadges);
@@ -337,11 +322,11 @@ export const getChapterProgress = (chapterId) => {
     averageScore:
       chapter.completedLevels.length > 0
         ? Math.round(
-            Object.values(chapter.scores).reduce(
-              (sum, score) => sum + score,
-              0
-            ) / chapter.completedLevels.length
-          )
+          Object.values(chapter.scores).reduce(
+            (sum, score) => sum + score,
+            0
+          ) / chapter.completedLevels.length
+        )
         : 0,
   };
 };
@@ -354,9 +339,9 @@ export const getOverallProgress = () => {
     completionPercentage:
       progress.overall.totalLevels > 0
         ? Math.round(
-            (progress.overall.completedLevels / progress.overall.totalLevels) *
-              100
-          )
+          (progress.overall.completedLevels / progress.overall.totalLevels) *
+          100
+        )
         : 0,
   };
 };

@@ -1,16 +1,18 @@
 import { useState } from "react";
-import api from "../utils/api";
+import api, { setAuthToken } from "../utils/api";
 import { Link, useNavigate } from "react-router-dom";
 import {
   useResponsive,
   getTouchFriendlyProps,
 } from "../utils/responsiveUtils.jsx";
+import LoadingSpinner from "../components/LoadingSpinner";
 
-export default function Register() {
+export default function Register({ setToken }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { isMobile, isTouchDevice } = useResponsive();
   const touchProps = getTouchFriendlyProps(isTouchDevice);
@@ -19,14 +21,35 @@ export default function Register() {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setIsLoading(true);
+
     try {
-      const res = await api.post("register.php", { username, password });
-      setSuccess(res.data.message);
+      // Use SQLite-based authentication
+      const response = await api.post("/auth/register", {
+        username,
+        password,
+        email: null, // Email is optional for now
+      });
+
+      // Show success message
+      setSuccess("Account created successfully!");
+
+      // Set token in parent component
+      if (setToken) {
+        setToken(response.data.token);
+      }
+
+      // Store user data
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+
+      // Navigate to home page after a short delay
       setTimeout(() => {
-        navigate("/login");
-      }, 2000);
+        navigate("/");
+      }, 1500);
     } catch (err) {
-      setError(err.response?.data?.error || "Registration failed");
+      setError(err.message || "Registration failed");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -75,20 +98,21 @@ export default function Register() {
               <label className="block text-gray-700 font-bold mb-3 text-lg">
                 Choose your username
               </label>
-              <div className="relative">
+              <div className="relative group">
                 <input
                   type="text"
                   placeholder="Pick something cool!"
                   className={`w-full px-6 ${
                     isTouchDevice ? "py-5" : "py-4"
-                  } bg-gray-50 border-3 border-gray-200 rounded-2xl text-gray-800 placeholder-gray-400 focus:outline-none focus:border-pink-400 focus:bg-white transition-all duration-300 text-lg font-medium shadow-inner`}
+                  } bg-gray-50 border-3 border-gray-200 rounded-2xl text-gray-800 placeholder-gray-400 focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 focus:bg-white hover:border-gray-300 transition-all duration-300 text-lg font-medium shadow-inner`}
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
+                  disabled={isLoading}
                 />
-                <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                  <div className="w-6 h-6 bg-pink-100 rounded-full flex items-center justify-center">
-                    <span className="text-pink-600 text-sm">✨</span>
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 transition-transform duration-200 group-focus-within:scale-110">
+                  <div className="w-7 h-7 bg-pink-100 rounded-full flex items-center justify-center shadow-sm">
+                    <span className="text-pink-600 text-base">✨</span>
                   </div>
                 </div>
               </div>
@@ -99,20 +123,21 @@ export default function Register() {
               <label className="block text-gray-700 font-bold mb-3 text-lg">
                 Create a password
               </label>
-              <div className="relative">
+              <div className="relative group">
                 <input
                   type="password"
                   placeholder="Make it super secure!"
                   className={`w-full px-6 ${
                     isTouchDevice ? "py-5" : "py-4"
-                  } bg-gray-50 border-3 border-gray-200 rounded-2xl text-gray-800 placeholder-gray-400 focus:outline-none focus:border-pink-400 focus:bg-white transition-all duration-300 text-lg font-medium shadow-inner`}
+                  } bg-gray-50 border-3 border-gray-200 rounded-2xl text-gray-800 placeholder-gray-400 focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 focus:bg-white hover:border-gray-300 transition-all duration-300 text-lg font-medium shadow-inner`}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  disabled={isLoading}
                 />
-                <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                  <div className="w-6 h-6 bg-pink-100 rounded-full flex items-center justify-center">
-                    <span className="text-pink-600 text-sm">🛡️</span>
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 transition-transform duration-200 group-focus-within:scale-110">
+                  <div className="w-7 h-7 bg-pink-100 rounded-full flex items-center justify-center shadow-sm">
+                    <span className="text-pink-600 text-base">🛡️</span>
                   </div>
                 </div>
               </div>
@@ -121,36 +146,54 @@ export default function Register() {
             {/* Register Button */}
             <button
               type="submit"
-              className={`w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white ${
+              disabled={isLoading}
+              className={`w-full bg-gradient-to-r from-pink-500 via-purple-500 to-purple-600 text-white ${
                 isTouchDevice ? "py-5" : "py-4"
-              } rounded-2xl font-black text-lg hover:from-pink-600 hover:to-purple-700 hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl border-b-4 border-purple-700 active:border-b-2 uppercase tracking-wide`}
+              } rounded-2xl font-black text-lg ${
+                isLoading
+                  ? "opacity-50 cursor-not-allowed"
+                  : `${
+                      isTouchDevice
+                        ? "active:from-pink-600 active:to-purple-700 active:scale-95"
+                        : "hover:from-pink-600 hover:via-purple-600 hover:to-purple-700 hover:scale-105 hover:-translate-y-1"
+                    } transition-all duration-300 shadow-xl hover:shadow-2xl`
+              } border-b-4 border-purple-700 active:border-b-2 uppercase tracking-wide focus:outline-none focus:ring-4 focus:ring-purple-300`}
               {...touchProps}
             >
-              <div className="flex items-center justify-center space-x-2">
-                <span>Start Learning</span>
-                <span className="text-xl">🌟</span>
-              </div>
+              {isLoading ? (
+                <div className="flex items-center justify-center space-x-3">
+                  <LoadingSpinner size="sm" showMessage={false} />
+                  <span>Creating account...</span>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center space-x-2">
+                  <span>Start Learning</span>
+                  <span className="text-xl">🌟</span>
+                </div>
+              )}
             </button>
           </form>
 
           {/* Error Message */}
           {error && (
-            <div className="mt-6 p-4 bg-red-50 border-2 border-red-200 rounded-2xl">
-              <div className="flex items-center space-x-2">
-                <span className="text-red-500 text-lg">😞</span>
-                <p className="text-red-700 font-semibold">{error}</p>
+            <div className="mt-6 p-4 bg-gradient-to-r from-red-50 to-red-100 border-2 border-red-300 rounded-2xl shadow-md animate-wiggle">
+              <div className="flex items-center space-x-3">
+                <span className="text-red-500 text-2xl">😞</span>
+                <p className="text-red-800 font-bold">{error}</p>
               </div>
             </div>
           )}
 
           {/* Success Message */}
           {success && (
-            <div className="mt-6 p-4 bg-green-50 border-2 border-green-200 rounded-2xl">
-              <div className="flex items-center space-x-2">
-                <span className="text-green-500 text-lg">🎉</span>
+            <div className="mt-6 p-4 bg-gradient-to-r from-green-50 to-emerald-100 border-2 border-green-300 rounded-2xl shadow-md animate-slide-up">
+              <div className="flex items-center space-x-3">
+                <span className="text-green-500 text-2xl animate-bounce">
+                  🎉
+                </span>
                 <div>
-                  <p className="text-green-700 font-semibold">{success}</p>
-                  <p className="text-green-600 text-sm mt-1">
+                  <p className="text-green-800 font-bold">{success}</p>
+                  <p className="text-green-700 text-sm mt-1 font-medium">
                     Taking you to login...
                   </p>
                 </div>
@@ -165,7 +208,7 @@ export default function Register() {
             </p>
             <Link
               to="/login"
-              className="inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-2xl transition-all duration-200 hover:scale-105 shadow-lg border-b-4 border-blue-700 active:border-b-2"
+              className="inline-block bg-gradient-to-r from-blue-500 via-blue-600 to-blue-500 hover:from-blue-600 hover:via-blue-700 hover:to-blue-600 text-white font-bold py-3 px-8 rounded-2xl transition-all duration-300 hover:scale-105 hover:-translate-y-1 shadow-xl hover:shadow-2xl border-b-4 border-blue-700 active:border-b-2 focus:outline-none focus:ring-4 focus:ring-blue-300"
               {...touchProps}
             >
               Sign In 🚀

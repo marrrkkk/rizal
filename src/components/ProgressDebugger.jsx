@@ -85,28 +85,15 @@ const ProgressDebugger = ({ username }) => {
 
         <button
           onClick={async () => {
-            console.log("🔧 Running progress system fix...");
-            try {
-              const token = localStorage.getItem("token");
-              const response = await fetch(
-                "http://localhost/rizal/api/debug/fix_progress_system.php",
-                {
-                  method: "POST",
-                  headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                  },
-                }
-              );
-              const result = await response.json();
-              console.log("🔧 Fix result:", result);
-              alert("Fix completed! Check console for details.");
-            } catch (error) {
-              console.error("🔧 Fix error:", error);
-              alert("Fix failed: " + error.message);
-            }
+            console.log(
+              "🔧 Progress system fix is no longer available (PHP backend removed)"
+            );
+            alert(
+              "Progress system fix is no longer available. PHP backend has been removed."
+            );
           }}
-          className="bg-red-500 text-white px-3 py-1 rounded text-sm w-full"
+          className="bg-gray-400 text-white px-3 py-1 rounded text-sm w-full cursor-not-allowed"
+          disabled
         >
           🔧 Fix Progress System
         </button>

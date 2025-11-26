@@ -4,7 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently \"npm run server\" \"vite\"",
+    "server": "node backend/server.cjs",
+    "create-admin": "node scripts/create_admin.cjs",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -15,11 +17,20 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@tailwindcss/vite": "^4.1.10",
     "axios": "^1.10.0",
+    "bcryptjs": "^3.0.3",
+    "body-parser": "^2.2.1",
+    "concurrently": "^9.2.1",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "jose": "^6.1.2",
+    "jsonwebtoken": "^9.0.2",
     "react": "^19.1.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.2",
+    "sql.js": "^1.13.0",
+    "sqlite3": "^5.1.7",
     "tailwindcss": "^4.1.10"
   },
   "devDependencies": {

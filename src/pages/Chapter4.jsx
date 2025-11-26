@@ -1,19 +1,24 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useProgressAPI } from "../hooks/useProgressAPI";
+import { getCurrentUserFromToken } from "../utils/api";
+import { createNavigationHelper } from "../utils/navigationHelper";
 
 export default function Chapter4({ username, onLogout }) {
   const navigate = useNavigate();
-  const [completedLevels, setCompletedLevels] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
+  const navigationHelper = createNavigationHelper(navigate);
+  const [userId, setUserId] = useState(null);
 
-  // Load completed levels from localStorage
+  // Get chapter progress
+  const chapterProgress = progressData ? getChapterProgress(4) : null;
+
   useEffect(() => {
-    const savedProgress = localStorage.getItem(`chapter4_progress_${username}`);
-    if (savedProgress) {
-      setCompletedLevels(JSON.parse(savedProgress));
+    // Get user ID
+    const user = getCurrentUserFromToken();
+    if (user) {
+      setUserId(user.id);
     }
-    setIsLoading(false);
-  }, [username]);
+  }, []);
 
   const levels = [
     {
@@ -60,25 +65,31 @@ export default function Chapter4({ username, onLogout }) {
     },
   ];
 
-  const handleLevelClick = (levelId, path) => {
-    // Allow access to level 1 or any completed level
-    if (levelId === 1 || completedLevels[levelId - 1]) {
-      navigate(path);
+  const handleLevelClick = async (level) => {
+    if (!userId) {
+      alert("Please log in to play levels");
+      return;
+    }
+
+    // Check if level is unlocked using the unified API
+    const levelUnlocked = isLevelUnlocked(4, level.id);
+
+    if (levelUnlocked) {
+      if (level.path) {
+        navigationHelper.goToLevel(4, level.id);
+      } else {
+        alert(`Level ${level.id}: ${level.title} - Coming Soon!`);
+      }
     } else {
-      alert("Please complete the previous levels first!");
+      alert("Complete previous levels to unlock this one!");
     }
   };
 
-  const handleLevelComplete = (levelId) => {
-    const updatedLevels = { ...completedLevels, [levelId]: true };
-    setCompletedLevels(updatedLevels);
-    localStorage.setItem(
-      `chapter4_progress_${username}`,
-      JSON.stringify(updatedLevels)
-    );
+  const handleBackToHome = () => {
+    navigationHelper.goHome();
   };
 
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
@@ -102,7 +113,7 @@ export default function Chapter4({ username, onLogout }) {
         <div className="w-full px-6 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <button
-              onClick={() => navigate("/")}
+              onClick={handleBackToHome}
               className="w-12 h-12 bg-gray-500 hover:bg-gray-600 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg border-b-2 border-gray-700 active:border-b-0"
             >
               <svg
@@ -174,17 +185,22 @@ export default function Chapter4({ username, onLogout }) {
                   Chapter Progress
                 </span>
                 <span className="text-pink-600 font-bold text-sm">
-                  {Object.keys(completedLevels).length}/5 complete
+                  {chapterProgress
+                    ? `${chapterProgress.completedLevels}/${chapterProgress.totalLevels}`
+                    : "0/5"}{" "}
+                  complete
                 </span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-pink-400 to-rose-500 rounded-full transition-all duration-500"
                   style={{
-                    width: `${
-                      (Object.keys(completedLevels).length / levels.length) *
-                      100
-                    }%`,
+                    width: `${chapterProgress
+                        ? (chapterProgress.completedLevels /
+                          chapterProgress.totalLevels) *
+                        100
+                        : 0
+                      }%`,
                   }}
                 ></div>
               </div>
@@ -195,56 +211,66 @@ export default function Chapter4({ username, onLogout }) {
         {/* Duolingo-style Levels Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto relative z-10">
           {levels.map((level, index) => {
-            const isUnlocked = level.id === 1 || completedLevels[level.id - 1];
-            const isCompleted = completedLevels[level.id];
+            // Use the unified progress API to check unlock status
+            const levelUnlocked = isLevelUnlocked(4, level.id);
+            const levelCompleted = isLevelCompleted(4, level.id);
+            const levelScore = progressData?.chapters?.[4]?.scores?.[level.id] || 0;
 
             return (
               <div
                 key={level.id}
-                className={`group relative bg-white rounded-3xl shadow-lg transition-all duration-300 transform cursor-pointer border-4 border-white/50 overflow-hidden ${
-                  isUnlocked
-                    ? "hover:shadow-2xl hover:scale-105"
-                    : "opacity-60 cursor-not-allowed"
-                }`}
+                className={`group relative bg-white rounded-3xl shadow-lg transition-all duration-300 transform cursor-pointer border-4 border-white/50 overflow-hidden ${levelUnlocked
+                  ? "hover:shadow-2xl hover:scale-105"
+                  : "opacity-60 cursor-not-allowed"
+                  }`}
                 style={{ animationDelay: `${index * 100}ms` }}
-                onClick={() =>
-                  isUnlocked && handleLevelClick(level.id, level.path)
-                }
+                onClick={() => handleLevelClick(level)}
               >
                 {/* Progress indicator */}
                 <div className="absolute top-0 left-0 right-0 h-2 bg-gray-200">
                   <div
-                    className={`h-full transition-all duration-500 ${
-                      isCompleted
-                        ? "w-full bg-gradient-to-r from-green-400 to-green-500"
-                        : isUnlocked
+                    className={`h-full transition-all duration-500 ${levelCompleted
+                      ? "w-full bg-gradient-to-r from-green-400 to-green-500"
+                      : levelUnlocked
                         ? "w-1/2 bg-gradient-to-r from-pink-400 to-rose-500"
                         : "w-0 bg-gray-300"
-                    }`}
+                      }`}
                   ></div>
                 </div>
 
                 {/* Status indicator */}
-                <div className="absolute top-4 right-4 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md">
-                  <span className="text-sm">
-                    {isCompleted ? "✅" : isUnlocked ? "🔓" : "🔒"}
+                <div
+                  className={`absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center shadow-md ${levelCompleted
+                    ? "bg-green-400"
+                    : levelUnlocked
+                      ? "bg-pink-400"
+                      : "bg-gray-400"
+                    }`}
+                >
+                  <span className="text-white text-sm font-bold">
+                    {levelCompleted ? "✓" : levelUnlocked ? "▶" : "🔒"}
                   </span>
                 </div>
+
+                {/* NEW indicator for recently unlocked levels */}
+                {levelUnlocked && !levelCompleted && level.id > 1 && (
+                  <div className="absolute top-4 left-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg animate-pulse">
+                    NEW!
+                  </div>
+                )}
 
                 <div className="p-6">
                   {/* Level icon with Duolingo-style design */}
                   <div className="relative mb-4">
                     <div
-                      className={`w-20 h-20 bg-gradient-to-br ${
-                        level.color
-                      } rounded-full flex items-center justify-center shadow-lg mx-auto border-4 border-white ${
-                        isUnlocked ? "group-hover:scale-110" : ""
-                      } transition-transform duration-300`}
+                      className={`w-20 h-20 bg-gradient-to-br ${level.color
+                        } rounded-full flex items-center justify-center shadow-lg mx-auto border-4 border-white ${levelUnlocked ? "group-hover:scale-110" : ""
+                        } transition-transform duration-300`}
                     >
                       <span className="text-3xl">{level.icon}</span>
                     </div>
                     {/* Completion stars */}
-                    {isCompleted && (
+                    {levelCompleted && (
                       <div className="absolute -bottom-1 -right-1 bg-yellow-400 rounded-full w-6 h-6 flex items-center justify-center shadow-md">
                         <span className="text-xs">⭐</span>
                       </div>
@@ -254,60 +280,89 @@ export default function Chapter4({ username, onLogout }) {
                   {/* Level info */}
                   <div className="text-center">
                     <h3
-                      className={`text-xl font-black mb-2 transition-colors ${
-                        isUnlocked
-                          ? "text-gray-800 group-hover:text-gray-900"
-                          : "text-gray-500"
-                      }`}
+                      className={`text-xl font-black mb-2 transition-colors ${levelUnlocked
+                        ? "text-gray-800 group-hover:text-gray-900"
+                        : "text-gray-500"
+                        }`}
                     >
                       {level.title}
                     </h3>
                     <p
-                      className={`text-sm mb-4 leading-relaxed ${
-                        isUnlocked ? "text-gray-600" : "text-gray-400"
-                      }`}
+                      className={`text-sm mb-4 leading-relaxed ${levelUnlocked ? "text-gray-600" : "text-gray-400"
+                        }`}
                     >
                       {level.description}
                     </p>
 
+                    {/* Score display for completed levels */}
+                    {levelCompleted && levelScore > 0 && (
+                      <div className="mb-4">
+                        <div className="inline-block bg-yellow-100 border-2 border-yellow-300 rounded-lg px-3 py-1">
+                          <span className="text-sm font-bold text-yellow-800">
+                            Score: {levelScore}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Status badge */}
                     <div className="mb-4">
                       <span
-                        className={`text-xs font-bold uppercase tracking-wide ${
-                          isCompleted
-                            ? "text-green-600"
-                            : isUnlocked
+                        className={`text-xs font-bold uppercase tracking-wide ${levelCompleted
+                          ? "text-green-600"
+                          : levelUnlocked
                             ? "text-pink-600"
                             : "text-gray-500"
-                        }`}
+                          }`}
                       >
-                        {isCompleted
+                        {levelCompleted
                           ? "Complete"
-                          : isUnlocked
-                          ? "Ready"
-                          : "Locked"}
+                          : levelUnlocked
+                            ? "Ready"
+                            : "Locked"}
                       </span>
                     </div>
 
                     {/* Action button */}
                     <button
-                      className={`w-full font-black py-3 px-6 rounded-2xl transition-all duration-200 border-b-4 active:border-b-2 uppercase tracking-wide text-sm ${
-                        isCompleted
-                          ? "bg-gradient-to-r from-green-500 to-green-600 text-white border-green-700 hover:shadow-lg"
-                          : isUnlocked
-                          ? "bg-gradient-to-r from-pink-500 to-rose-600 text-white border-rose-700 hover:shadow-lg"
-                          : "bg-gray-300 text-gray-500 border-gray-400 cursor-not-allowed"
-                      }`}
-                      disabled={!isUnlocked}
+                      className={`w-full font-black py-3 px-6 rounded-2xl transition-all duration-200 border-b-4 active:border-b-2 uppercase tracking-wide text-sm ${levelCompleted
+                        ? "bg-gradient-to-r from-green-500 to-green-600 text-white border-green-700 hover:shadow-lg hover:scale-105"
+                        : levelUnlocked
+                          ? "bg-gradient-to-r from-pink-500 to-rose-600 text-white border-rose-700 hover:shadow-lg hover:scale-105"
+                          : "bg-gray-300 text-gray-500 border-gray-400 cursor-not-allowed opacity-60"
+                        }`}
+                      disabled={!levelUnlocked}
                     >
-                      {isCompleted
-                        ? "Play Again"
-                        : isUnlocked
-                        ? "Start"
-                        : "Locked"}
+                      {levelCompleted
+                        ? "✓ Review"
+                        : levelUnlocked
+                          ? "▶ Start"
+                          : "🔒 Complete Previous Level"}
                     </button>
                   </div>
                 </div>
+
+                {/* Locked overlay with unlock requirements */}
+                {!levelUnlocked && (
+                  <div className="absolute inset-0 bg-gray-900/50 rounded-3xl flex items-center justify-center">
+                    <div className="text-center text-white px-4">
+                      <div className="text-4xl mb-2">🔒</div>
+                      <p className="text-sm font-bold mb-1">Locked</p>
+                      <p className="text-xs text-gray-300">
+                        {level.id === 1
+                          ? "Start here!"
+                          : `Complete Level ${level.id - 1} to unlock`}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Completion celebration */}
+                {levelCompleted && (
+                  <div className="absolute top-2 left-2 animate-bounce">
+                    <span className="text-2xl">🎉</span>
+                  </div>
+                )}
               </div>
             );
           })}

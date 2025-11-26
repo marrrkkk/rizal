@@ -1,48 +1,62 @@
 /**
  * Badge Gallery Component
  * Displays all earned badges in a beautiful, interactive gallery
+ * Updated to use Epic Achievement System
+ * Requirements: 12.3
  */
 
 import { useState } from "react";
-import { BADGE_DEFINITIONS } from "./BadgeNotificationSystem";
+import { EPIC_ACHIEVEMENTS, RARITY_CONFIG } from "../utils/achievementConfig";
 
-const BadgeGallery = ({ badges = [], className = "" }) => {
+const BadgeGallery = ({
+  badges = [],
+  badgesWithDates = [],
+  className = "",
+}) => {
   const [selectedBadge, setSelectedBadge] = useState(null);
   const [filter, setFilter] = useState("all");
+
+  // Create a map of badge IDs to earned dates if badgesWithDates is provided
+  const badgeDateMap = badgesWithDates.reduce((acc, badge) => {
+    acc[badge.achievement_name] = badge.earned_at;
+    return acc;
+  }, {});
 
   // Get badge info with fallback
   const getBadgeInfo = (badgeId) => {
     return (
-      BADGE_DEFINITIONS[badgeId] || {
+      EPIC_ACHIEVEMENTS[badgeId] || {
         name: badgeId
           .replace(/_/g, " ")
           .replace(/\b\w/g, (l) => l.toUpperCase()),
+        epicTitle: "Achievement",
         description: "Achievement unlocked!",
         icon: "🏆",
         color: "from-blue-400 to-blue-600",
         rarity: "common",
+        type: "milestone",
       }
     );
   };
 
-  // Group badges by category
+  // Group badges by category using achievement type
   const categorizedBadges = {
-    chapter: badges.filter((badge) => badge.includes("chapter_")),
-    performance: badges.filter((badge) =>
-      [
-        "perfect_score",
-        "knowledge_seeker",
-        "speed_runner",
-        "efficiency_master",
-        "persistent_learner",
-      ].includes(badge)
-    ),
-    dedication: badges.filter((badge) =>
-      ["dedication", "marathon_learner"].includes(badge)
-    ),
-    milestone: badges.filter((badge) =>
-      ["first_level_complete", "rizal_expert"].includes(badge)
-    ),
+    chapter: badges.filter((badge) => {
+      const info = getBadgeInfo(badge);
+      return info.type === "chapter";
+    }),
+    performance: badges.filter((badge) => {
+      const info = getBadgeInfo(badge);
+      return info.type === "performance";
+    }),
+    milestone: badges.filter((badge) => {
+      const info = getBadgeInfo(badge);
+      return info.type === "milestone";
+    }),
+    ultimate: badges.filter((badge) => {
+      const info = getBadgeInfo(badge);
+      return info.type === "ultimate";
+    }),
   };
 
   const filteredBadges =
@@ -120,8 +134,8 @@ const BadgeGallery = ({ badges = [], className = "" }) => {
             { key: "all", label: "All", icon: "🎯" },
             { key: "chapter", label: "Chapters", icon: "📚" },
             { key: "performance", label: "Performance", icon: "⭐" },
-            { key: "dedication", label: "Dedication", icon: "🔥" },
-            { key: "milestone", label: "Milestones", icon: "👑" },
+            { key: "milestone", label: "Milestones", icon: "🏆" },
+            { key: "ultimate", label: "Ultimate", icon: "👑" },
           ].map(({ key, label, icon }) => (
             <button
               key={key}
@@ -235,6 +249,9 @@ const BadgeGallery = ({ badges = [], className = "" }) => {
                   </div>
 
                   {/* Badge Info */}
+                  <div className="text-sm text-gray-500 mb-2">
+                    {badgeInfo.epicTitle}
+                  </div>
                   <h2 className="text-2xl font-bold text-gray-800 mb-2">
                     {badgeInfo.name}
                   </h2>
@@ -250,7 +267,7 @@ const BadgeGallery = ({ badges = [], className = "" }) => {
                         : "bg-gray-100 text-gray-800"
                     }`}
                   >
-                    {badgeInfo.rarity.toUpperCase()} BADGE
+                    {badgeInfo.rarity.toUpperCase()} ACHIEVEMENT
                   </div>
 
                   <p className="text-gray-600 mb-6 leading-relaxed">
@@ -259,7 +276,20 @@ const BadgeGallery = ({ badges = [], className = "" }) => {
 
                   {/* Achievement Date (if available) */}
                   <div className="text-sm text-gray-500 mb-4">
-                    🎉 Achievement Unlocked!
+                    {badgeDateMap[selectedBadge] ? (
+                      <>
+                        🎉 Unlocked on{" "}
+                        {new Date(
+                          badgeDateMap[selectedBadge]
+                        ).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </>
+                    ) : (
+                      "🎉 Achievement Unlocked!"
+                    )}
                   </div>
 
                   <button

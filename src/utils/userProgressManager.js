@@ -91,7 +91,7 @@ const createDefaultUserProgress = (username) => {
     lastAccessed: now,
     chapters: {
       1: {
-        unlockedLevels: [1],
+        unlockedLevels: [1, 2, 3, 4, 5],
         completedLevels: [],
         scores: {},
         badges: [],
@@ -100,7 +100,7 @@ const createDefaultUserProgress = (username) => {
         attempts: {},
       },
       2: {
-        unlockedLevels: [],
+        unlockedLevels: [1, 2, 3, 4, 5],
         completedLevels: [],
         scores: {},
         badges: [],
@@ -109,7 +109,7 @@ const createDefaultUserProgress = (username) => {
         attempts: {},
       },
       3: {
-        unlockedLevels: [],
+        unlockedLevels: [1, 2, 3, 4, 5],
         completedLevels: [],
         scores: {},
         badges: [],
@@ -118,7 +118,7 @@ const createDefaultUserProgress = (username) => {
         attempts: {},
       },
       4: {
-        unlockedLevels: [],
+        unlockedLevels: [1, 2, 3, 4, 5],
         completedLevels: [],
         scores: {},
         badges: [],
@@ -127,7 +127,7 @@ const createDefaultUserProgress = (username) => {
         attempts: {},
       },
       5: {
-        unlockedLevels: [],
+        unlockedLevels: [1, 2, 3, 4, 5],
         completedLevels: [],
         scores: {},
         badges: [],
@@ -246,25 +246,9 @@ export const completeUserLevel = (
     }
   }
 
-  // Unlock next level in same chapter
-  const nextLevel = levelId + 1;
+  // Check if chapter is complete and award badge
   const chapterConfig = chapterConfigs[chapterId];
-  if (
-    nextLevel <= chapterConfig.totalLevels &&
-    !chapter.unlockedLevels.includes(nextLevel)
-  ) {
-    chapter.unlockedLevels.push(nextLevel);
-  }
-
-  // If chapter is complete, unlock first level of next chapter
   if (chapter.completedLevels.length === chapterConfig.totalLevels) {
-    const nextChapter = chapterId + 1;
-    if (chapterConfigs[nextChapter] && progress.chapters[nextChapter]) {
-      if (!progress.chapters[nextChapter].unlockedLevels.includes(1)) {
-        progress.chapters[nextChapter].unlockedLevels.push(1);
-      }
-    }
-
     // Award chapter completion badge
     const chapterBadge = `chapter_${chapterId}_complete`;
     if (!chapter.badges.includes(chapterBadge)) {
@@ -463,9 +447,8 @@ const saveProgressToFile = async (username, progressData) => {
     if ("showSaveFilePicker" in window) {
       // Modern browsers with File System Access API
       const fileHandle = await window.showSaveFilePicker({
-        suggestedName: `rizal_progress_${username}_${
-          new Date().toISOString().split("T")[0]
-        }.json`,
+        suggestedName: `rizal_progress_${username}_${new Date().toISOString().split("T")[0]
+          }.json`,
         types: [
           {
             description: "JSON files",
@@ -488,9 +471,8 @@ const saveProgressToFile = async (username, progressData) => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `rizal_progress_${username}_${
-        new Date().toISOString().split("T")[0]
-      }.json`;
+      a.download = `rizal_progress_${username}_${new Date().toISOString().split("T")[0]
+        }.json`;
 
       // Auto-download is disabled by default to avoid spam
       // Uncomment the next two lines if you want automatic downloads
@@ -558,9 +540,8 @@ export const exportUserProgress = (username) => {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `rizal_progress_backup_${username}_${
-    new Date().toISOString().split("T")[0]
-  }.json`;
+  a.download = `rizal_progress_backup_${username}_${new Date().toISOString().split("T")[0]
+    }.json`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAnalytics } from "../hooks/useAnalytics";
+import LeaderboardWidget from "./LeaderboardWidget";
 
 const AnalyticsDashboard = ({ username, onClose }) => {
   const { userStats, progressReport, generateReport, exportData, loading } =
@@ -118,9 +119,10 @@ const AnalyticsDashboard = ({ username, onClose }) => {
           <nav className="flex space-x-8 px-6">
             {[
               { id: "overview", label: "Overview", icon: "📊" },
+              { id: "leaderboard", label: "Leaderboard", icon: "🏆" },
               { id: "chapters", label: "Chapters", icon: "📚" },
               { id: "patterns", label: "Learning Patterns", icon: "🧠" },
-              { id: "achievements", label: "Achievements", icon: "🏆" },
+              { id: "achievements", label: "Achievements", icon: "🎖️" },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -142,6 +144,11 @@ const AnalyticsDashboard = ({ username, onClose }) => {
         <div className="p-6 overflow-y-auto max-h-[60vh]">
           {activeTab === "overview" && (
             <div className="space-y-6">
+              {/* Leaderboard - Prominent Position */}
+              <div className="mb-6">
+                <LeaderboardWidget limit={5} autoRefresh={false} />
+              </div>
+
               {/* Summary Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-xl">
@@ -263,6 +270,25 @@ const AnalyticsDashboard = ({ username, onClose }) => {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {activeTab === "leaderboard" && (
+            <div className="space-y-6">
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                  Top Performers
+                </h3>
+                <p className="text-gray-600">
+                  See how you compare with other students learning about José
+                  Rizal
+                </p>
+              </div>
+              <LeaderboardWidget
+                limit={5}
+                autoRefresh={true}
+                refreshInterval={60000}
+              />
             </div>
           )}
 

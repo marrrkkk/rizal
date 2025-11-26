@@ -1,14 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useProgressAPI } from "../hooks/useProgressAPI";
 import { useResponsive } from "../utils/responsiveUtils";
 import LoadingSpinner from "../components/LoadingSpinner";
 import Navbar from "../components/Navbar";
+import BadgeGallery from "../components/BadgeGallery";
+import { getUserAchievements } from "../utils/achievementSystem";
+import { getUserIdFromUsername } from "../utils/auth";
 
-const UserStats = ({ username, onLogout, onShowAnalytics, usingFallback }) => {
+const UserStats = ({ username, onLogout, onShowAnalytics }) => {
   const navigate = useNavigate();
   const { isMobile } = useResponsive();
   const [activeTab, setActiveTab] = useState("overview");
+  const [userAchievements, setUserAchievements] = useState([]);
+  const [achievementsWithDates, setAchievementsWithDates] = useState([]);
+  const [loadingAchievements, setLoadingAchievements] = useState(true);
 
   const {
     progressData,
@@ -19,6 +25,31 @@ const UserStats = ({ username, onLogout, onShowAnalytics, usingFallback }) => {
     getAllBadges,
   } = useProgressAPI(username);
 
+  // Load user achievements from database
+  useEffect(() => {
+    const loadAchievements = async () => {
+      try {
+        if (username) {
+          const userId = await getUserIdFromUsername(username);
+          if (userId) {
+            const achievements = await getUserAchievements(userId);
+            // Store full achievement data with dates
+            setAchievementsWithDates(achievements);
+            // Extract achievement names for BadgeGallery
+            const achievementIds = achievements.map((a) => a.achievement_name);
+            setUserAchievements(achievementIds);
+          }
+        }
+      } catch (err) {
+        console.error("Error loading achievements:", err);
+      } finally {
+        setLoadingAchievements(false);
+      }
+    };
+
+    loadAchievements();
+  }, [username]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-100 via-blue-100 to-purple-100">
@@ -27,7 +58,6 @@ const UserStats = ({ username, onLogout, onShowAnalytics, usingFallback }) => {
           onLogout={onLogout}
           onShowAnalytics={onShowAnalytics}
           progressData={progressData}
-          usingFallback={usingFallback}
         />
         <div className="flex items-center justify-center h-96">
           <LoadingSpinner size="lg" message="Loading your stats..." />
@@ -44,7 +74,6 @@ const UserStats = ({ username, onLogout, onShowAnalytics, usingFallback }) => {
           onLogout={onLogout}
           onShowAnalytics={onShowAnalytics}
           progressData={progressData}
-          usingFallback={usingFallback}
         />
         <div className="flex items-center justify-center h-96">
           <div className="bg-white rounded-3xl p-8 shadow-xl max-w-md mx-auto text-center">
@@ -70,8 +99,8 @@ const UserStats = ({ username, onLogout, onShowAnalytics, usingFallback }) => {
   const completionPercentage =
     overallProgress.totalLevels > 0
       ? Math.round(
-          (overallProgress.completedLevels / overallProgress.totalLevels) * 100
-        )
+        (overallProgress.completedLevels / overallProgress.totalLevels) * 100
+      )
       : 0;
 
   // Calculate chapter stats
@@ -141,7 +170,6 @@ const UserStats = ({ username, onLogout, onShowAnalytics, usingFallback }) => {
         onLogout={onLogout}
         onShowAnalytics={onShowAnalytics}
         progressData={progressData}
-        usingFallback={usingFallback}
       />
 
       <div className="max-w-6xl mx-auto px-4 py-8">
@@ -192,19 +220,17 @@ const UserStats = ({ username, onLogout, onShowAnalytics, usingFallback }) => {
         <div className="flex justify-center mb-8">
           <div className="bg-white rounded-2xl p-2 shadow-lg border border-gray-200">
             <div
-              className={`grid ${
-                isMobile ? "grid-cols-2" : "grid-cols-4"
-              } gap-2`}
+              className={`grid ${isMobile ? "grid-cols-2" : "grid-cols-4"
+                } gap-2`}
             >
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-semibold transition-all duration-200 ${
-                    activeTab === tab.id
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-semibold transition-all duration-200 ${activeTab === tab.id
                       ? "bg-green-500 text-white shadow-md"
                       : "text-gray-600 hover:bg-gray-50"
-                  }`}
+                    }`}
                 >
                   <span>{tab.icon}</span>
                   {!isMobile && <span>{tab.name}</span>}
@@ -253,14 +279,14 @@ const UserStats = ({ username, onLogout, onShowAnalytics, usingFallback }) => {
               <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
                 <div className="flex items-center justify-between mb-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
-                    <span className="text-white text-xl">🎖️</span>
+                    <span className="text-white text-xl">🏆</span>
                   </div>
                   <span className="text-2xl font-black text-purple-600">
-                    {badges.length}
+                    {userAchievements.length}
                   </span>
                 </div>
-                <h3 className="font-bold text-gray-800 mb-1">Badges Earned</h3>
-                <p className="text-sm text-gray-600">Achievements unlocked</p>
+                <h3 className="font-bold text-gray-800 mb-1">Achievements</h3>
+                <p className="text-sm text-gray-600">Epic badges earned</p>
               </div>
 
               <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
@@ -292,8 +318,8 @@ const UserStats = ({ username, onLogout, onShowAnalytics, usingFallback }) => {
                       {chapter.isComplete
                         ? "✅"
                         : chapter.completedLevels > 0
-                        ? "🔄"
-                        : "⏳"}
+                          ? "🔄"
+                          : "⏳"}
                     </span>
                   </div>
 
@@ -309,10 +335,9 @@ const UserStats = ({ username, onLogout, onShowAnalytics, usingFallback }) => {
                       <div
                         className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-500"
                         style={{
-                          width: `${
-                            (chapter.completedLevels / chapter.totalLevels) *
+                          width: `${(chapter.completedLevels / chapter.totalLevels) *
                             100
-                          }%`,
+                            }%`,
                         }}
                       ></div>
                     </div>
@@ -337,17 +362,14 @@ const UserStats = ({ username, onLogout, onShowAnalytics, usingFallback }) => {
               {achievements.map((achievement) => (
                 <div
                   key={achievement.id}
-                  className={`bg-white rounded-2xl p-6 shadow-lg border border-gray-200 ${
-                    achievement.earned ? "" : "opacity-60"
-                  }`}
+                  className={`bg-white rounded-2xl p-6 shadow-lg border border-gray-200 ${achievement.earned ? "" : "opacity-60"
+                    }`}
                 >
                   <div className="flex items-center space-x-4 mb-4">
                     <div
-                      className={`w-16 h-16 bg-gradient-to-br ${
-                        achievement.color
-                      } rounded-full flex items-center justify-center shadow-lg ${
-                        achievement.earned ? "" : "grayscale"
-                      }`}
+                      className={`w-16 h-16 bg-gradient-to-br ${achievement.color
+                        } rounded-full flex items-center justify-center shadow-lg ${achievement.earned ? "" : "grayscale"
+                        }`}
                     >
                       <span className="text-2xl">{achievement.icon}</span>
                     </div>
@@ -368,49 +390,18 @@ const UserStats = ({ username, onLogout, onShowAnalytics, usingFallback }) => {
             </div>
           )}
 
-          {/* Badges Tab */}
+          {/* Badges Tab - Using Epic Achievement System */}
           {activeTab === "badges" && (
             <div className="space-y-6">
-              {badges.length > 0 ? (
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {badges.map((badge, index) => (
-                    <div
-                      key={index}
-                      className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200"
-                    >
-                      <div className="text-center">
-                        <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-lg mx-auto mb-4">
-                          <span className="text-2xl">🎖️</span>
-                        </div>
-                        <h3 className="font-bold text-gray-800 mb-2">
-                          {badge.badge_name || badge.badge_type}
-                        </h3>
-                        {badge.earned_date && (
-                          <p className="text-sm text-gray-600">
-                            Earned:{" "}
-                            {new Date(badge.earned_date).toLocaleDateString()}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+              {loadingAchievements ? (
+                <div className="flex justify-center py-12">
+                  <LoadingSpinner size="lg" message="Loading achievements..." />
                 </div>
               ) : (
-                <div className="text-center py-12">
-                  <div className="text-6xl mb-4">🎖️</div>
-                  <h3 className="text-2xl font-bold text-gray-800 mb-2">
-                    No Badges Yet
-                  </h3>
-                  <p className="text-gray-600 mb-6">
-                    Complete levels to earn your first badge!
-                  </p>
-                  <button
-                    onClick={() => navigate("/")}
-                    className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-semibold"
-                  >
-                    Start Learning
-                  </button>
-                </div>
+                <BadgeGallery
+                  badges={userAchievements}
+                  badgesWithDates={achievementsWithDates}
+                />
               )}
             </div>
           )}

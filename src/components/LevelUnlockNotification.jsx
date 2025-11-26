@@ -1,40 +1,48 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+/**
+ * Level Unlock Notification Component
+ * Shows animated notification when a new level is unlocked
+ * Implements Requirement 9.5
+ */
 
-const LevelUnlockNotification = ({ chapter, level, onClose, onGoToLevel }) => {
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
+
+const LevelUnlockNotification = ({
+  chapter,
+  level,
+  chapterName,
+  onClose,
+  autoClose = true,
+  duration = 4000,
+}) => {
   const [isVisible, setIsVisible] = useState(false);
-  const navigate = useNavigate();
+  const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
-    // Show notification with animation
-    const timer = setTimeout(() => setIsVisible(true), 100);
+    // Animate in
+    const showTimer = setTimeout(() => {
+      setIsVisible(true);
+    }, 100);
 
-    // Auto-hide after 4 seconds
-    const hideTimer = setTimeout(() => {
-      setIsVisible(false);
-      setTimeout(onClose, 300); // Wait for fade out animation
-    }, 4000);
+    // Auto close if enabled
+    let hideTimer;
+    if (autoClose) {
+      hideTimer = setTimeout(() => {
+        handleClose();
+      }, duration);
+    }
 
     return () => {
-      clearTimeout(timer);
-      clearTimeout(hideTimer);
+      clearTimeout(showTimer);
+      if (hideTimer) clearTimeout(hideTimer);
     };
-  }, [onClose]);
+  }, [autoClose, duration]);
 
-  const chapterNames = {
-    1: "Childhood in Calamba",
-    2: "Education in Manila",
-    3: "Studies Abroad",
-    4: "Noli Me Tangere",
-    5: "Return to the Philippines",
-  };
-
-  const chapterColors = {
-    1: "from-blue-400 to-blue-600",
-    2: "from-orange-400 to-amber-600",
-    3: "from-green-400 to-emerald-600",
-    4: "from-pink-400 to-rose-600",
-    5: "from-purple-400 to-indigo-600",
+  const handleClose = () => {
+    setIsExiting(true);
+    setTimeout(() => {
+      if (onClose) onClose();
+    }, 500);
   };
 
   const chapterEmojis = {
@@ -43,81 +51,122 @@ const LevelUnlockNotification = ({ chapter, level, onClose, onGoToLevel }) => {
     3: "✈️",
     4: "📖",
     5: "🇵🇭",
+    6: "🏛️",
   };
 
-  const handleGoToLevel = () => {
-    setIsVisible(false);
-    setTimeout(() => {
-      if (onGoToLevel) {
-        onGoToLevel(chapter, level);
-      } else {
-        // Default navigation logic
-        navigate(`/chapter/${chapter}/level/${level}`);
-      }
-      onClose();
-    }, 300);
+  const chapterColors = {
+    1: "from-blue-400 to-blue-600",
+    2: "from-purple-400 to-purple-600",
+    3: "from-orange-400 to-orange-600",
+    4: "from-pink-400 to-pink-600",
+    5: "from-red-400 to-red-600",
+    6: "from-indigo-400 to-indigo-600",
   };
 
-  const handleContinue = () => {
-    setIsVisible(false);
-    setTimeout(onClose, 300);
-  };
-
-  return (
+  return createPortal(
     <div
-      className={`fixed top-4 right-4 z-50 transform transition-all duration-300 ${
-        isVisible ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
+      className={`fixed top-4 right-4 z-50 transform transition-all duration-500 ${
+        isVisible && !isExiting
+          ? "translate-x-0 opacity-100 scale-100"
+          : "translate-x-full opacity-0 scale-95"
       }`}
     >
-      <div className="bg-white rounded-2xl shadow-2xl border-4 border-yellow-300 p-6 max-w-sm">
-        <div className="text-center">
-          {/* Unlock icon */}
-          <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg animate-bounce">
-            <span className="text-2xl">🔓</span>
+      <div className="bg-white rounded-2xl shadow-2xl border-3 border-blue-300 overflow-hidden max-w-sm hover:shadow-3xl transition-shadow duration-300">
+        {/* Header with gradient */}
+        <div
+          className={`bg-gradient-to-r ${
+            chapterColors[chapter] || chapterColors[1]
+          } p-5 relative overflow-hidden`}
+        >
+          {/* Animated background sparkles */}
+          <div className="absolute inset-0 overflow-hidden opacity-20">
+            <div className="absolute top-2 left-1/4 w-8 h-8 bg-white rounded-full animate-ping"></div>
+            <div
+              className="absolute top-4 right-1/4 w-6 h-6 bg-white rounded-full animate-ping"
+              style={{ animationDelay: "0.2s" }}
+            ></div>
           </div>
 
-          {/* Title */}
-          <h3 className="text-xl font-black text-gray-800 mb-2">
-            New Level Unlocked!
-          </h3>
-
-          {/* Level info */}
-          <div
-            className={`bg-gradient-to-r ${chapterColors[chapter]} text-white rounded-xl p-4 mb-4`}
-          >
-            <div className="flex items-center justify-center space-x-2 mb-2">
-              <span className="text-2xl">{chapterEmojis[chapter]}</span>
-              <span className="font-bold">Chapter {chapter}</span>
+          <div className="flex items-center justify-between relative z-10">
+            <div className="flex items-center space-x-3">
+              <div className="w-14 h-14 bg-white/30 rounded-full flex items-center justify-center animate-bounce shadow-lg border-2 border-white/50">
+                <span className="text-3xl">
+                  {chapterEmojis[chapter] || "🔓"}
+                </span>
+              </div>
+              <div>
+                <h3 className="text-white font-black text-lg drop-shadow-md">
+                  New Level Unlocked!
+                </h3>
+                <p className="text-white/95 text-sm font-semibold">
+                  Keep up the great work!
+                </p>
+              </div>
             </div>
-            <p className="text-sm opacity-90 mb-1">{chapterNames[chapter]}</p>
-            <p className="font-bold">Level {level}</p>
-          </div>
-
-          {/* Encouragement */}
-          <p className="text-gray-600 text-sm font-medium mb-4">
-            Great job! Keep learning about Jose Rizal!
-          </p>
-
-          {/* Action buttons */}
-          <div className="flex flex-col space-y-2">
             <button
-              onClick={handleGoToLevel}
-              className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-6 py-3 rounded-full font-bold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center space-x-2"
+              onClick={handleClose}
+              className="text-white/80 hover:text-white hover:bg-white/20 rounded-full p-1 transition-all duration-200 transform hover:scale-110"
             >
-              <span>🚀</span>
-              <span>Go to Next Level</span>
-            </button>
-
-            <button
-              onClick={handleContinue}
-              className="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2 rounded-full text-sm font-medium transition-colors"
-            >
-              Continue Later
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
             </button>
           </div>
         </div>
+
+        {/* Content */}
+        <div className="p-5">
+          <div className="flex items-center space-x-3 mb-4">
+            <div
+              className={`w-18 h-18 bg-gradient-to-br ${
+                chapterColors[chapter] || chapterColors[1]
+              } rounded-full flex items-center justify-center shadow-xl border-3 border-white animate-pulse`}
+            >
+              <span className="text-white font-black text-2xl">{level}</span>
+            </div>
+            <div className="flex-1">
+              <p className="text-gray-800 font-bold text-base">
+                Chapter {chapter}, Level {level}
+              </p>
+              {chapterName && (
+                <p className="text-gray-600 text-sm font-medium">
+                  {chapterName}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Unlock icon */}
+          <div className="flex items-center justify-center space-x-2 text-green-700 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-3 border-2 border-green-200 shadow-sm">
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"
+              />
+            </svg>
+            <span className="text-sm font-bold">Ready to play!</span>
+          </div>
+        </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

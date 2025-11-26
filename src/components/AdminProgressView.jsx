@@ -5,6 +5,8 @@
 
 import { useState } from "react";
 import { useMultiUserProgress } from "../hooks/useUserProgress";
+import AdminLoadingState from "./AdminLoadingState";
+import AdminErrorMessage from "./AdminErrorMessage";
 
 const AdminProgressView = ({ className = "" }) => {
   const { users, loading, error, refreshUsers, getTopPerformers, totalUsers } =
@@ -30,39 +32,21 @@ const AdminProgressView = ({ className = "" }) => {
 
   if (loading) {
     return (
-      <div
-        className={`bg-white/80 backdrop-blur-sm rounded-xl p-6 ${className}`}
-      >
-        <div className="animate-pulse">
-          <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-16 bg-gray-200 rounded"></div>
-            ))}
-          </div>
-        </div>
+      <div className={className}>
+        <AdminLoadingState type="default" message="Loading user progress..." />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div
-        className={`bg-red-50 border border-red-200 rounded-xl p-6 ${className}`}
-      >
-        <div className="flex items-center mb-2">
-          <span className="text-2xl mr-2">⚠️</span>
-          <h3 className="text-lg font-semibold text-red-800">
-            Error Loading Users
-          </h3>
-        </div>
-        <p className="text-red-600 mb-4">{error}</p>
-        <button
-          onClick={refreshUsers}
-          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-        >
-          Try Again
-        </button>
+      <div className={className}>
+        <AdminErrorMessage
+          error={error}
+          onRetry={refreshUsers}
+          title="Failed to Load User Progress"
+          showDetails={true}
+        />
       </div>
     );
   }

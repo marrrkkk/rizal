@@ -106,3 +106,75 @@ This document outlines the requirements for improving the José Rizal educationa
 3. WHEN the user completes all levels in a chapter THEN the system SHALL unlock the first level of the next chapter
 4. WHEN the user tries to access locked content THEN the system SHALL display clear messaging about completion requirements
 5. WHEN the user unlocks new content THEN the system SHALL show celebratory notifications and visual indicators
+
+### Requirement 10
+
+**User Story:** As a developer, I want authentication to use SQLite database directly without PHP middleware, so that the system is simpler, more maintainable, and has fewer dependencies.
+
+#### Acceptance Criteria
+
+1. WHEN the system handles authentication THEN the system SHALL use SQLite database directly for user management
+2. WHEN the user registers THEN the system SHALL store credentials securely in the SQLite database with proper password hashing
+3. WHEN the user logs in THEN the system SHALL validate credentials against the SQLite database
+4. WHEN authentication is required THEN the system SHALL use JWT tokens generated without PHP backend
+5. WHEN the PHP authentication system exists THEN the system SHALL remove all PHP authentication files and dependencies
+
+### Requirement 11
+
+**User Story:** As a child user, I want my final score to be accurately recorded when I complete a level, so that my achievements are properly tracked and displayed.
+
+#### Acceptance Criteria
+
+1. WHEN the user completes a level THEN the system SHALL calculate the final score based on performance metrics
+2. WHEN the final score is calculated THEN the system SHALL save it to the SQLite database immediately
+3. WHEN the user views their progress THEN the system SHALL display the correct final score for each completed level
+4. WHEN score calculation occurs THEN the system SHALL include all relevant factors (accuracy, time, hints used)
+5. WHEN the score is saved THEN the system SHALL update all related statistics and analytics
+
+### Requirement 12
+
+**User Story:** As a child user, I want to earn epic achievement badges with anime-style opening names, so that I feel excited and motivated by my accomplishments.
+
+#### Acceptance Criteria
+
+1. WHEN the user earns an achievement THEN the system SHALL display an epic anime-style achievement name
+2. WHEN achievement names are shown THEN the system SHALL use dramatic, inspiring titles that match anime opening themes
+3. WHEN the user views achievements THEN the system SHALL display achievement names with visual flair and animations
+4. WHEN achievements are earned THEN the system SHALL use names like "Hero's Awakening", "Path of Enlightenment", "Legacy Unleashed"
+5. WHEN the achievement system displays names THEN the system SHALL maintain child-appropriate and educational context
+
+### Requirement 13
+
+**User Story:** As a teacher or parent, I want to see a top 5 student leaderboard in the analytics dashboard, so that I can recognize high-performing students and encourage healthy competition.
+
+#### Acceptance Criteria
+
+1. WHEN the analytics dashboard loads THEN the system SHALL display a top 5 students list based on overall performance
+2. WHEN calculating rankings THEN the system SHALL consider total score, completion rate, and achievement count
+3. WHEN displaying the leaderboard THEN the system SHALL show student names, scores, and achievement badges
+4. WHEN students have equal scores THEN the system SHALL use completion time as a tiebreaker
+5. WHEN the leaderboard updates THEN the system SHALL refresh rankings in real-time as students complete levels
+
+### Requirement 14
+
+**User Story:** As an administrator, I want a fully functional admin dashboard, so that I can manage users, view analytics, and monitor system health effectively.
+
+#### Acceptance Criteria
+
+1. WHEN the administrator accesses the admin dashboard THEN the system SHALL display all user statistics and progress data
+2. WHEN viewing user data THEN the system SHALL show detailed progress, scores, and completion rates for each user
+3. WHEN the admin needs to manage users THEN the system SHALL provide functionality to view, edit, or remove user accounts
+4. WHEN system analytics are displayed THEN the system SHALL show aggregate statistics, popular levels, and difficulty metrics
+5. WHEN the admin dashboard loads THEN the system SHALL present data in clear, organized visualizations with proper error handling
+
+### Requirement 15
+
+**User Story:** As a child user, I want an improved and polished user interface, so that the app is more enjoyable, easier to use, and visually appealing.
+
+#### Acceptance Criteria
+
+1. WHEN the user navigates the app THEN the system SHALL display consistent, polished UI elements across all pages
+2. WHEN interactive elements are present THEN the system SHALL provide clear visual feedback for all user actions
+3. WHEN the user views any page THEN the system SHALL use proper spacing, alignment, and visual hierarchy
+4. WHEN colors and themes are applied THEN the system SHALL maintain accessibility standards and readability
+5. WHEN animations occur THEN the system SHALL use smooth, performant transitions that enhance rather than distract

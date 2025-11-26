@@ -18,10 +18,10 @@ const initializeDefaultProgress = () => {
     badges: [],
   };
 
-  // Initialize all chapters
+  // Initialize all chapters with all levels unlocked
   for (let i = 1; i <= 6; i++) {
     defaultProgress.chapters[i] = {
-      unlockedLevels: i === 1 ? [1] : [], // Only first level of first chapter unlocked
+      unlockedLevels: [1, 2, 3, 4, 5], // All levels unlocked
       completedLevels: [],
       scores: {},
       badges: [],
@@ -92,19 +92,15 @@ export const completeLocalLevel = (chapter, level, score = 0) => {
     progress.overall.averageScore =
       allScores.length > 0
         ? Math.round(
-            allScores.reduce((sum, s) => sum + s, 0) / allScores.length
-          )
+          allScores.reduce((sum, s) => sum + s, 0) / allScores.length
+        )
         : 0;
 
     progress.overall.lastPlayed = new Date().toISOString();
   }
 
-  // Unlock next level logic
-  let nextLevelUnlocked = false;
-  let nextChapterUnlocked = false;
-  let chapterComplete = false;
-
   // Check if this completes the chapter
+  let chapterComplete = false;
   if (chapterData.completedLevels.length >= 5) {
     chapterComplete = true;
 
@@ -118,22 +114,6 @@ export const completeLocalLevel = (chapter, level, score = 0) => {
         earned_date: new Date().toISOString(),
       });
     }
-
-    // Unlock first level of next chapter
-    if (chapter < 6) {
-      const nextChapter = progress.chapters[chapter + 1];
-      if (nextChapter && !nextChapter.unlockedLevels.includes(1)) {
-        nextChapter.unlockedLevels.push(1);
-        nextChapterUnlocked = true;
-      }
-    }
-  } else {
-    // Unlock next level in same chapter
-    const nextLevel = level + 1;
-    if (nextLevel <= 5 && !chapterData.unlockedLevels.includes(nextLevel)) {
-      chapterData.unlockedLevels.push(nextLevel);
-      nextLevelUnlocked = true;
-    }
   }
 
   // Save updated progress
@@ -142,12 +122,9 @@ export const completeLocalLevel = (chapter, level, score = 0) => {
   if (saved) {
     return {
       success: true,
-      data: {
-        newBadges: chapterComplete ? [`chapter_${chapter}_complete`] : [],
-        chapterComplete,
-        nextLevelUnlocked,
-        nextChapterUnlocked,
-      },
+      newBadges: chapterComplete ? [`chapter_${chapter}_complete`] : [],
+      chapterComplete,
+      progress, // Include full progress for reference
     };
   } else {
     return { success: false, error: "Failed to save progress" };

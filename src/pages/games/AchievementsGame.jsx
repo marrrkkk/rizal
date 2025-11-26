@@ -3,46 +3,46 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 
-export default function AchievementsGame({ username, onLogout }) {
+export default function AchievementsGame({ username, onLogout, onComplete }) {
   const navigate = useNavigate()
   const [events, setEvents] = useState([
-    { 
-      id: 1, 
-      year: 1877, 
-      title: "Enrolled at UST", 
+    {
+      id: 1,
+      year: 1877,
+      title: "Enrolled at UST",
       description: "Began studies in Philosophy and Letters",
       position: 0
     },
-    { 
-      id: 2, 
-      year: 1878, 
-      title: "Won First Prize", 
+    {
+      id: 2,
+      year: 1878,
+      title: "Won First Prize",
       description: "A La Juventud Filipina (To the Filipino Youth) poem contest",
       position: 0
     },
-    { 
-      id: 3, 
-      year: 1879, 
-      title: "El Consejo de los Dioses", 
+    {
+      id: 3,
+      year: 1879,
+      title: "El Consejo de los Dioses",
       description: "Won first prize in literary contest",
       position: 0
     },
-    { 
-      id: 4, 
-      year: 1880, 
-      title: "Shifted to Medicine", 
+    {
+      id: 4,
+      year: 1880,
+      title: "Shifted to Medicine",
       description: "Transferred to medical studies at UST",
       position: 0
     },
-    { 
-      id: 5, 
-      year: 1882, 
-      title: "Sailed to Spain", 
+    {
+      id: 5,
+      year: 1882,
+      title: "Sailed to Spain",
       description: "Left UST to continue medical studies in Madrid",
       position: 0
     },
   ])
-  
+
   const [shuffledEvents, setShuffledEvents] = useState([])
   const [selectedEvents, setSelectedEvents] = useState([])
   const [isComplete, setIsComplete] = useState(false)
@@ -53,7 +53,7 @@ export default function AchievementsGame({ username, onLogout }) {
     // Shuffle events for the selection pool
     const shuffled = [...events].sort(() => Math.random() - 0.5)
     setShuffledEvents(shuffled)
-    
+
     // Initialize positions for the timeline
     const positionedEvents = events.map((event, index) => ({
       ...event,
@@ -64,10 +64,10 @@ export default function AchievementsGame({ username, onLogout }) {
 
   const handleSelectEvent = (event) => {
     if (selectedEvents.some(e => e.id === event.id)) return
-    
+
     const newSelection = [...selectedEvents, event]
     setSelectedEvents(newSelection)
-    
+
     // Check if all events are selected
     if (newSelection.length === events.length) {
       checkOrder(newSelection)
@@ -79,10 +79,10 @@ export default function AchievementsGame({ username, onLogout }) {
   }
 
   const checkOrder = (selected) => {
-    const isCorrect = selected.every((event, index) => 
+    const isCorrect = selected.every((event, index) =>
       index === 0 || event.year >= selected[index - 1].year
     )
-    
+
     if (isCorrect) {
       setFeedback("Correct! You've arranged the events in the right order!")
       setTimeout(() => {
@@ -95,7 +95,11 @@ export default function AchievementsGame({ username, onLogout }) {
   }
 
   const handleComplete = () => {
-    navigate("/chapter/2")
+    if (onComplete) {
+      onComplete(100); // Perfect score for completing the timeline
+    } else {
+      navigate("/chapter/2")
+    }
   }
 
   if (isComplete) {
@@ -143,7 +147,7 @@ export default function AchievementsGame({ username, onLogout }) {
           <div className="relative h-24 mb-12">
             {/* Timeline line */}
             <div className="absolute left-4 right-4 top-1/2 h-1 bg-teal-200 transform -translate-y-1/2"></div>
-            
+
             {/* Timeline markers */}
             <div className="absolute left-0 right-0 top-1/2 flex justify-between transform -translate-y-1/2">
               {[1877, 1879, 1881, 1883].map((year) => (
@@ -158,14 +162,14 @@ export default function AchievementsGame({ username, onLogout }) {
 
             {/* Selected events */}
             {selectedEvents.map((event, index) => (
-              <div 
+              <div
                 key={`selected-${event.id}`}
                 className="absolute top-1/2 transform -translate-y-1/2 bg-white border-2 border-teal-400 rounded-lg p-2 shadow-md w-40 text-center cursor-move"
                 style={{ left: `${(index / (events.length - 1)) * 80 + 10}%` }}
               >
                 <div className="font-medium text-sm text-teal-800">{event.title}</div>
                 <div className="text-xs text-teal-600">{event.year}</div>
-                <button 
+                <button
                   onClick={(e) => {
                     e.stopPropagation()
                     handleDeselectEvent(event.id)
@@ -188,7 +192,7 @@ export default function AchievementsGame({ username, onLogout }) {
             {shuffledEvents
               .filter(event => !selectedEvents.some(selected => selected.id === event.id))
               .map(event => (
-                <div 
+                <div
                   key={event.id}
                   onClick={() => handleSelectEvent(event)}
                   className="bg-white p-3 rounded-lg border border-teal-100 hover:border-teal-300 cursor-pointer transition-colors"
@@ -211,7 +215,7 @@ export default function AchievementsGame({ username, onLogout }) {
         {showHint && (
           <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6 rounded-r">
             <p className="text-sm text-blue-700">
-              <strong>Hint:</strong> Rizal enrolled at UST in 1877 and left for Spain in 1882. 
+              <strong>Hint:</strong> Rizal enrolled at UST in 1877 and left for Spain in 1882.
               His most famous literary works from this period are "A La Juventud Filipina" and "El Consejo de los Dioses".
             </p>
           </div>
@@ -224,7 +228,7 @@ export default function AchievementsGame({ username, onLogout }) {
           >
             ← Back to Chapter 2
           </button>
-          
+
           <div className="text-sm text-teal-700">
             {selectedEvents.length} of {events.length} events placed
           </div>

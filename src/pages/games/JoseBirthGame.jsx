@@ -267,12 +267,18 @@ export default function JoseBirthGame({ username, onLogout, onComplete }) {
     setGameCompleted(true);
     setShowCelebration(true);
 
-    // Calculate time spent (you can enhance this with actual timing)
+    // Calculate time spent
     const timeSpent = Date.now() - (window.gameStartTime || Date.now());
 
-    // Call the onComplete callback if provided
+    // Call the onComplete callback with enhanced game state
     if (onComplete) {
-      onComplete(score, timeSpent);
+      onComplete(score, timeSpent, {
+        attempts: attempts,
+        hintsUsed: hintsUsed,
+        startTime: new Date(window.gameStartTime || Date.now()),
+        endTime: new Date(),
+        accuracy: score,
+      });
     }
   };
 

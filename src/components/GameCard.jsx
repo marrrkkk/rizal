@@ -3,6 +3,9 @@ import {
   useResponsive,
   getTouchFriendlyProps,
 } from "../utils/responsiveUtils.jsx";
+import { getCardClasses, transitions, shadows } from "../utils/designSystem";
+import { getInteractiveFeedback } from "../utils/interactiveFeedback";
+import { getTouchTarget, getFocusRing } from "../utils/accessibility";
 
 const GameCard = ({
   level,
@@ -129,9 +132,11 @@ const GameCard = ({
 
   return (
     <div
-      className={`group relative overflow-hidden rounded-2xl shadow-lg transition-all duration-300 transform cursor-pointer ${
+      className={`group relative overflow-hidden rounded-2xl ${shadows.lg} ${
+        transitions.slow
+      } transform cursor-pointer ${getTouchTarget("minimum")} ${
         isUnlocked
-          ? `bg-white ${
+          ? `bg-white ${getInteractiveFeedback("card")} ${getFocusRing()} ${
               isTouchDevice
                 ? "active:shadow-xl active:scale-95"
                 : "hover:shadow-2xl hover:-translate-y-2"
@@ -140,6 +145,18 @@ const GameCard = ({
       } ${isTouchDevice ? "min-h-[120px]" : ""} ${className}`}
       onClick={handleClick}
       {...(isUnlocked ? touchProps : {})}
+      role="button"
+      tabIndex={isUnlocked ? 0 : -1}
+      aria-label={`${title}, ${
+        isCompleted ? "completed" : isUnlocked ? "available" : "locked"
+      }`}
+      aria-disabled={!isUnlocked}
+      onKeyDown={(e) => {
+        if (isUnlocked && (e.key === "Enter" || e.key === " ")) {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
     >
       {/* Background Pattern */}
       {isUnlocked && (

@@ -1,6 +1,6 @@
 // API utilities for progress management with backend database
 
-const API_BASE_URL = "http://localhost/rizal/api";
+const API_BASE_URL = "http://localhost:3000/api";
 
 // Get auth token from localStorage
 const getAuthToken = () => {
@@ -20,7 +20,7 @@ const getAuthHeaders = () => {
 export const initializeUserProgress = async () => {
   try {
     const response = await fetch(
-      `${API_BASE_URL}/progress/initialize_progress.php`,
+      `${API_BASE_URL}/progress/initialize_progress`,
       {
         method: "POST",
         headers: getAuthHeaders(),
@@ -42,7 +42,7 @@ export const initializeUserProgress = async () => {
 // Get user progress from database
 export const getUserProgress = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/progress/get_progress.php`, {
+    const response = await fetch(`${API_BASE_URL}/progress/get_progress`, {
       method: "GET",
       headers: getAuthHeaders(),
     });
@@ -71,7 +71,7 @@ export const completeLevel = async (
     console.log(`🌐 Request data:`, { chapter, level, score, timeSpent });
 
     const response = await fetch(
-      `${API_BASE_URL}/progress/complete_level.php`,
+      `${API_BASE_URL}/progress/complete_level`,
       {
         method: "POST",
         headers: getAuthHeaders(),
@@ -158,11 +158,11 @@ export const getChapterProgress = (progressData, chapterId) => {
     averageScore:
       chapter.completedLevels.length > 0
         ? Math.round(
-            Object.values(chapter.scores).reduce(
-              (sum, score) => sum + score,
-              0
-            ) / chapter.completedLevels.length
-          )
+          Object.values(chapter.scores).reduce(
+            (sum, score) => sum + score,
+            0
+          ) / chapter.completedLevels.length
+        )
         : 0,
   };
 };
@@ -176,10 +176,10 @@ export const getOverallProgress = (progressData) => {
     completionPercentage:
       progressData.overall.totalLevels > 0
         ? Math.round(
-            (progressData.overall.completedLevels /
-              progressData.overall.totalLevels) *
-              100
-          )
+          (progressData.overall.completedLevels /
+            progressData.overall.totalLevels) *
+          100
+        )
         : 0,
   };
 };

@@ -58,22 +58,28 @@ const ToastNotification = ({
   return (
     <div
       className={`fixed top-4 right-4 z-50 transform transition-all duration-300 ${
-        isVisible ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
+        isVisible
+          ? "translate-x-0 opacity-100 scale-100"
+          : "translate-x-full opacity-0 scale-95"
       }`}
     >
       <div
-        className={`${getTypeStyles()} rounded-2xl shadow-2xl p-4 max-w-sm flex items-center space-x-3`}
+        className={`${getTypeStyles()} rounded-2xl shadow-2xl p-4 max-w-sm flex items-center space-x-3 border-2 border-white/30 backdrop-blur-sm hover:shadow-3xl transition-shadow duration-200`}
       >
-        <div className="text-2xl">{icon || getDefaultIcon()}</div>
+        <div className="text-3xl animate-bounce">
+          {icon || getDefaultIcon()}
+        </div>
         <div className="flex-1">
-          <p className="font-medium text-sm leading-relaxed">{message}</p>
+          <p className="font-semibold text-sm leading-relaxed drop-shadow-sm">
+            {message}
+          </p>
         </div>
         <button
           onClick={() => {
             setIsVisible(false);
             setTimeout(onClose, 300);
           }}
-          className="text-white/80 hover:text-white transition-colors"
+          className="text-white/80 hover:text-white hover:bg-white/20 rounded-full p-1.5 transition-all duration-200 transform hover:scale-110 active:scale-95"
         >
           <svg
             className="w-4 h-4"

@@ -7,12 +7,12 @@ import { usePerformanceOptimization } from "../hooks/usePerformanceOptimization"
 import { useProgressAPI } from "../hooks/useProgressAPI";
 import LoadingSpinner from "../components/LoadingSpinner";
 import Navbar from "../components/Navbar";
+import SoundToggle from "../components/SoundToggle";
 
 export default function Home({
   username,
   onLogout,
   onShowAnalytics,
-  usingFallback,
 }) {
   const navigate = useNavigate();
   const navigationHelper = createNavigationHelper(navigate);
@@ -24,7 +24,6 @@ export default function Home({
     progressData,
     loading,
     error,
-    usingFallback: progressUsingFallback,
     isLevelUnlocked,
     getChapterProgress,
     getOverallProgress,
@@ -116,7 +115,6 @@ export default function Home({
           onLogout={onLogout}
           onShowAnalytics={onShowAnalytics}
           progressData={progressData}
-          usingFallback={usingFallback || progressUsingFallback}
         />
         <div className="flex items-center justify-center h-96">
           <LoadingSpinner
@@ -137,7 +135,6 @@ export default function Home({
           onLogout={onLogout}
           onShowAnalytics={onShowAnalytics}
           progressData={progressData}
-          usingFallback={usingFallback || progressUsingFallback}
         />
         <div className="flex items-center justify-center h-96">
           <div className="bg-white rounded-3xl p-8 shadow-xl max-w-md mx-auto text-center border-4 border-red-200">
@@ -166,7 +163,6 @@ export default function Home({
           onLogout={onLogout}
           onShowAnalytics={onShowAnalytics}
           progressData={progressData}
-          usingFallback={usingFallback || progressUsingFallback}
         />
 
         {/* Main Content - Only Chapters */}
@@ -195,11 +191,10 @@ export default function Home({
               return (
                 <div
                   key={chapter.id}
-                  className={`group relative bg-white rounded-3xl shadow-lg transition-all duration-300 transform border-4 border-white/50 overflow-hidden ${
-                    isChapterUnlocked
-                      ? "hover:shadow-2xl hover:scale-105 cursor-pointer"
-                      : "opacity-60 cursor-not-allowed"
-                  }`}
+                  className={`group relative bg-white rounded-3xl shadow-lg transition-all duration-300 transform border-4 border-white/50 overflow-hidden ${isChapterUnlocked
+                    ? "hover:shadow-2xl hover:scale-105 cursor-pointer"
+                    : "opacity-60 cursor-not-allowed"
+                    }`}
                   style={{ animationDelay: `${index * 100}ms` }}
                   onClick={() => handleChapterClick(chapter)}
                 >
@@ -217,8 +212,8 @@ export default function Home({
                       {isChapterComplete
                         ? "✅"
                         : isChapterUnlocked
-                        ? "🔓"
-                        : "🔒"}
+                          ? "🔓"
+                          : "🔒"}
                     </span>
                   </div>
 
@@ -226,13 +221,10 @@ export default function Home({
                     {/* Chapter icon */}
                     <div className="relative mb-4">
                       <div
-                        className={`w-20 h-20 bg-gradient-to-br ${
-                          chapter.color
-                        } rounded-full flex items-center justify-center shadow-lg mx-auto border-4 border-white ${
-                          isChapterUnlocked ? "group-hover:scale-110" : ""
-                        } transition-transform duration-300 ${
-                          !isChapterUnlocked ? "grayscale" : ""
-                        }`}
+                        className={`w-20 h-20 bg-gradient-to-br ${chapter.color
+                          } rounded-full flex items-center justify-center shadow-lg mx-auto border-4 border-white ${isChapterUnlocked ? "group-hover:scale-110" : ""
+                          } transition-transform duration-300 ${!isChapterUnlocked ? "grayscale" : ""
+                          }`}
                       >
                         <span className="text-3xl">{chapter.icon}</span>
                       </div>
@@ -247,18 +239,16 @@ export default function Home({
                     {/* Chapter info */}
                     <div className="text-center">
                       <h3
-                        className={`text-xl font-black mb-2 transition-colors ${
-                          isChapterUnlocked
-                            ? "text-black group-hover:text-gray-900"
-                            : "text-gray-500"
-                        }`}
+                        className={`text-xl font-black mb-2 transition-colors ${isChapterUnlocked
+                          ? "text-black group-hover:text-gray-900"
+                          : "text-gray-500"
+                          }`}
                       >
                         {chapter.title}
                       </h3>
                       <p
-                        className={`text-sm mb-4 leading-relaxed ${
-                          isChapterUnlocked ? "text-black" : "text-gray-400"
-                        }`}
+                        className={`text-sm mb-4 leading-relaxed ${isChapterUnlocked ? "text-black" : "text-gray-400"
+                          }`}
                       >
                         {chapter.description}
                       </p>
@@ -266,9 +256,8 @@ export default function Home({
                       {/* Lesson count */}
                       <div className="flex items-center justify-center space-x-2 mb-4">
                         <span
-                          className={`text-xs font-bold uppercase tracking-wide ${
-                            isChapterUnlocked ? "text-black" : "text-gray-400"
-                          }`}
+                          className={`text-xs font-bold uppercase tracking-wide ${isChapterUnlocked ? "text-black" : "text-gray-400"
+                            }`}
                         >
                           {totalLevels} Lessons
                         </span>
@@ -280,20 +269,19 @@ export default function Home({
 
                       {/* Start button */}
                       <button
-                        className={`w-full font-black py-3 px-6 rounded-2xl transition-all duration-200 border-b-4 active:border-b-2 uppercase tracking-wide text-sm ${
-                          isChapterUnlocked
-                            ? `bg-gradient-to-r ${chapter.color} text-white border-opacity-50 border-gray-700 hover:shadow-lg`
-                            : "bg-gray-300 text-gray-500 border-gray-400 cursor-not-allowed"
-                        }`}
+                        className={`w-full font-black py-3 px-6 rounded-2xl transition-all duration-200 border-b-4 active:border-b-2 uppercase tracking-wide text-sm ${isChapterUnlocked
+                          ? `bg-gradient-to-r ${chapter.color} text-white border-opacity-50 border-gray-700 hover:shadow-lg`
+                          : "bg-gray-300 text-gray-500 border-gray-400 cursor-not-allowed"
+                          }`}
                         disabled={!isChapterUnlocked}
                       >
                         {!isChapterUnlocked
                           ? "Locked"
                           : completedLevels === 0
-                          ? "Start"
-                          : isChapterComplete
-                          ? "Complete"
-                          : "Continue"}
+                            ? "Start"
+                            : isChapterComplete
+                              ? "Complete"
+                              : "Continue"}
                       </button>
                     </div>
                   </div>
@@ -302,6 +290,9 @@ export default function Home({
             })}
           </div>
         </main>
+
+        {/* Sound Toggle Button */}
+        <SoundToggle />
       </div>
     </ErrorBoundary>
   );

@@ -1,10 +1,9 @@
-// React hook for managing progress with database backend and localStorage fallback
+// React hook for managing progress with backend database (SQLite)
 
 import { useState, useEffect, useCallback } from "react";
 import {
   getUserProgress,
   completeLevel as apiCompleteLevel,
-  initializeUserProgress,
   isLevelUnlocked,
   isLevelCompleted,
   getLevelScore,
@@ -12,172 +11,94 @@ import {
   getOverallProgress,
   getAllBadges,
 } from "../utils/progressAPI";
-import {
-  getLocalProgress,
-  completeLocalLevel,
-  isLocalLevelUnlocked,
-  isLocalLevelCompleted,
-  getLocalLevelScore,
-} from "../utils/progressFallback";
 
 export const useProgressAPI = (username) => {
   const [progressData, setProgressData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [usingFallback, setUsingFallback] = useState(false);
 
-  // Load progress from database with fallback to localStorage
+  // Load progress from API
   const loadProgress = useCallback(async () => {
+    if (!username) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
-      setUsingFallback(false);
 
-      if (username) {
-        // Try API first
-        console.log("🔄 Attempting to load progress from API...");
+      console.log("🔄 Loading progress from database...");
+      const result = await getUserProgress();
 
-        // Initialize progress if needed
-        await initializeUserProgress();
-
-        // Get current progress
-        const result = await getUserProgress();
-
-        if (result.success) {
-          console.log("✅ Successfully loaded progress from API");
-          setProgressData(result.data);
-          return;
-        } else {
-          console.warn(
-            "⚠️ API failed, falling back to localStorage:",
-            result.error
-          );
-        }
+      if (result.success) {
+        setProgressData(result.data);
+        console.log("✅ Successfully loaded progress from database");
+      } else {
+        throw new Error(result.error || "Failed to load progress");
       }
-
-      // Fallback to localStorage
-      console.log("🔄 Loading progress from localStorage fallback...");
-      const localProgress = getLocalProgress();
-      setProgressData(localProgress);
-      setUsingFallback(true);
-      console.log("✅ Successfully loaded progress from localStorage");
     } catch (err) {
-      console.warn("⚠️ API error, falling back to localStorage:", err.message);
-
-      // Fallback to localStorage
-      const localProgress = getLocalProgress();
-      setProgressData(localProgress);
-      setUsingFallback(true);
-      setError(`API unavailable, using offline mode: ${err.message}`);
+      console.error("❌ Error loading progress from database:", err.message);
+      setError(`Failed to connect to server: ${err.message}`);
     } finally {
       setLoading(false);
     }
   }, [username]);
 
-  // Complete a level with API and localStorage fallback
+  // Complete a level
   const completeLevel = useCallback(
     async (chapter, level, score = 0, timeSpent = 0) => {
       try {
         console.log(
-          `📡 Completing level ${chapter}-${level} with score ${score}`
+          `📝 Completing level ${chapter}-${level} with score ${score}`
         );
 
-        // Try API first if we have a username and not already using fallback
-        if (username && !usingFallback) {
-          console.log("📡 Attempting API completion...");
-          const result = await apiCompleteLevel(
-            chapter,
-            level,
-            score,
-            timeSpent
-          );
-
-          if (result.success) {
-            console.log("📡 API Success, reloading progress...");
-            await loadProgress();
-
-            const response = {
-              success: true,
-              newBadges: result.data.newBadges || [],
-              chapterComplete: result.data.chapterComplete || false,
-              nextLevelUnlocked: result.data.nextLevelUnlocked,
-              nextChapterUnlocked: result.data.nextChapterUnlocked,
-            };
-
-            console.log("📡 API Response:", response);
-            return response;
-          } else {
-            console.warn(
-              "📡 API failed, falling back to localStorage:",
-              result.error
-            );
-          }
-        }
-
-        // Fallback to localStorage
-        console.log("💾 Using localStorage completion...");
-        const result = completeLocalLevel(chapter, level, score);
+        // Use API
+        const result = await apiCompleteLevel(chapter, level, score, timeSpent);
 
         if (result.success) {
-          // Update local state
-          const updatedProgress = getLocalProgress();
-          setProgressData(updatedProgress);
-          setUsingFallback(true);
+          // Refresh progress to get updated state
+          await loadProgress();
 
-          console.log("💾 localStorage Success:", result);
-          return result;
+          // Return the result with nextLevelUnlocked info
+          return {
+            success: true,
+            newBadges: result.data.newBadges,
+            chapterComplete: result.data.chapterComplete,
+            nextLevelUnlocked: result.data.nextLevelUnlocked,
+            nextChapterUnlocked: result.data.nextChapterUnlocked,
+          };
         } else {
-          console.error("💾 localStorage Error:", result.error);
-          return result;
+          throw new Error(result.error || "Failed to save progress");
         }
       } catch (err) {
-        console.error("📡 Error completing level:", err);
-
-        // Final fallback to localStorage
-        console.log("💾 Final fallback to localStorage...");
-        const result = completeLocalLevel(chapter, level, score);
-
-        if (result.success) {
-          const updatedProgress = getLocalProgress();
-          setProgressData(updatedProgress);
-          setUsingFallback(true);
-        }
-
-        return result.success ? result : { success: false, error: err.message };
+        console.error("❌ Error completing level:", err);
+        return { success: false, error: err.message };
       }
     },
-    [username, usingFallback, loadProgress]
+    [username, loadProgress]
   );
 
-  // Helper functions that work with current progress data or fallback
+  // Helper functions that work with current progress data
   const checkLevelUnlocked = useCallback(
     (chapterId, levelId) => {
-      if (usingFallback) {
-        return isLocalLevelUnlocked(chapterId, levelId);
-      }
       return isLevelUnlocked(progressData, chapterId, levelId);
     },
-    [progressData, usingFallback]
+    [progressData]
   );
 
   const checkLevelCompleted = useCallback(
     (chapterId, levelId) => {
-      if (usingFallback) {
-        return isLocalLevelCompleted(chapterId, levelId);
-      }
       return isLevelCompleted(progressData, chapterId, levelId);
     },
-    [progressData, usingFallback]
+    [progressData]
   );
 
   const getScore = useCallback(
     (chapterId, levelId) => {
-      if (usingFallback) {
-        return getLocalLevelScore(chapterId, levelId);
-      }
       return getLevelScore(progressData, chapterId, levelId);
     },
-    [progressData, usingFallback]
+    [progressData]
   );
 
   const getChapterInfo = useCallback(
@@ -205,7 +126,6 @@ export const useProgressAPI = (username) => {
     progressData,
     loading,
     error,
-    usingFallback, // New: indicates if using localStorage fallback
 
     // Actions
     completeLevel,

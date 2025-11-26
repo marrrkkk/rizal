@@ -1,6 +1,5 @@
 // Export theme configuration and utilities
 export {
-  default as filipinoTheme,
   filipinoTheme,
   getChapterTheme,
   getGameTypeTheme,

@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom"
 const PUZZLE_SIZE = 3 // 3x3 puzzle
 const EMPTY_CELL = PUZZLE_SIZE * PUZZLE_SIZE - 1 // Last cell is empty
 
-export default function EducationPuzzleGame({ username, onLogout }) {
+export default function EducationPuzzleGame({ username, onLogout, onComplete }) {
   const navigate = useNavigate()
   const [puzzle, setPuzzle] = useState([])
   const [moves, setMoves] = useState(0)
@@ -14,7 +14,7 @@ export default function EducationPuzzleGame({ username, onLogout }) {
   const [showHint, setShowHint] = useState(false)
   const [shuffling, setShuffling] = useState(true)
   const [showInfo, setShowInfo] = useState(true)
-  
+
   // Educational facts about Rizal's education
   const educationFacts = [
     "Rizal enrolled at Ateneo Municipal de Manila in 1872 at age 11.",
@@ -27,7 +27,7 @@ export default function EducationPuzzleGame({ username, onLogout }) {
     "He earned a degree in Medicine from the Universidad Central de Madrid.",
     "Rizal also studied at the University of Paris and the University of Heidelberg.",
   ]
-  
+
   // Initialize the puzzle
   const initializePuzzle = useCallback(() => {
     // Create solved puzzle
@@ -36,52 +36,52 @@ export default function EducationPuzzleGame({ username, onLogout }) {
       value: i === EMPTY_CELL ? null : i + 1,
       isCorrect: true,
     }));
-    
+
     // Shuffle the puzzle
     const shufflePuzzle = (puzzleArray) => {
       let newPuzzle = [...puzzleArray];
       let emptyIndex = EMPTY_CELL;
       let lastMoved = null;
-      
+
       // Perform random valid moves to shuffle
       const shuffleMoves = 100 + Math.floor(Math.random() * 100);
-      
+
       for (let i = 0; i < shuffleMoves; i++) {
         const possibleMoves = [];
         const row = Math.floor(emptyIndex / PUZZLE_SIZE);
         const col = emptyIndex % PUZZLE_SIZE;
-        
+
         // Find all possible moves (up, down, left, right)
         if (row > 0) possibleMoves.push(emptyIndex - PUZZLE_SIZE); // Up
         if (row < PUZZLE_SIZE - 1) possibleMoves.push(emptyIndex + PUZZLE_SIZE); // Down
         if (col > 0) possibleMoves.push(emptyIndex - 1); // Left
         if (col < PUZZLE_SIZE - 1) possibleMoves.push(emptyIndex + 1); // Right
-        
+
         // Remove the last moved piece to avoid back-and-forth
         const validMoves = possibleMoves.filter(move => move !== lastMoved);
-        
+
         if (validMoves.length > 0) {
           const randomMove = validMoves[Math.floor(Math.random() * validMoves.length)];
-          
+
           // Swap empty cell with the selected move
-          [newPuzzle[emptyIndex], newPuzzle[randomMove]] = 
+          [newPuzzle[emptyIndex], newPuzzle[randomMove]] =
             [newPuzzle[randomMove], newPuzzle[emptyIndex]];
-            
+
           lastMoved = emptyIndex;
           emptyIndex = randomMove;
         }
       }
-      
+
       return { puzzle: newPuzzle, emptyIndex };
     };
-    
+
     const { puzzle: shuffledPuzzle, emptyIndex } = shufflePuzzle(solvedPuzzle);
-    
+
     // Check if the puzzle is solvable
     const isSolvable = (puzzleArray) => {
       let inversions = 0;
       const flatPuzzle = puzzleArray.filter(tile => tile.value !== null).map(tile => tile.value);
-      
+
       for (let i = 0; i < flatPuzzle.length - 1; i++) {
         for (let j = i + 1; j < flatPuzzle.length; j++) {
           if (flatPuzzle[i] > flatPuzzle[j]) {
@@ -89,42 +89,42 @@ export default function EducationPuzzleGame({ username, onLogout }) {
           }
         }
       }
-      
+
       // For a puzzle with odd width, number of inversions must be even
       return inversions % 2 === 0;
     };
-    
+
     // If the puzzle is not solvable, swap two non-empty tiles to make it solvable
     if (!isSolvable(shuffledPuzzle)) {
       // Find first two non-empty tiles that are not in their correct positions
       let first, second;
       for (let i = 0; i < shuffledPuzzle.length - 1; i++) {
-        if (shuffledPuzzle[i].value !== null && 
-            shuffledPuzzle[i].value !== i + 1 && 
-            shuffledPuzzle[i + 1].value !== null) {
+        if (shuffledPuzzle[i].value !== null &&
+          shuffledPuzzle[i].value !== i + 1 &&
+          shuffledPuzzle[i + 1].value !== null) {
           first = i;
           second = i + 1;
           break;
         }
       }
-      
+
       // If all tiles are in correct positions (shouldn't happen with proper shuffling)
       if (first === undefined) {
         first = 0;
         second = 1;
       }
-      
+
       // Swap the two tiles
-      [shuffledPuzzle[first], shuffledPuzzle[second]] = 
+      [shuffledPuzzle[first], shuffledPuzzle[second]] =
         [shuffledPuzzle[second], shuffledPuzzle[first]];
     }
-    
+
     // Mark correct positions
     const finalPuzzle = shuffledPuzzle.map((tile, index) => ({
       ...tile,
       isCorrect: tile.value === null ? true : tile.value === index + 1,
     }));
-    
+
     return { puzzle: finalPuzzle, emptyIndex };
   }, []);
 
@@ -132,79 +132,83 @@ export default function EducationPuzzleGame({ username, onLogout }) {
   useEffect(() => {
     startNewGame();
   }, []);
-  
+
   const startNewGame = () => {
     const { puzzle: newPuzzle, emptyIndex } = initializePuzzle();
     setPuzzle(newPuzzle);
     setMoves(0);
     setIsComplete(false);
     setShuffling(true);
-    
+
     // Auto-hide the info panel after 5 seconds
     setTimeout(() => {
       setShowInfo(false);
       setShuffling(false);
     }, 5000);
   };
-  
+
   // Check if the puzzle is solved
   const checkCompletion = useCallback((currentPuzzle) => {
-    return currentPuzzle.every(tile => 
+    return currentPuzzle.every(tile =>
       tile.value === null || tile.value === tile.id + 1
     );
   }, []);
-  
+
   // Handle tile click
   const handleTileClick = (index) => {
     if (shuffling || isComplete) return;
-    
+
     const emptyIndex = puzzle.findIndex(tile => tile.value === null);
     const clickedRow = Math.floor(index / PUZZLE_SIZE);
     const clickedCol = index % PUZZLE_SIZE;
     const emptyRow = Math.floor(emptyIndex / PUZZLE_SIZE);
     const emptyCol = emptyIndex % PUZZLE_SIZE;
-    
+
     // Check if the clicked tile is adjacent to the empty space
-    const isAdjacent = 
+    const isAdjacent =
       (clickedRow === emptyRow && Math.abs(clickedCol - emptyCol) === 1) || // Same row, adjacent column
       (clickedCol === emptyCol && Math.abs(clickedRow - emptyRow) === 1);   // Same column, adjacent row
-    
+
     if (isAdjacent) {
       const newPuzzle = [...puzzle];
-      
+
       // Swap the clicked tile with the empty space
       [newPuzzle[index], newPuzzle[emptyIndex]] = [newPuzzle[emptyIndex], newPuzzle[index]];
-      
+
       // Update correctness of the moved tiles
       newPuzzle[index] = { ...newPuzzle[index], isCorrect: newPuzzle[index].value === index + 1 };
-      newPuzzle[emptyIndex] = { 
-        ...newPuzzle[emptyIndex], 
-        isCorrect: newPuzzle[emptyIndex].value === emptyIndex + 1 
+      newPuzzle[emptyIndex] = {
+        ...newPuzzle[emptyIndex],
+        isCorrect: newPuzzle[emptyIndex].value === emptyIndex + 1
       };
-      
+
       setPuzzle(newPuzzle);
       setMoves(prevMoves => {
         const newMoves = prevMoves + 1;
-        
+
         // Check if the puzzle is complete after each move
         if (checkCompletion(newPuzzle)) {
           setIsComplete(true);
         }
-        
+
         return newMoves;
       });
     }
   };
-  
+
   // Get a random education fact
   const getRandomFact = () => {
     return educationFacts[Math.floor(Math.random() * educationFacts.length)];
   };
-  
+
   const handleComplete = () => {
-    navigate("/chapter/2");
+    if (onComplete) {
+      onComplete(100); // Perfect score for completing the puzzle
+    } else {
+      navigate("/chapter/2");
+    }
   };
-  
+
   if (isComplete) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 to-rose-100 p-4">
@@ -215,12 +219,12 @@ export default function EducationPuzzleGame({ username, onLogout }) {
           <p className="text-gray-600 mb-6">
             You completed the puzzle in {moves} {moves === 1 ? 'move' : 'moves'}!
           </p>
-          
+
           <div className="bg-rose-50 p-4 rounded-lg mb-6 text-left">
             <h3 className="font-semibold text-rose-800 mb-2">Did you know?</h3>
             <p className="text-sm text-rose-700">{getRandomFact()}</p>
           </div>
-          
+
           <div className="flex flex-col space-y-3">
             <button
               onClick={startNewGame}
@@ -248,14 +252,14 @@ export default function EducationPuzzleGame({ username, onLogout }) {
             <h1 className="text-2xl font-bold text-rose-900">Education Puzzle</h1>
             <p className="text-rose-800">Slide the tiles to complete the puzzle</p>
           </div>
-          
+
           <div className="bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm mt-4 md:mt-0">
             <span className="font-medium text-rose-700">Moves: {moves}</span>
           </div>
         </div>
-        
+
         {/* Puzzle Board */}
-        <div 
+        <div
           className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-lg mb-6 mx-auto"
           style={{
             width: `${PUZZLE_SIZE * 100}px`,
@@ -270,7 +274,7 @@ export default function EducationPuzzleGame({ username, onLogout }) {
           {puzzle.map((tile, index) => {
             if (tile.value === null) {
               return (
-                <div 
+                <div
                   key={index}
                   className="bg-rose-50 rounded-lg flex items-center justify-center"
                   style={{
@@ -279,7 +283,7 @@ export default function EducationPuzzleGame({ username, onLogout }) {
                 ></div>
               );
             }
-            
+
             return (
               <button
                 key={index}
@@ -301,13 +305,13 @@ export default function EducationPuzzleGame({ username, onLogout }) {
             );
           })}
         </div>
-        
+
         {/* Game Info Panel */}
         {showInfo && (
           <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 shadow-lg mb-6 animate-fade-in">
             <div className="flex justify-between items-start mb-3">
               <h3 className="text-lg font-semibold text-rose-800">How to Play</h3>
-              <button 
+              <button
                 onClick={() => setShowInfo(false)}
                 className="text-rose-500 hover:text-rose-700"
               >
@@ -324,7 +328,7 @@ export default function EducationPuzzleGame({ username, onLogout }) {
             </div>
           </div>
         )}
-        
+
         {/* Educational Fact */}
         {!shuffling && (
           <div className="bg-rose-50 border-l-4 border-rose-400 p-4 rounded-r-lg mb-6">
@@ -332,7 +336,7 @@ export default function EducationPuzzleGame({ username, onLogout }) {
             <p className="text-sm text-rose-700">{getRandomFact()}</p>
           </div>
         )}
-        
+
         {/* Controls */}
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
           <button
@@ -341,7 +345,7 @@ export default function EducationPuzzleGame({ username, onLogout }) {
           >
             ← Back to Chapter 2
           </button>
-          
+
           <div className="flex items-center space-x-3">
             <button
               onClick={() => setShowHint(!showHint)}
@@ -349,7 +353,7 @@ export default function EducationPuzzleGame({ username, onLogout }) {
             >
               {showHint ? 'Hide' : 'Show'} Hint
             </button>
-            
+
             <button
               onClick={startNewGame}
               className="bg-rose-100 text-rose-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-rose-200 transition-colors"
@@ -358,14 +362,14 @@ export default function EducationPuzzleGame({ username, onLogout }) {
             </button>
           </div>
         </div>
-        
+
         {/* Hint */}
         {showHint && !shuffling && (
           <div className="mt-6 p-4 bg-rose-50 rounded-lg border border-rose-100">
             <h3 className="font-semibold text-rose-800 mb-2">Hint</h3>
             <p className="text-sm text-rose-700">
-              Start by moving the tiles to form the top row from left to right. 
-              Then work on the second row, and so on. The empty space should 
+              Start by moving the tiles to form the top row from left to right.
+              Then work on the second row, and so on. The empty space should
               always be used to position the next correct tile.
             </p>
           </div>

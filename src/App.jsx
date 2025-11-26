@@ -55,7 +55,7 @@ import RizalDigitalAgeGame from "./pages/games/RizalDigitalAgeGame";
 import RizalMonumentsGame from "./pages/games/RizalMonumentsGame";
 import ModernFilipinoHeroesGame from "./pages/games/ModernFilipinoHeroesGame";
 import RizalEternalLegacyGame from "./pages/games/RizalEternalLegacyGame";
-import { setAuthToken } from "./utils/api";
+import { setAuthToken, clearAuthToken } from "./utils/api";
 import { resetSessionTracking } from "./utils/progressManager";
 import { BadgeNotification } from "./components/BadgeSystem";
 import CelebrationAnimation from "./components/CelebrationAnimation";
@@ -65,6 +65,7 @@ import BadgeNotificationSystem, {
 import BadgeTestComponent from "./components/BadgeTestComponent";
 import GameIntegrationExample from "./components/GameIntegrationExample";
 import LevelUnlockNotification from "./components/LevelUnlockNotification";
+import ChapterUnlockNotification from "./components/ChapterUnlockNotification";
 import LevelCompletionModal from "./components/LevelCompletionModal";
 import QuickNextLevelButton from "./components/QuickNextLevelButton";
 import ProgressDebugger from "./components/ProgressDebugger";
@@ -74,6 +75,12 @@ import { useProgressAPI } from "./hooks/useProgressAPI";
 import { useAnalytics } from "./hooks/useAnalytics";
 import AnalyticsDashboard from "./components/AnalyticsDashboard";
 import ConnectionStatus from "./components/ConnectionStatus";
+import {
+  handleGameCompletion,
+  getLevelType,
+  createGameStateTracker,
+} from "./utils/gameCompletionHandler";
+import { calculateScoreBreakdown } from "./utils/scoreCalculation";
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem("token"));
@@ -81,6 +88,8 @@ function App() {
   const [newBadges, setNewBadges] = useState([]);
   const [showCelebration, setShowCelebration] = useState(null);
   const [levelUnlockNotification, setLevelUnlockNotification] = useState(null);
+  const [chapterUnlockNotification, setChapterUnlockNotification] =
+    useState(null);
   const [showAnalyticsDashboard, setShowAnalyticsDashboard] = useState(false);
   const [levelCompletionModal, setLevelCompletionModal] = useState(null);
   const [showNextLevelButton, setShowNextLevelButton] = useState(null);
@@ -108,12 +117,11 @@ function App() {
     }
   }, [setToastManager]);
 
-  // Use the database-backed progress system with localStorage fallback
+  // Use the database-backed progress system
   const {
     progressData,
     loading: progressLoading,
     error: progressError,
-    usingFallback,
     completeLevel: completeUserLevel,
     refreshProgress,
     isLevelUnlocked,
@@ -135,12 +143,6 @@ function App() {
       );
     }
 
-    // Performance optimizations
-    if (!isLowEndDevice) {
-      // Preload critical resources on high-end devices
-      preloadResource("/api/auth/protected.php");
-    }
-
     // Add performance monitoring
     if ("performance" in window && "mark" in performance) {
       performance.mark("app-init-start");
@@ -151,33 +153,30 @@ function App() {
       return;
     }
 
-    // fetch current user from protected endpoint
-    fetch("http://localhost/rizal/api/auth/protected.php", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Unauthorized");
-        return res.json();
-      })
-      .then((data) => {
-        // data.message is "Hello, username! ..."
-        const match = data.message.match(/Hello, (\w+)!/);
-        if (match) setUsername(match[1]);
-      })
-      .catch(() => {
-        setToken(null);
-        localStorage.removeItem("token");
-      });
+    // Use SQLite authentication to decode token
+    try {
+      // Decode JWT token to get username using new auth utilities
+      const tokenParts = token.split(".");
+      if (tokenParts.length === 3) {
+        const payload = JSON.parse(atob(tokenParts[1]));
+        if (payload.username) {
+          setUsername(payload.username);
+        }
+      }
+    } catch (error) {
+      console.warn("Could not decode token:", error);
+      // Token is invalid, clear it
+      setToken(null);
+      localStorage.removeItem("token");
+    }
   }, [token]);
 
   const handleLogout = () => {
     resetSessionTracking();
     setToken(null);
     setUsername(null);
-    localStorage.removeItem("token");
-    setAuthToken(null);
+    clearAuthToken();
+    localStorage.removeItem("user");
   };
 
   const handleGoToLevel = (chapter, level) => {
@@ -189,7 +188,8 @@ function App() {
     chapter,
     level,
     score = 0,
-    timeSpent = 0
+    timeSpent = 0,
+    gameState = {}
   ) => {
     if (!username) {
       console.error("No user logged in");
@@ -198,11 +198,54 @@ function App() {
 
     try {
       console.log(
-        `🎮 Attempting to complete Level ${level} of Chapter ${chapter} with score ${score}`
+        `🎮 Attempting to complete Level ${level} of Chapter ${chapter} with raw score ${score}`
       );
 
-      // Use the new user-specific progress system
-      const result = await completeUserLevel(chapter, level, score, timeSpent);
+      // Get user ID from localStorage or username
+      const userId = localStorage.getItem("userId") || username;
+
+      // Get level type for score calculation
+      const levelType = getLevelType(chapter, level);
+
+      // Calculate final score using the game completion handler
+      const completionResult = await handleGameCompletion({
+        userId,
+        chapterId: chapter,
+        levelId: level,
+        score,
+        gameState: {
+          attempts: gameState.attempts || 1,
+          hintsUsed: gameState.hintsUsed || 0,
+          startTime: gameState.startTime || new Date(Date.now() - timeSpent),
+          endTime: gameState.endTime || new Date(),
+          accuracy: gameState.accuracy || score,
+        },
+        levelConfig: {
+          type: levelType,
+        },
+      });
+
+      if (!completionResult.success) {
+        console.error(
+          "Failed to calculate final score:",
+          completionResult.error
+        );
+        // Fall back to using raw score
+        var finalScore = score;
+      } else {
+        var finalScore = completionResult.finalScore;
+        console.log(
+          `📊 Final score calculated: ${finalScore} (raw score: ${score})`
+        );
+      }
+
+      // Use the new user-specific progress system with final score
+      const result = await completeUserLevel(
+        chapter,
+        level,
+        finalScore,
+        timeSpent
+      );
 
       console.log("🔍 Complete level result:", result);
 
@@ -224,8 +267,8 @@ function App() {
         // Show level completion notification
         showLevelCompleteNotification(chapter, level, score);
 
-        // Show immediate success notification
-        showSuccess(`🎉 Level ${level} completed! Score: ${score}%`, {
+        // Show immediate success notification with final score
+        showSuccess(`🎉 Level ${level} completed! Final Score: ${finalScore}`, {
           duration: 3000,
           icon: "✅",
         });
@@ -233,11 +276,17 @@ function App() {
         // Show celebration animation
         setShowCelebration("level");
 
+        // Calculate fallback next level if missing
+        let nextLevelUnlocked = result.nextLevelUnlocked;
+        if (!nextLevelUnlocked && !result.nextChapterUnlocked && level < 5) {
+          nextLevelUnlocked = { chapter, level: level + 1 };
+        }
+
         // Show toast notifications for unlocks
-        if (result.nextLevelUnlocked) {
+        if (nextLevelUnlocked) {
           setTimeout(() => {
             showSuccess(
-              `🔓 Level ${result.nextLevelUnlocked.level} unlocked in Chapter ${result.nextLevelUnlocked.chapter}!`,
+              `🔓 Level ${nextLevelUnlocked.level} unlocked in Chapter ${nextLevelUnlocked.chapter}!`,
               { duration: 4000, icon: "🆕" }
             );
           }, 1500);
@@ -249,28 +298,35 @@ function App() {
               `🚀 New Chapter ${result.nextChapterUnlocked.chapter} unlocked!`,
               { duration: 5000, icon: "📚" }
             );
+            // Show chapter unlock notification with celebration
+            setChapterUnlockNotification({
+              chapter: result.nextChapterUnlocked.chapter,
+              chapterName: result.nextChapterUnlocked.chapterName,
+            });
           }, 2500);
         }
 
         // Show quick next level button immediately after celebration
         const nextLevel =
-          result.nextLevelUnlocked || result.nextChapterUnlocked;
+          nextLevelUnlocked || result.nextChapterUnlocked;
         if (nextLevel) {
           setTimeout(() => {
             setShowNextLevelButton(nextLevel);
-          }, 1000);
+          }, 500);
         }
 
         // Show comprehensive completion modal after celebration
         setTimeout(() => {
           setLevelCompletionModal({
             completedLevel: { chapter, level },
-            score,
-            nextLevelUnlocked: result.nextLevelUnlocked,
+            score: finalScore, // Use final score instead of raw score
+            rawScore: score, // Keep raw score for reference
+            finalScore: finalScore, // Explicitly include final score
+            nextLevelUnlocked: nextLevelUnlocked,
             nextChapterUnlocked: result.nextChapterUnlocked,
             newBadges: result.newBadges || [],
           });
-        }, 2000);
+        }, 1000);
 
         // Show new badge notifications
         if (result.newBadges && result.newBadges.length > 0) {
@@ -313,8 +369,6 @@ function App() {
   return (
     <ErrorBoundary>
       <BrowserRouter>
-        {/* Connection Status Indicator */}
-        <ConnectionStatus usingFallback={usingFallback} error={progressError} />
 
         {/* Celebration Animation */}
         {showCelebration && (
@@ -348,6 +402,15 @@ function App() {
           />
         )}
 
+        {/* Chapter Unlock Notification */}
+        {chapterUnlockNotification && (
+          <ChapterUnlockNotification
+            chapter={chapterUnlockNotification.chapter}
+            chapterName={chapterUnlockNotification.chapterName}
+            onClose={() => setChapterUnlockNotification(null)}
+          />
+        )}
+
         <Routes>
           <Route
             path="/"
@@ -357,7 +420,6 @@ function App() {
                   username={username}
                   onLogout={handleLogout}
                   onShowAnalytics={() => setShowAnalyticsDashboard(true)}
-                  usingFallback={usingFallback}
                 />
               ) : (
                 <Navigate to="/login" />
@@ -372,7 +434,6 @@ function App() {
                   username={username}
                   onLogout={handleLogout}
                   onShowAnalytics={() => setShowAnalyticsDashboard(true)}
-                  usingFallback={usingFallback}
                 />
               ) : (
                 <Navigate to="/login" />
@@ -396,8 +457,8 @@ function App() {
                 <JoseBirthGame
                   username={username}
                   onLogout={handleLogout}
-                  onComplete={(score, timeSpent) =>
-                    handleLevelComplete(1, 1, score, timeSpent)
+                  onComplete={(score, timeSpent, gameState) =>
+                    handleLevelComplete(1, 1, score, timeSpent, gameState)
                   }
                 />
               ) : (
@@ -412,8 +473,8 @@ function App() {
                 <FamilyBackgroundGame
                   username={username}
                   onLogout={handleLogout}
-                  onComplete={(score, timeSpent) =>
-                    handleLevelComplete(1, 2, score, timeSpent)
+                  onComplete={(score, timeSpent, gameState) =>
+                    handleLevelComplete(1, 2, score, timeSpent, gameState)
                   }
                 />
               ) : (
@@ -428,8 +489,8 @@ function App() {
                 <EarlyChildhoodGame
                   username={username}
                   onLogout={handleLogout}
-                  onComplete={(score, timeSpent) =>
-                    handleLevelComplete(1, 3, score, timeSpent)
+                  onComplete={(score, timeSpent, gameState) =>
+                    handleLevelComplete(1, 3, score, timeSpent, gameState)
                   }
                 />
               ) : (
@@ -444,8 +505,8 @@ function App() {
                 <FirstTeacherGame
                   username={username}
                   onLogout={handleLogout}
-                  onComplete={(score, timeSpent) =>
-                    handleLevelComplete(1, 4, score, timeSpent)
+                  onComplete={(score, timeSpent, gameState) =>
+                    handleLevelComplete(1, 4, score, timeSpent, gameState)
                   }
                 />
               ) : (
@@ -485,8 +546,8 @@ function App() {
               token ? (
                 <AteneoGame
                   username={username}
-                  onComplete={(score, timeSpent) =>
-                    handleLevelComplete(2, 1, score, timeSpent)
+                  onComplete={(score, timeSpent, gameState) =>
+                    handleLevelComplete(2, 1, score, timeSpent, gameState)
                   }
                 />
               ) : (
@@ -500,8 +561,8 @@ function App() {
               token ? (
                 <UstGame
                   username={username}
-                  onComplete={(score, timeSpent) =>
-                    handleLevelComplete(2, 2, score, timeSpent)
+                  onComplete={(score, timeSpent, gameState) =>
+                    handleLevelComplete(2, 2, score, timeSpent, gameState)
                   }
                 />
               ) : (
@@ -515,7 +576,9 @@ function App() {
               token ? (
                 <AchievementsGame
                   username={username}
-                  onComplete={() => handleLevelComplete(2, 3)}
+                  onComplete={(score) =>
+                    handleLevelComplete(2, 3, score !== undefined ? score : 100)
+                  }
                 />
               ) : (
                 <Navigate to="/login" />
@@ -528,7 +591,9 @@ function App() {
               token ? (
                 <LiteraryWorksGame
                   username={username}
-                  onComplete={() => handleLevelComplete(2, 4)}
+                  onComplete={(score) =>
+                    handleLevelComplete(2, 4, score !== undefined ? score : 100)
+                  }
                 />
               ) : (
                 <Navigate to="/login" />
@@ -541,7 +606,9 @@ function App() {
               token ? (
                 <EducationPuzzleGame
                   username={username}
-                  onComplete={() => handleLevelComplete(2, 5)}
+                  onComplete={(score) =>
+                    handleLevelComplete(2, 5, score !== undefined ? score : 100)
+                  }
                 />
               ) : (
                 <Navigate to="/login" />
@@ -566,7 +633,9 @@ function App() {
               token ? (
                 <EuropeanJourneyGame
                   username={username}
-                  onComplete={() => handleLevelComplete(3, 1)}
+                  onComplete={(score) =>
+                    handleLevelComplete(3, 1, score !== undefined ? score : 100)
+                  }
                 />
               ) : (
                 <Navigate to="/login" />
@@ -579,7 +648,9 @@ function App() {
               token ? (
                 <LiteraryCrosswordGame
                   username={username}
-                  onComplete={() => handleLevelComplete(3, 2)}
+                  onComplete={(score) =>
+                    handleLevelComplete(3, 2, score !== undefined ? score : 100)
+                  }
                 />
               ) : (
                 <Navigate to="/login" />
@@ -592,7 +663,9 @@ function App() {
               token ? (
                 <LettersAbroadGame
                   username={username}
-                  onComplete={() => handleLevelComplete(3, 3)}
+                  onComplete={(score) =>
+                    handleLevelComplete(3, 3, score !== undefined ? score : 100)
+                  }
                 />
               ) : (
                 <Navigate to="/login" />
@@ -605,7 +678,9 @@ function App() {
               token ? (
                 <EuropeanQuizGame
                   username={username}
-                  onComplete={() => handleLevelComplete(3, 4)}
+                  onComplete={(score) =>
+                    handleLevelComplete(3, 4, score !== undefined ? score : 100)
+                  }
                 />
               ) : (
                 <Navigate to="/login" />
@@ -618,7 +693,9 @@ function App() {
               token ? (
                 <TravelMapGame
                   username={username}
-                  onComplete={() => handleLevelComplete(3, 5)}
+                  onComplete={(score) =>
+                    handleLevelComplete(3, 5, score !== undefined ? score : 100)
+                  }
                 />
               ) : (
                 <Navigate to="/login" />
@@ -642,7 +719,9 @@ function App() {
               token ? (
                 <CharacterConnectionsGame
                   username={username}
-                  onComplete={() => handleLevelComplete(4, 1)}
+                  onComplete={(score) =>
+                    handleLevelComplete(4, 1, score !== undefined ? score : 100)
+                  }
                 />
               ) : (
                 <Navigate to="/login" />
@@ -655,7 +734,9 @@ function App() {
               token ? (
                 <PlotReconstructionGame
                   username={username}
-                  onComplete={() => handleLevelComplete(4, 2)}
+                  onComplete={(score) =>
+                    handleLevelComplete(4, 2, score !== undefined ? score : 100)
+                  }
                 />
               ) : (
                 <Navigate to="/login" />
@@ -668,7 +749,9 @@ function App() {
               token ? (
                 <SymbolismHuntGame
                   username={username}
-                  onComplete={() => handleLevelComplete(4, 3)}
+                  onComplete={(score) =>
+                    handleLevelComplete(4, 3, score !== undefined ? score : 100)
+                  }
                 />
               ) : (
                 <Navigate to="/login" />
@@ -681,7 +764,9 @@ function App() {
               token ? (
                 <QuoteUnscrambleGame
                   username={username}
-                  onComplete={() => handleLevelComplete(4, 4)}
+                  onComplete={(score) =>
+                    handleLevelComplete(4, 4, score !== undefined ? score : 100)
+                  }
                 />
               ) : (
                 <Navigate to="/login" />
@@ -694,7 +779,9 @@ function App() {
               token ? (
                 <SceneExplorerGame
                   username={username}
-                  onComplete={() => handleLevelComplete(4, 5)}
+                  onComplete={(score) =>
+                    handleLevelComplete(4, 5, score !== undefined ? score : 100)
+                  }
                 />
               ) : (
                 <Navigate to="/login" />
@@ -719,7 +806,9 @@ function App() {
               token ? (
                 <LigaTimelineGame
                   username={username}
-                  onComplete={() => handleLevelComplete(5, 1)}
+                  onComplete={(score) =>
+                    handleLevelComplete(5, 1, score !== undefined ? score : 100)
+                  }
                 />
               ) : (
                 <Navigate to="/login" />
@@ -801,8 +890,8 @@ function App() {
                 <RizalGlobalImpactGame
                   username={username}
                   onLogout={handleLogout}
-                  onComplete={(score, timeSpent) =>
-                    handleLevelComplete(6, 1, score, timeSpent)
+                  onComplete={(score, timeSpent, gameState) =>
+                    handleLevelComplete(6, 1, score, timeSpent, gameState)
                   }
                 />
               ) : (
@@ -817,8 +906,8 @@ function App() {
                 <RizalDigitalAgeGame
                   username={username}
                   onLogout={handleLogout}
-                  onComplete={(score, timeSpent) =>
-                    handleLevelComplete(6, 2, score, timeSpent)
+                  onComplete={(score, timeSpent, gameState) =>
+                    handleLevelComplete(6, 2, score, timeSpent, gameState)
                   }
                 />
               ) : (
@@ -833,8 +922,8 @@ function App() {
                 <RizalMonumentsGame
                   username={username}
                   onLogout={handleLogout}
-                  onComplete={(score, timeSpent) =>
-                    handleLevelComplete(6, 3, score, timeSpent)
+                  onComplete={(score, timeSpent, gameState) =>
+                    handleLevelComplete(6, 3, score, timeSpent, gameState)
                   }
                 />
               ) : (
@@ -849,8 +938,8 @@ function App() {
                 <ModernFilipinoHeroesGame
                   username={username}
                   onLogout={handleLogout}
-                  onComplete={(score, timeSpent) =>
-                    handleLevelComplete(6, 4, score, timeSpent)
+                  onComplete={(score, timeSpent, gameState) =>
+                    handleLevelComplete(6, 4, score, timeSpent, gameState)
                   }
                 />
               ) : (
@@ -865,8 +954,8 @@ function App() {
                 <RizalEternalLegacyGame
                   username={username}
                   onLogout={handleLogout}
-                  onComplete={(score, timeSpent) =>
-                    handleLevelComplete(6, 5, score, timeSpent)
+                  onComplete={(score, timeSpent, gameState) =>
+                    handleLevelComplete(6, 5, score, timeSpent, gameState)
                   }
                 />
               ) : (
@@ -883,7 +972,9 @@ function App() {
           />
           <Route
             path="/register"
-            element={!token ? <Register /> : <Navigate to="/" />}
+            element={
+              !token ? <Register setToken={setToken} /> : <Navigate to="/" />
+            }
           />
           <Route
             path="/admin"

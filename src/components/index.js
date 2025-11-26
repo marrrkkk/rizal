@@ -55,9 +55,47 @@ export {
   VisualFeedback,
   FeedbackButton,
   AnimatedProgress,
-  CelebrationAnimation,
   HoverEffect,
 } from "./VisualFeedback";
 
 // Export educational enhancement demo
 export { default as EducationalEnhancementDemo } from "./EducationalEnhancementDemo";
+
+// Export unlock notification components
+export { default as LevelUnlockNotification } from "./LevelUnlockNotification";
+export { default as ChapterUnlockNotification } from "./ChapterUnlockNotification";
+export { default as LevelCard } from "./LevelCard";
+
+// Export achievement components
+export { default as AchievementNotification } from "./AchievementNotification";
+export { default as AchievementNotificationContainer } from "./AchievementNotificationContainer";
+export { default as BadgeGallery } from "./BadgeGallery";
+export { default as AchievementIndicator } from "./AchievementIndicator";
+
+// Export leaderboard components
+export { default as LeaderboardWidget } from "./LeaderboardWidget";
+
+// Export admin dashboard components
+export { default as UserStatsTable } from "./UserStatsTable";
+export { default as UserDetailModal } from "./UserDetailModal";
+export { default as SystemAnalytics } from "./SystemAnalytics";
+export { default as AdminErrorBoundary } from "./AdminErrorBoundary";
+export { default as AdminLoadingState } from "./AdminLoadingState";
+export { default as AdminErrorMessage } from "./AdminErrorMessage";
+export { default as AdminProgressView } from "./AdminProgressView";
+
+// Export interactive feedback components
+export {
+  InteractiveButton,
+  InteractiveCard,
+  LoadingSpinner as InteractiveLoadingSpinner,
+  LoadingDots,
+  LoadingOverlay,
+  SuccessMessage,
+  ErrorMessage,
+  WarningMessage,
+  InfoMessage,
+  ProgressBar as InteractiveProgressBar,
+  SkeletonLoader,
+} from "./InteractiveFeedback";
+export { default as InteractiveFeedbackDemo } from "./InteractiveFeedbackDemo";

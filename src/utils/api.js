@@ -68,7 +68,7 @@ const api = {
       // Handle 401 Unauthorized (token expired or invalid)
       if (response.status === 401) {
         clearAuthToken();
-        // Optionally redirect to login, but let the caller handle it for now
+        // Simple approach: just clear the token, let components handle redirects
       }
 
       if (!response.ok) {

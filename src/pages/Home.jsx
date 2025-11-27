@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import { createNavigationHelper } from "../utils/navigationHelper";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { useResponsive } from "../utils/responsiveUtils.jsx";
@@ -7,7 +6,6 @@ import { usePerformanceOptimization } from "../hooks/usePerformanceOptimization"
 import { useProgressAPI } from "../hooks/useProgressAPI";
 import LoadingSpinner from "../components/LoadingSpinner";
 import Navbar from "../components/Navbar";
-import SoundToggle from "../components/SoundToggle";
 
 export default function Home({
   username,
@@ -26,7 +24,6 @@ export default function Home({
     error,
     isLevelUnlocked,
     getChapterProgress,
-    getOverallProgress,
   } = useProgressAPI(username);
 
   const chapters = [
@@ -138,17 +135,40 @@ export default function Home({
         />
         <div className="flex items-center justify-center h-96">
           <div className="bg-white rounded-3xl p-8 shadow-xl max-w-md mx-auto text-center border-4 border-red-200">
-            <div className="text-6xl mb-4">⚠️</div>
-            <h2 className="text-2xl font-black text-black mb-4">
-              Error Loading Progress
-            </h2>
-            <p className="text-black mb-6">{error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-semibold"
-            >
-              Retry
-            </button>
+            {error?.includes('disabled') || error?.includes('401') ? (
+              <>
+                <div className="text-6xl mb-4">🚫</div>
+                <h2 className="text-2xl font-black text-red-600 mb-4">
+                  Account Disabled
+                </h2>
+                <p className="text-gray-700 mb-4">
+                  Your account has been disabled by an administrator.
+                </p>
+                <p className="text-gray-600 text-sm mb-6">
+                  Please contact support if you believe this is an error.
+                </p>
+                <button
+                  onClick={onLogout}
+                  className="bg-red-500 hover:bg-red-600 text-[#000000] px-6 py-3 rounded-xl font-semibold transition-colors"
+                >
+                  Return to Login
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="text-6xl mb-4">⚠️</div>
+                <h2 className="text-2xl font-black text-black mb-4">
+                  Error Loading Progress
+                </h2>
+                <p className="text-black mb-6">{error}</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-semibold transition-colors"
+                >
+                  Retry
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -290,9 +310,6 @@ export default function Home({
             })}
           </div>
         </main>
-
-        {/* Sound Toggle Button */}
-        <SoundToggle />
       </div>
     </ErrorBoundary>
   );

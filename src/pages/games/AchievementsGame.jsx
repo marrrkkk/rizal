@@ -108,7 +108,7 @@ export default function AchievementsGame({ username, onLogout, onComplete }) {
         <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center">
           <h2 className="text-3xl font-bold text-teal-700 mb-6">Timeline Master!</h2>
           <div className="text-6xl mb-6">📅</div>
-          <p className="text-xl text-gray-700 mb-2">You've successfully arranged</p>
+          <p className="text-xl text-black mb-2">You've successfully arranged</p>
           <p className="text-4xl font-bold text-teal-600 mb-2">Rizal's Academic Journey</p>
           <div className="mt-6 space-y-2 text-left">
             {events.map((event, index) => (

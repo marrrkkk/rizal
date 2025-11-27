@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useProgressAPI } from "../hooks/useProgressAPI";
 import { getCurrentUserFromToken } from "../utils/api";
 import { createNavigationHelper } from "../utils/navigationHelper";
-import MusicControl from "../components/MusicControl";
 
 export default function Chapter3({ username, onLogout }) {
   const navigate = useNavigate();
@@ -392,8 +391,6 @@ export default function Chapter3({ username, onLogout }) {
           </>
         )}
       </main>
-      {/* Background Music Control */}
-      <MusicControl chapterId={3} />
     </div >
   );
 }

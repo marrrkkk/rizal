@@ -9,7 +9,7 @@ export default function FirstTeacherGame({ username, onLogout }) {
   const [currentGame, setCurrentGame] = useState(0);
   const [score, setScore] = useState(0);
   const [gameCompleted, setGameCompleted] = useState(false);
-  const [showCelebration, setShowCelebration] = useState(false);
+
 
   // Quiz Game State
   const [selectedAnswer, setSelectedAnswer] = useState(null);
@@ -179,7 +179,6 @@ export default function FirstTeacherGame({ username, onLogout }) {
       setReadingAnswers({});
     } else {
       setGameCompleted(true);
-      setShowCelebration(true);
     }
   };
 
@@ -434,9 +433,7 @@ export default function FirstTeacherGame({ username, onLogout }) {
       <div className="min-h-screen w-full bg-gradient-to-br from-rose-50 via-pink-50 to-red-100 flex items-center justify-center p-6">
         <div className="text-center">
           <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 shadow-xl max-w-2xl mx-auto">
-            {showCelebration && (
-              <div className="text-6xl mb-6 animate-bounce">👩‍🏫</div>
-            )}
+
             <h1 className="text-4xl font-bold text-gray-800 mb-4">
               Learning Champion!
             </h1>
@@ -469,10 +466,10 @@ export default function FirstTeacherGame({ username, onLogout }) {
     <div className="min-h-screen w-full bg-gradient-to-br from-rose-100 via-pink-100 to-red-100 relative overflow-hidden">
       {/* Duolingo-style floating elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-16 h-16 bg-yellow-300 rounded-full opacity-10 animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-12 h-12 bg-blue-300 rounded-full opacity-15 animate-bounce"></div>
+        <div className="absolute top-20 left-10 w-16 h-16 bg-yellow-300 rounded-full opacity-10"></div>
+        <div className="absolute top-40 right-20 w-12 h-12 bg-blue-300 rounded-full opacity-15"></div>
         <div className="absolute bottom-32 left-20 w-20 h-20 bg-rose-300 rounded-full opacity-10"></div>
-        <div className="absolute bottom-20 right-10 w-14 h-14 bg-pink-300 rounded-full opacity-15 animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-14 h-14 bg-pink-300 rounded-full opacity-15"></div>
         <div className="absolute top-1/2 left-1/4 w-10 h-10 bg-red-300 rounded-full opacity-10"></div>
       </div>
 

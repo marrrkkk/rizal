@@ -64,28 +64,13 @@ async function seed() {
     );
     console.log('✅ Admin user created (username: admin, password: admin123)');
 
-    // Create Regular Users
-    const users = [
-        { username: 'student1', password: 'password123' },
-        { username: 'student2', password: 'password123' },
-        { username: 'maria_clara', password: 'password123' },
-        { username: 'pepe', password: 'password123' }
-    ];
+    // No mock users created - only admin user exists
 
-    for (const user of users) {
-        const hashedPassword = await bcrypt.hash(user.password, 10);
-        await runQuery(
-            'INSERT OR IGNORE INTO users (username, password, is_admin) VALUES (?, ?, 0)',
-            [user.username, hashedPassword]
-        );
-    }
-    console.log(`✅ ${users.length} regular users created`);
-
-    // Add Progress Data
+    // Initialize progress for existing users (unlocked levels only)
     const allUsers = await getQuery('SELECT id, username FROM users');
 
     for (const user of allUsers) {
-        // Initialize all levels as unlocked
+        // Initialize all levels as unlocked for all users
         for (let chapter = 1; chapter <= 6; chapter++) {
             for (let level = 1; level <= 5; level++) {
                 await runQuery(
@@ -94,42 +79,8 @@ async function seed() {
                 );
             }
         }
-
-        // Add some random completion data
-        if (user.username !== 'admin') {
-            const completedCount = Math.floor(Math.random() * 20) + 5; // 5 to 25 levels
-
-            for (let i = 0; i < completedCount; i++) {
-                const chapter = Math.floor(Math.random() * 6) + 1;
-                const level = Math.floor(Math.random() * 5) + 1;
-                const score = Math.floor(Math.random() * 50) + 50; // 50-100 score
-
-                await runQuery(
-                    `INSERT INTO user_progress (user_id, chapter_id, level_id, is_unlocked, is_completed, score, completion_date)
-                     VALUES (?, ?, ?, 1, 1, ?, CURRENT_TIMESTAMP)
-                     ON CONFLICT(user_id, chapter_id, level_id) 
-                     DO UPDATE SET is_completed=1, score=?, completion_date=CURRENT_TIMESTAMP`,
-                    [user.id, chapter, level, score, score]
-                );
-            }
-
-            // Add some badges
-            const badges = [
-                { type: 'chapter_1_complete', name: 'Childhood Master' },
-                { type: 'chapter_2_complete', name: 'Education Master' },
-                { type: 'perfect_score', name: 'Perfectionist' }
-            ];
-
-            if (Math.random() > 0.5) {
-                const badge = badges[Math.floor(Math.random() * badges.length)];
-                await runQuery(
-                    'INSERT OR IGNORE INTO user_badges (user_id, badge_type, badge_name) VALUES (?, ?, ?)',
-                    [user.id, badge.type, badge.name]
-                );
-            }
-        }
     }
-    console.log('✅ Mock progress data added');
+    console.log('✅ Progress initialization completed (no mock data)');
 
     db.close();
     console.log('✨ Seeding completed successfully!');

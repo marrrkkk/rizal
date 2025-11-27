@@ -132,19 +132,13 @@ export const animations = {
   scaleIn: "animate-scale-in",
   slideDown: "animate-slide-down",
 
-  // Attention animations
-  bounce: "animate-bounce",
-  pulse: "animate-pulse",
-  wiggle: "animate-wiggle",
+
 
   // Loading animations
   spin: "animate-spin",
   shimmer: "animate-shimmer",
 
-  // Celebration animations
-  confetti: "animate-confetti",
-  badgeBounce: "animate-badge-bounce",
-  celebrationPulse: "animate-celebration-pulse",
+
 };
 
 /**
@@ -248,12 +242,12 @@ export const typography = {
     black: "font-black",
   },
 
-  // Text colors
+  // Text colors - Updated for better contrast and readability
   colors: {
-    primary: "text-gray-800",
-    secondary: "text-gray-600",
-    muted: "text-gray-500",
-    light: "text-gray-400",
+    primary: "text-black",
+    secondary: "text-gray-900",
+    muted: "text-gray-800",
+    light: "text-gray-700",
     white: "text-white",
   },
 };
@@ -279,7 +273,7 @@ export const focusRing = {
 export const loadingStates = {
   spinner:
     "inline-block animate-spin rounded-full border-4 border-solid border-current border-r-transparent",
-  skeleton: "animate-pulse bg-gray-200 rounded",
+  skeleton: "bg-gray-200 rounded",
   shimmer:
     "animate-shimmer bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200",
 };

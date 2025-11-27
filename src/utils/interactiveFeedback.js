@@ -20,7 +20,7 @@ export const hoverEffect = {
   brighten: "hover:brightness-110 transition-all duration-200",
   darken: "hover:brightness-90 transition-all duration-200",
   rotate: "hover:rotate-3 transition-transform duration-200",
-  pulse: "hover:animate-pulse",
+  pulse: "",
 };
 
 /**
@@ -71,7 +71,7 @@ export const clickFeedback = {
   scale: "active:scale-95 transition-transform duration-100",
   press: "active:translate-y-0.5 transition-transform duration-100",
   ripple: "relative overflow-hidden",
-  bounce: "active:animate-bounce",
+  bounce: "",
 };
 
 /**
@@ -135,7 +135,7 @@ export const showSuccessFeedback = (element) => {
   const checkmark = document.createElement("span");
   checkmark.innerHTML = "✓";
   checkmark.className =
-    "absolute top-2 right-2 text-green-600 text-2xl animate-bounce";
+    "absolute top-2 right-2 text-green-600 text-2xl";
   element.style.position = "relative";
   element.appendChild(checkmark);
 
@@ -201,7 +201,7 @@ export const warningState = {
   badge: "bg-yellow-100 text-yellow-800 border border-yellow-300",
   alert:
     "bg-yellow-50 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded-r-lg",
-  animation: "animate-pulse",
+  animation: "",
 };
 
 /**
@@ -283,9 +283,9 @@ export const getLoadingSpinner = (size = "md", color = "blue") => {
 export const getLoadingDots = () => {
   return `
     <div class="${loadingState.dots}">
-      <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
-      <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
-      <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+      <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+      <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+      <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
     </div>
   `;
 };

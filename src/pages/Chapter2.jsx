@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import { useProgressAPI } from "../hooks/useProgressAPI";
 import { getCurrentUserFromToken } from "../utils/api";
 import { createNavigationHelper } from "../utils/navigationHelper";
-import MusicControl from "../components/MusicControl";
 import ChapterHeader from "../components/ChapterHeader";
 
 export default function Chapter2({ username, onLogout }) {
@@ -346,9 +345,6 @@ export default function Chapter2({ username, onLogout }) {
           </>
         )}
       </main>
-
-      {/* Background Music Control */}
-      <MusicControl chapterId={2} />
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useProgressAPI } from "../hooks/useProgressAPI";
 import { getCurrentUserFromToken } from "../utils/api";
 import { createNavigationHelper } from "../utils/navigationHelper";
+import MusicControl from "../components/MusicControl";
 
 export default function Chapter6({ username, onLogout }) {
   const navigate = useNavigate();
@@ -74,17 +75,11 @@ export default function Chapter6({ username, onLogout }) {
       return;
     }
 
-    // Check if level is unlocked using the unified API
-    const levelUnlocked = isLevelUnlocked(6, level.id);
-
-    if (levelUnlocked) {
-      if (level.path) {
-        navigationHelper.goToLevel(6, level.id);
-      } else {
-        alert(`Level ${level.id}: ${level.title} - Coming Soon!`);
-      }
+    // Allow all levels to be played
+    if (level.path) {
+      navigationHelper.goToLevel(6, level.id);
     } else {
-      alert("Complete previous levels to unlock this one!");
+      alert(`Level ${level.id}: ${level.title} - Coming Soon!`);
     }
   };
 
@@ -197,10 +192,10 @@ export default function Chapter6({ username, onLogout }) {
                   className="h-full bg-gradient-to-r from-red-400 to-pink-500 rounded-full transition-all duration-500"
                   style={{
                     width: `${chapterProgress
-                        ? (chapterProgress.completedLevels /
-                          chapterProgress.totalLevels) *
-                        100
-                        : 0
+                      ? (chapterProgress.completedLevels /
+                        chapterProgress.totalLevels) *
+                      100
+                      : 0
                       }%`,
                   }}
                 ></div>
@@ -369,6 +364,9 @@ export default function Chapter6({ username, onLogout }) {
           })}
         </div>
       </main>
+
+      {/* Background Music Control */}
+      <MusicControl chapterId={6} />
     </div>
   );
 }

@@ -136,11 +136,11 @@ function App() {
       // Add progress data to window for debugging
       window.getProgressData = () => progressData;
       window.refreshProgress = refreshProgress;
-      console.log("🧪 Developer tools available:");
-      console.log("  - window.getProgressData() - View current progress data");
-      console.log(
-        "  - window.refreshProgress() - Refresh progress from database"
-      );
+      // console.log("🧪 Developer tools available:");
+      // console.log("  - window.getProgressData() - View current progress data");
+      // console.log(
+      //   "  - window.refreshProgress() - Refresh progress from database"
+      // );
     }
 
     // Add performance monitoring
@@ -197,9 +197,9 @@ function App() {
     }
 
     try {
-      console.log(
-        `🎮 Attempting to complete Level ${level} of Chapter ${chapter} with raw score ${score}`
-      );
+      // console.log(
+      //   `🎮 Attempting to complete Level ${level} of Chapter ${chapter} with raw score ${score}`
+      // );
 
       // Get user ID from localStorage or username
       const userId = localStorage.getItem("userId") || username;
@@ -234,9 +234,9 @@ function App() {
         var finalScore = score;
       } else {
         var finalScore = completionResult.finalScore;
-        console.log(
-          `📊 Final score calculated: ${finalScore} (raw score: ${score})`
-        );
+        // console.log(
+        //   `📊 Final score calculated: ${finalScore} (raw score: ${score})`
+        // );
       }
 
       // Use the new user-specific progress system with final score
@@ -247,14 +247,14 @@ function App() {
         timeSpent
       );
 
-      console.log("🔍 Complete level result:", result);
+      // console.log("🔍 Complete level result:", result);
 
       if (result.success) {
-        console.log(
-          `✅ User ${username}: Level ${level} of Chapter ${chapter} completed with score ${score}!`
-        );
-        console.log("🔓 Next level unlocked:", result.nextLevelUnlocked);
-        console.log("🚀 Next chapter unlocked:", result.nextChapterUnlocked);
+        // console.log(
+        //   `✅ User ${username}: Level ${level} of Chapter ${chapter} completed with score ${score}!`
+        // );
+        // console.log("🔓 Next level unlocked:", result.nextLevelUnlocked);
+        // console.log("🚀 Next chapter unlocked:", result.nextChapterUnlocked);
 
         // Track analytics for level completion
         trackLevelComplete(chapter, level, {
@@ -339,14 +339,14 @@ function App() {
         }
 
         // Log progress to console for debugging
-        console.log(`Progress saved for user ${username}:`, {
-          chapter,
-          level,
-          score,
-          timeSpent,
-          totalCompleted: result.progress?.overall?.completedLevels || 0,
-          newBadges: result.newBadges,
-        });
+        // console.log(`Progress saved for user ${username}:`, {
+        //   chapter,
+        //   level,
+        //   score,
+        //   timeSpent,
+        //   totalCompleted: result.progress?.overall?.completedLevels || 0,
+        //   newBadges: result.newBadges,
+        // });
       } else {
         console.error(
           `Failed to save completion for Level ${level} of Chapter ${chapter}:`,
@@ -1026,7 +1026,7 @@ function App() {
         )}
 
         {/* Progress Debugger (temporary) */}
-        {username && <ProgressDebugger username={username} />}
+        {/* {username && <ProgressDebugger username={username} />} */}
 
         {/* Toast Notifications */}
         <ToastManager ref={toastManagerRef} />

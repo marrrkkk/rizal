@@ -7,6 +7,8 @@ import {
 } from "../utils/responsiveUtils.jsx";
 import LoadingSpinner from "../components/LoadingSpinner";
 
+import bgImage from "../assets/bg-kids.png";
+
 export default function Register({ setToken }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -54,9 +56,19 @@ export default function Register({ setToken }) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 flex items-center justify-center p-4 relative overflow-hidden">
+    <div
+      className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+      style={{
+        backgroundImage: `url(${bgImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
+      }}
+    >
+      {/* Overlay for readability */}
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm z-0"></div>
+
       {/* Duolingo-style floating elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-16 right-16 w-20 h-20 bg-yellow-300 rounded-full opacity-20 animate-pulse"></div>
         <div className="absolute top-32 left-12 w-16 h-16 bg-blue-300 rounded-full opacity-25 animate-bounce"></div>
         <div className="absolute bottom-24 right-24 w-24 h-24 bg-green-300 rounded-full opacity-20"></div>
@@ -102,9 +114,8 @@ export default function Register({ setToken }) {
                 <input
                   type="text"
                   placeholder="Pick something cool!"
-                  className={`w-full px-6 ${
-                    isTouchDevice ? "py-5" : "py-4"
-                  } bg-gray-50 border-3 border-gray-200 rounded-2xl text-gray-800 placeholder-gray-400 focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 focus:bg-white hover:border-gray-300 transition-all duration-300 text-lg font-medium shadow-inner`}
+                  className={`w-full px-6 ${isTouchDevice ? "py-5" : "py-4"
+                    } bg-gray-50 border-3 border-gray-200 rounded-2xl text-gray-800 placeholder-gray-400 focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 focus:bg-white hover:border-gray-300 transition-all duration-300 text-lg font-medium shadow-inner`}
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
@@ -127,9 +138,8 @@ export default function Register({ setToken }) {
                 <input
                   type="password"
                   placeholder="Make it super secure!"
-                  className={`w-full px-6 ${
-                    isTouchDevice ? "py-5" : "py-4"
-                  } bg-gray-50 border-3 border-gray-200 rounded-2xl text-gray-800 placeholder-gray-400 focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 focus:bg-white hover:border-gray-300 transition-all duration-300 text-lg font-medium shadow-inner`}
+                  className={`w-full px-6 ${isTouchDevice ? "py-5" : "py-4"
+                    } bg-gray-50 border-3 border-gray-200 rounded-2xl text-gray-800 placeholder-gray-400 focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 focus:bg-white hover:border-gray-300 transition-all duration-300 text-lg font-medium shadow-inner`}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -147,17 +157,14 @@ export default function Register({ setToken }) {
             <button
               type="submit"
               disabled={isLoading}
-              className={`w-full bg-gradient-to-r from-pink-500 via-purple-500 to-purple-600 text-white ${
-                isTouchDevice ? "py-5" : "py-4"
-              } rounded-2xl font-black text-lg ${
-                isLoading
+              className={`w-full bg-gradient-to-r from-pink-500 via-purple-500 to-purple-600 text-white ${isTouchDevice ? "py-5" : "py-4"
+                } rounded-2xl font-black text-lg ${isLoading
                   ? "opacity-50 cursor-not-allowed"
-                  : `${
-                      isTouchDevice
-                        ? "active:from-pink-600 active:to-purple-700 active:scale-95"
-                        : "hover:from-pink-600 hover:via-purple-600 hover:to-purple-700 hover:scale-105 hover:-translate-y-1"
-                    } transition-all duration-300 shadow-xl hover:shadow-2xl`
-              } border-b-4 border-purple-700 active:border-b-2 uppercase tracking-wide focus:outline-none focus:ring-4 focus:ring-purple-300`}
+                  : `${isTouchDevice
+                    ? "active:from-pink-600 active:to-purple-700 active:scale-95"
+                    : "hover:from-pink-600 hover:via-purple-600 hover:to-purple-700 hover:scale-105 hover:-translate-y-1"
+                  } transition-all duration-300 shadow-xl hover:shadow-2xl`
+                } border-b-4 border-purple-700 active:border-b-2 uppercase tracking-wide focus:outline-none focus:ring-4 focus:ring-purple-300`}
               {...touchProps}
             >
               {isLoading ? (

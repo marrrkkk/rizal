@@ -139,11 +139,15 @@ export const register = async (username, password, email = null) => {
   // Initialize user statistics
   executeUpdate("INSERT INTO user_statistics (user_id) VALUES (?)", [userId]);
 
-  // Initialize first level (Chapter 1, Level 1) as unlocked
-  executeUpdate(
-    "INSERT INTO user_progress (user_id, chapter_id, level_id, is_unlocked) VALUES (?, 1, 1, 1)",
-    [userId]
-  );
+  // Initialize all levels as unlocked (Chapters 1-6, Levels 1-5)
+  for (let chapter = 1; chapter <= 6; chapter++) {
+    for (let level = 1; level <= 5; level++) {
+      executeUpdate(
+        "INSERT INTO user_progress (user_id, chapter_id, level_id, is_unlocked) VALUES (?, ?, ?, 1)",
+        [userId, chapter, level]
+      );
+    }
+  }
 
   // Generate JWT token
   const token = await generateToken({

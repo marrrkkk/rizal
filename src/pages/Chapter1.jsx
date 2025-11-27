@@ -1,33 +1,27 @@
 "use client";
 
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
-import {
-  getChapterProgress,
-  isLevelUnlocked,
-  isLevelCompleted,
-  getChapterBadges,
-} from "../utils/progressManager";
+import { useState } from "react";
+import { useProgressAPI } from "../hooks/useProgressAPI";
 import ProgressDashboard from "../components/ProgressDashboard";
 import CompletionCertificate from "../components/CompletionCertificate";
 import { createNavigationHelper } from "../utils/navigationHelper";
+import MusicControl from "../components/MusicControl";
 
 export default function Chapter1({ username, onLogout }) {
   const navigate = useNavigate();
   const navigationHelper = createNavigationHelper(navigate);
-  const [chapterProgress, setChapterProgress] = useState(null);
-  const [chapterBadges, setChapterBadges] = useState([]);
+  const {
+    getChapterProgress,
+    isLevelUnlocked,
+    isLevelCompleted,
+    loading
+  } = useProgressAPI(username);
+
   const [showCertificate, setShowCertificate] = useState(false);
 
-  useEffect(() => {
-    // Load chapter progress
-    const progress = getChapterProgress(1);
-    setChapterProgress(progress);
-
-    // Load chapter badges
-    const badges = getChapterBadges(1);
-    setChapterBadges(badges);
-  }, []);
+  const chapterProgress = getChapterProgress(1);
+  const chapterBadges = chapterProgress ? chapterProgress.badges : [];
 
   const levels = [
     {
@@ -63,16 +57,11 @@ export default function Chapter1({ username, onLogout }) {
   ];
 
   const handleLevelClick = (level) => {
-    const isUnlocked = isLevelUnlocked(1, level.id);
-
-    if (isUnlocked) {
-      if (level.path) {
-        navigationHelper.goToLevel(1, level.id);
-      } else {
-        alert(`Level ${level.id}: ${level.title} - Coming Soon!`);
-      }
+    // Allow all levels to be played
+    if (level.path) {
+      navigationHelper.goToLevel(1, level.id);
     } else {
-      alert("Complete previous levels to unlock this one!");
+      alert(`Level ${level.id}: ${level.title} - Coming Soon!`);
     }
   };
 
@@ -166,11 +155,14 @@ export default function Chapter1({ username, onLogout }) {
               <div className="flex items-center justify-between mb-2">
                 <span className="font-bold text-black">Chapter Progress</span>
                 <span className="text-blue-600 font-bold text-sm">
-                  3/5 complete
+                  {chapterProgress ? chapterProgress.completedLevels : 0}/5 complete
                 </span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                <div className="w-3/5 h-full bg-gradient-to-r from-blue-400 to-blue-500 rounded-full transition-all duration-500"></div>
+                <div
+                  className="h-full bg-gradient-to-r from-blue-400 to-blue-500 rounded-full transition-all duration-500"
+                  style={{ width: `${chapterProgress ? (chapterProgress.completedLevels / 5) * 100 : 0}%` }}
+                ></div>
               </div>
             </div>
           </div>
@@ -190,36 +182,33 @@ export default function Chapter1({ username, onLogout }) {
             return (
               <div
                 key={level.id}
-                className={`group relative bg-white rounded-3xl shadow-lg transition-all duration-300 transform cursor-pointer border-4 border-white/50 overflow-hidden ${
-                  isUnlocked
-                    ? "hover:shadow-2xl hover:scale-105"
-                    : "opacity-60 cursor-not-allowed"
-                }`}
+                className={`group relative bg-white rounded-3xl shadow-lg transition-all duration-300 transform cursor-pointer border-4 border-white/50 overflow-hidden ${isUnlocked
+                  ? "hover:shadow-2xl hover:scale-105"
+                  : "opacity-60 cursor-not-allowed"
+                  }`}
                 style={{ animationDelay: `${index * 100}ms` }}
                 onClick={() => handleLevelClick(level)}
               >
                 {/* Progress indicator */}
                 <div className="absolute top-0 left-0 right-0 h-2 bg-gray-200">
                   <div
-                    className={`h-full transition-all duration-500 ${
-                      isCompleted
-                        ? "w-full bg-gradient-to-r from-green-400 to-green-500"
-                        : isUnlocked
+                    className={`h-full transition-all duration-500 ${isCompleted
+                      ? "w-full bg-gradient-to-r from-green-400 to-green-500"
+                      : isUnlocked
                         ? "w-1/2 bg-gradient-to-r from-blue-400 to-blue-500"
                         : "w-0 bg-gray-300"
-                    }`}
+                      }`}
                   ></div>
                 </div>
 
                 {/* Status indicator */}
                 <div
-                  className={`absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center shadow-md ${
-                    isCompleted
-                      ? "bg-green-400"
-                      : isUnlocked
+                  className={`absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center shadow-md ${isCompleted
+                    ? "bg-green-400"
+                    : isUnlocked
                       ? "bg-blue-400"
                       : "bg-gray-400"
-                  }`}
+                    }`}
                 >
                   <span className="text-white text-sm font-bold">
                     {isCompleted ? "✓" : isUnlocked ? "▶" : "🔒"}
@@ -237,9 +226,8 @@ export default function Chapter1({ username, onLogout }) {
                   {/* Level icon with Duolingo-style design */}
                   <div className="relative mb-4">
                     <div
-                      className={`w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg mx-auto border-4 border-white ${
-                        isUnlocked ? "group-hover:scale-110" : ""
-                      } transition-transform duration-300`}
+                      className={`w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg mx-auto border-4 border-white ${isUnlocked ? "group-hover:scale-110" : ""
+                        } transition-transform duration-300`}
                     >
                       <span className="text-white font-black text-2xl">
                         {level.id}
@@ -256,18 +244,16 @@ export default function Chapter1({ username, onLogout }) {
                   {/* Level info */}
                   <div className="text-center">
                     <h3
-                      className={`text-xl font-black mb-2 transition-colors ${
-                        isUnlocked
-                          ? "text-black group-hover:text-gray-900"
-                          : "text-gray-500"
-                      }`}
+                      className={`text-xl font-black mb-2 transition-colors ${isUnlocked
+                        ? "text-black group-hover:text-gray-900"
+                        : "text-gray-500"
+                        }`}
                     >
                       {level.title}
                     </h3>
                     <p
-                      className={`text-sm mb-4 leading-relaxed ${
-                        isUnlocked ? "text-black" : "text-gray-400"
-                      }`}
+                      className={`text-sm mb-4 leading-relaxed ${isUnlocked ? "text-black" : "text-gray-400"
+                        }`}
                     >
                       {level.description}
                     </p>
@@ -275,38 +261,36 @@ export default function Chapter1({ username, onLogout }) {
                     {/* Status badge */}
                     <div className="mb-4">
                       <span
-                        className={`text-xs font-bold uppercase tracking-wide ${
-                          isCompleted
-                            ? "text-green-600"
-                            : isUnlocked
+                        className={`text-xs font-bold uppercase tracking-wide ${isCompleted
+                          ? "text-green-600"
+                          : isUnlocked
                             ? "text-blue-600"
                             : "text-gray-500"
-                        }`}
+                          }`}
                       >
                         {isCompleted
                           ? "Complete"
                           : isUnlocked
-                          ? "Ready"
-                          : "Locked"}
+                            ? "Ready"
+                            : "Locked"}
                       </span>
                     </div>
 
                     {/* Action button */}
                     <button
-                      className={`w-full font-black py-3 px-6 rounded-2xl transition-all duration-200 border-b-4 active:border-b-2 uppercase tracking-wide text-sm ${
-                        isCompleted
-                          ? "bg-gradient-to-r from-green-500 to-green-600 text-white border-green-700 hover:shadow-lg hover:scale-105"
-                          : isUnlocked
+                      className={`w-full font-black py-3 px-6 rounded-2xl transition-all duration-200 border-b-4 active:border-b-2 uppercase tracking-wide text-sm ${isCompleted
+                        ? "bg-gradient-to-r from-green-500 to-green-600 text-white border-green-700 hover:shadow-lg hover:scale-105"
+                        : isUnlocked
                           ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white border-blue-700 hover:shadow-lg hover:scale-105"
                           : "bg-gray-300 text-gray-500 border-gray-400 cursor-not-allowed opacity-60"
-                      }`}
+                        }`}
                       disabled={!isUnlocked}
                     >
                       {isCompleted
                         ? "✓ Review"
                         : isUnlocked
-                        ? "▶ Start"
-                        : "🔒 Complete Previous Level"}
+                          ? "▶ Start"
+                          : "🔒 Complete Previous Level"}
                     </button>
                   </div>
                 </div>
@@ -447,6 +431,9 @@ export default function Chapter1({ username, onLogout }) {
           </div>
         </div>
       </main>
+
+      {/* Background Music Control */}
+      <MusicControl chapterId={1} />
     </div>
   );
 }

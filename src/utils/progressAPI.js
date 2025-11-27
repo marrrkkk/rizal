@@ -67,9 +67,6 @@ export const completeLevel = async (
   timeSpent = 0
 ) => {
   try {
-    console.log(`🌐 Sending request to complete level ${chapter}-${level}`);
-    console.log(`🌐 Request data:`, { chapter, level, score, timeSpent });
-
     const response = await fetch(
       `${API_BASE_URL}/progress/complete_level`,
       {
@@ -84,19 +81,14 @@ export const completeLevel = async (
       }
     );
 
-    console.log(`🌐 Response status: ${response.status}`);
-
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`🌐 HTTP Error Response:`, errorText);
       throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
-    console.log(`🌐 Response data:`, data);
     return { success: true, data };
   } catch (error) {
-    console.error("🌐 Failed to complete level:", error);
     return { success: false, error: error.message };
   }
 };

@@ -223,7 +223,9 @@ app.get('/api/progress/get_progress', authenticateToken, (req, res) => {
                 const cId = row.chapter_id;
                 if (!chapters[cId]) return;
 
-                if (row.is_unlocked) chapters[cId].unlockedLevels.push(row.level_id);
+                // Always unlock all levels
+                chapters[cId].unlockedLevels = [1, 2, 3, 4, 5];
+
                 if (row.is_completed) {
                     chapters[cId].completedLevels.push(row.level_id);
                     chapters[cId].scores[row.level_id] = row.score;

@@ -17,6 +17,7 @@ import {
   announceError,
   announceSuccess,
 } from "../utils/accessibilityEnhancements";
+import bgImage from "../assets/bg-kids.png";
 
 export default function Login({ setToken }) {
   const [username, setUsername] = useState("");
@@ -74,9 +75,19 @@ export default function Login({ setToken }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-400 via-blue-500 to-purple-600 flex items-center justify-center p-4 relative overflow-hidden">
+    <div
+      className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+      style={{
+        backgroundImage: `url(${bgImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
+      }}
+    >
+      {/* Overlay for readability */}
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm z-0"></div>
+
       {/* Duolingo-style floating elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-20 left-10 w-16 h-16 bg-yellow-300 rounded-full opacity-20 animate-pulse"></div>
         <div className="absolute top-40 right-20 w-12 h-12 bg-pink-300 rounded-full opacity-30 animate-bounce"></div>
         <div className="absolute bottom-32 left-20 w-20 h-20 bg-blue-300 rounded-full opacity-25"></div>

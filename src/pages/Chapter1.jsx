@@ -210,14 +210,14 @@ export default function Chapter1({ username, onLogout }) {
                   <div className="text-center">
                     <h3
                       className={`text-xl font-black mb-2 transition-colors ${isUnlocked
-                        ? "text-black group-hover:text-gray-900"
-                        : "text-gray-500"
+                        ? "text-black group-hover:text-black"
+                        : "text-black"
                         }`}
                     >
                       {level.title}
                     </h3>
                     <p
-                      className={`text-sm mb-4 leading-relaxed ${isUnlocked ? "text-black" : "text-gray-400"
+                      className={`text-sm mb-4 leading-relaxed ${isUnlocked ? "text-black" : "text-black"
                         }`}
                     >
                       {level.description}
@@ -230,7 +230,7 @@ export default function Chapter1({ username, onLogout }) {
                           ? "text-green-600"
                           : isUnlocked
                             ? "text-blue-600"
-                            : "text-gray-500"
+                            : "text-black"
                           }`}
                       >
                         {isCompleted
@@ -247,7 +247,7 @@ export default function Chapter1({ username, onLogout }) {
                         ? "bg-gradient-to-r from-green-500 to-green-600 text-white border-green-700 hover:shadow-lg hover:scale-105"
                         : isUnlocked
                           ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white border-blue-700 hover:shadow-lg hover:scale-105"
-                          : "bg-gray-300 text-gray-500 border-gray-400 cursor-not-allowed opacity-60"
+                          : "bg-gray-300 text-black border-gray-400 cursor-not-allowed opacity-60"
                         }`}
                       disabled={!isUnlocked}
                     >
@@ -317,15 +317,15 @@ export default function Chapter1({ username, onLogout }) {
 
         {/* Chapter Info */}
         <div className="mt-16 bg-white/60 backdrop-blur-sm rounded-3xl p-8 shadow-lg max-w-4xl mx-auto">
-          <h3 className="text-2xl font-bold text-center text-gray-800 mb-6">
+          <h3 className="text-2xl font-bold text-center text-black mb-6">
             About This Chapter
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <h4 className="text-lg font-semibold text-gray-800 mb-3">
+              <h4 className="text-lg font-semibold text-black mb-3">
                 What You'll Learn
               </h4>
-              <ul className="space-y-2 text-gray-600">
+              <ul className="space-y-2 text-black">
                 <li className="flex items-start space-x-2">
                   <span className="text-blue-500 mt-1">•</span>
                   <span>Jose Rizal's birth and early family life</span>
@@ -349,7 +349,7 @@ export default function Chapter1({ username, onLogout }) {
               </ul>
             </div>
             <div>
-              <h4 className="text-lg font-semibold text-gray-800 mb-3">
+              <h4 className="text-lg font-semibold text-black mb-3">
                 Key Highlights
               </h4>
               <div className="space-y-3">
@@ -359,7 +359,7 @@ export default function Chapter1({ username, onLogout }) {
                       1861
                     </span>
                   </div>
-                  <span className="text-gray-600">
+                  <span className="text-black">
                     Year Jose Rizal was born
                   </span>
                 </div>
@@ -367,7 +367,7 @@ export default function Chapter1({ username, onLogout }) {
                   <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
                     <span className="text-green-600 font-bold text-sm">3</span>
                   </div>
-                  <span className="text-gray-600">
+                  <span className="text-black">
                     Age when he learned to read
                   </span>
                 </div>
@@ -377,7 +377,7 @@ export default function Chapter1({ username, onLogout }) {
                       👩
                     </span>
                   </div>
-                  <span className="text-gray-600">
+                  <span className="text-black">
                     His mother was his first teacher
                   </span>
                 </div>
@@ -387,7 +387,7 @@ export default function Chapter1({ username, onLogout }) {
                       📚
                     </span>
                   </div>
-                  <span className="text-gray-600">
+                  <span className="text-black">
                     Loved reading from a very young age
                   </span>
                 </div>

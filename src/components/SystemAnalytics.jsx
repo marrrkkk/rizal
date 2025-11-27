@@ -121,16 +121,16 @@ const SystemAnalytics = () => {
       <div className="space-y-3">
         {data.map((item, index) => (
           <div key={index} className="flex items-center gap-3 text-sm">
-            <div className="w-24 font-medium text-slate-600 truncate text-right">
+            <div className="w-24 font-medium text-black truncate text-right">
               {item.label}
             </div>
             <div className="flex-1 bg-slate-100 rounded-full h-4 overflow-hidden">
               <div
-                className={`h-full ${colorClasses[color] || "bg-slate-500"} rounded-full transition-all duration-500`}
+                className={`h-full ${colorClasses[color] || "bg-black"} rounded-full transition-all duration-500`}
                 style={{ width: `${(item.value / maxValue) * 100}%` }}
               ></div>
             </div>
-            <div className="w-12 font-bold text-slate-700 text-right">
+            <div className="w-12 font-bold text-black text-right">
               {item.value}
             </div>
           </div>
@@ -169,7 +169,7 @@ const SystemAnalytics = () => {
     <div className="space-y-6">
       {/* System Health Overview */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-        <h3 className="text-lg font-bold text-slate-800 mb-6">
+        <h3 className="text-lg font-bold text-black mb-6">
           System Overview
         </h3>
 
@@ -196,10 +196,10 @@ const SystemAnalytics = () => {
         {/* System Health Indicator */}
         <div className="mt-6 p-4 bg-slate-50 rounded-lg border border-slate-100">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-slate-700">
+            <span className="text-sm font-medium text-black">
               System Health
             </span>
-            <span className={`text-sm font-bold ${stats.activeUsers > 0 ? "text-green-600" : "text-slate-500"}`}>
+            <span className={`text-sm font-bold ${stats.activeUsers > 0 ? "text-green-600" : "text-black"}`}>
               {stats.activeUsers > 0 ? "Healthy" : "Inactive"}
             </span>
           </div>
@@ -219,7 +219,7 @@ const SystemAnalytics = () => {
               }}
             ></div>
           </div>
-          <p className="text-xs text-slate-500 mt-2">
+          <p className="text-xs text-black mt-2">
             {stats.activeUsers} of {stats.totalUsers} users active in the last 7 days
           </p>
         </div>
@@ -228,14 +228,14 @@ const SystemAnalytics = () => {
       {/* Chapter Performance Chart */}
       {chapterStats.length > 0 && (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-          <h3 className="text-lg font-bold text-slate-800 mb-6">
+          <h3 className="text-lg font-bold text-black mb-6">
             Chapter Performance Overview
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Completions by Chapter */}
             <div>
-              <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">
+              <h4 className="text-sm font-semibold text-black uppercase tracking-wider mb-4">
                 Total Completions
               </h4>
               {renderBarChart(
@@ -250,7 +250,7 @@ const SystemAnalytics = () => {
 
             {/* Average Scores by Chapter */}
             <div>
-              <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">
+              <h4 className="text-sm font-semibold text-black uppercase tracking-wider mb-4">
                 Average Scores
               </h4>
               {renderBarChart(
@@ -269,7 +269,7 @@ const SystemAnalytics = () => {
       {/* Level Difficulty Heatmap */}
       {difficultyMetrics.length > 0 && (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-          <h3 className="text-lg font-bold text-slate-800 mb-6">
+          <h3 className="text-lg font-bold text-black mb-6">
             Level Difficulty Heatmap
           </h3>
 
@@ -277,13 +277,13 @@ const SystemAnalytics = () => {
             <div className="inline-block min-w-full">
               <div className="grid grid-cols-6 gap-2">
                 {/* Header */}
-                <div className="font-semibold text-slate-500 text-xs uppercase tracking-wider py-2">
+                <div className="font-semibold text-black text-xs uppercase tracking-wider py-2">
                   Chapter
                 </div>
                 {[1, 2, 3, 4, 5].map((level) => (
                   <div
                     key={level}
-                    className="font-semibold text-slate-500 text-xs uppercase tracking-wider text-center py-2"
+                    className="font-semibold text-black text-xs uppercase tracking-wider text-center py-2"
                   >
                     L{level}
                   </div>
@@ -294,7 +294,7 @@ const SystemAnalytics = () => {
                   <>
                     <div
                       key={`ch-${chapterId}`}
-                      className="font-medium text-slate-700 text-sm py-3"
+                      className="font-medium text-black text-sm py-3"
                     >
                       Ch {chapterId}
                     </div>
@@ -310,7 +310,7 @@ const SystemAnalytics = () => {
                             key={`${chapterId}-${levelId}`}
                             className="bg-slate-50 rounded-lg p-3 text-center border border-slate-100"
                           >
-                            <span className="text-xs text-slate-300">-</span>
+                            <span className="text-xs text-black">-</span>
                           </div>
                         );
                       }
@@ -350,7 +350,7 @@ const SystemAnalytics = () => {
               </div>
 
               {/* Legend */}
-              <div className="mt-6 flex items-center justify-center space-x-6 text-xs text-slate-600">
+              <div className="mt-6 flex items-center justify-center space-x-6 text-xs text-black">
                 <div className="flex items-center space-x-2">
                   <div className="w-3 h-3 bg-green-200 border border-green-300 rounded"></div>
                   <span>Easy</span>
@@ -387,7 +387,7 @@ const SystemAnalytics = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === tab.id
                   ? "bg-white text-blue-600 shadow-sm"
-                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                  : "text-black hover:bg-slate-100 hover:text-black"
                   }`}
               >
                 <tab.icon className="w-5 h-5 mr-2" />
@@ -401,11 +401,11 @@ const SystemAnalytics = () => {
           {/* Popular Levels */}
           {activeTab === "popular" && (
             <div>
-              <h4 className="font-bold text-slate-800 mb-4">
+              <h4 className="font-bold text-black mb-4">
                 Most Completed Levels
               </h4>
               {popularLevels.length === 0 ? (
-                <div className="text-center py-8 text-slate-600">
+                <div className="text-center py-8 text-black">
                   <p>No level data available yet</p>
                 </div>
               ) : (
@@ -420,10 +420,10 @@ const SystemAnalytics = () => {
                           #{index + 1}
                         </div>
                         <div>
-                          <div className="font-semibold text-slate-800 text-sm">
+                          <div className="font-semibold text-black text-sm">
                             {getChapterName(level.chapterId)} - Level {level.levelId}
                           </div>
-                          <div className="text-xs text-slate-500">
+                          <div className="text-xs text-black">
                             {level.completionCount} completions
                           </div>
                         </div>
@@ -432,7 +432,7 @@ const SystemAnalytics = () => {
                         <div className="text-lg font-bold text-green-600">
                           {level.avgScore}
                         </div>
-                        <div className="text-xs text-slate-600">
+                        <div className="text-xs text-black">
                           {formatTime(level.avgTimeMinutes)}
                         </div>
                       </div>
@@ -446,11 +446,11 @@ const SystemAnalytics = () => {
           {/* Difficult Levels */}
           {activeTab === "difficult" && (
             <div>
-              <h4 className="font-bold text-slate-800 mb-4">
+              <h4 className="font-bold text-black mb-4">
                 Challenging Levels (Lowest Scores)
               </h4>
               {difficultLevels.length === 0 ? (
-                <div className="text-center py-8 text-slate-600">
+                <div className="text-center py-8 text-black">
                   <p>No difficulty data available yet</p>
                 </div>
               ) : (
@@ -465,10 +465,10 @@ const SystemAnalytics = () => {
                           <Icons.Warning className="w-5 h-5" />
                         </div>
                         <div>
-                          <div className="font-semibold text-slate-800 text-sm">
+                          <div className="font-semibold text-black text-sm">
                             {getChapterName(level.chapterId)} - Level {level.levelId}
                           </div>
-                          <div className="text-xs text-slate-500">
+                          <div className="text-xs text-black">
                             {level.attemptCount} attempts • Avg {level.avgAttempts} tries
                           </div>
                         </div>
@@ -477,7 +477,7 @@ const SystemAnalytics = () => {
                         <div className="text-lg font-bold text-orange-600">
                           {level.avgScore}
                         </div>
-                        <div className="text-xs text-slate-600">
+                        <div className="text-xs text-black">
                           {level.avgHints} hints used
                         </div>
                       </div>
@@ -491,11 +491,11 @@ const SystemAnalytics = () => {
           {/* Recent Activity */}
           {activeTab === "activity" && (
             <div>
-              <h4 className="font-bold text-slate-800 mb-4">
+              <h4 className="font-bold text-black mb-4">
                 Recent Activity Timeline
               </h4>
               {recentActivity.length === 0 ? (
-                <div className="text-center py-8 text-slate-600">
+                <div className="text-center py-8 text-black">
                   <p>No recent activity</p>
                 </div>
               ) : (
@@ -506,33 +506,33 @@ const SystemAnalytics = () => {
                       className="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-lg hover:bg-slate-50 transition-colors"
                     >
                       <div className="flex items-center space-x-3">
-                        <span className="text-slate-500">
+                        <span className="text-black">
                           {activity.type === "level_completed" ? <Icons.Check className="w-5 h-5 text-green-500" /> : <Icons.Badge className="w-5 h-5 text-purple-500" />}
                         </span>
                         <div>
-                          <div className="text-sm text-slate-800">
+                          <div className="text-sm text-black">
                             <span className="font-bold">
                               {activity.username}
                             </span>
                             {activity.type === "level_completed" ? (
                               <>
-                                <span className="text-slate-500"> completed </span>
+                                <span className="text-black"> completed </span>
                                 <span className="text-blue-600 font-medium">
                                   {getChapterName(activity.chapterId)} - L{activity.levelId}
                                 </span>
                               </>
                             ) : (
-                              <span className="text-slate-500"> earned an achievement</span>
+                              <span className="text-black"> earned an achievement</span>
                             )}
                           </div>
                           {activity.type === "level_completed" && (
-                            <div className="text-xs text-slate-500">
+                            <div className="text-xs text-black">
                               Score: {activity.finalScore}
                             </div>
                           )}
                         </div>
                       </div>
-                      <div className="text-xs text-slate-600 whitespace-nowrap ml-4">
+                      <div className="text-xs text-black whitespace-nowrap ml-4">
                         {formatTimestamp(activity.timestamp)}
                       </div>
                     </div>

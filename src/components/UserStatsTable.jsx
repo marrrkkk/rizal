@@ -146,10 +146,10 @@ const UserStatsTable = ({
       <div className="p-6 border-b border-slate-200 bg-white">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h3 className="text-lg font-bold text-slate-800">
+            <h3 className="text-lg font-bold text-black">
               User Statistics
             </h3>
-            <p className="text-sm text-slate-500 mt-1">
+            <p className="text-sm text-black mt-1">
               Showing {processedUsers.length} users
             </p>
           </div>
@@ -157,7 +157,7 @@ const UserStatsTable = ({
           <div className="flex flex-col sm:flex-row gap-3">
             {/* Search */}
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-black">
                 <Icons.Search className="w-4 h-4" />
               </span>
               <input
@@ -216,13 +216,13 @@ const UserStatsTable = ({
               ].map((col) => (
                 <th
                   key={col.id}
-                  className={`px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider ${col.id !== 'actions' ? 'cursor-pointer hover:bg-slate-100 hover:text-slate-700' : ''}`}
+                  className={`px-6 py-4 text-xs font-semibold text-black uppercase tracking-wider ${col.id !== 'actions' ? 'cursor-pointer hover:bg-slate-100 hover:text-black' : ''}`}
                   onClick={() => col.id !== 'actions' && handleSort(col.id)}
                 >
                   <div className="flex items-center gap-1">
                     {col.label}
                     {col.id !== 'actions' && (
-                      <span className={`text-slate-600 ${sortField === col.id ? 'text-blue-500' : ''}`}>
+                      <span className={`text-black ${sortField === col.id ? 'text-blue-500' : ''}`}>
                         {getSortIndicator(col.id) || '↕'}
                       </span>
                     )}
@@ -235,8 +235,8 @@ const UserStatsTable = ({
             {processedUsers.length === 0 ? (
               <tr>
                 <td colSpan="10" className="px-6 py-12 text-center">
-                  <div className="text-slate-500 flex flex-col items-center">
-                    <Icons.Search className="w-12 h-12 mb-2 text-slate-300" />
+                  <div className="text-black flex flex-col items-center">
+                    <Icons.Search className="w-12 h-12 mb-2 text-black" />
                     <p>No users found matching your criteria</p>
                   </div>
                 </td>
@@ -249,32 +249,32 @@ const UserStatsTable = ({
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-600 font-bold text-xs mr-3">
+                      <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-black font-bold text-xs mr-3">
                         {user.username.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <div className="text-sm font-medium text-slate-900 group-hover:text-blue-600 transition-colors">
+                        <div className="text-sm font-medium text-black group-hover:text-blue-600 transition-colors">
                           {user.username}
                         </div>
-                        <div className="text-xs text-slate-500">
+                        <div className="text-xs text-black">
                           {user.email}
                         </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-slate-700">
+                    <div className="text-sm font-medium text-black">
                       {user.totalScore.toLocaleString()}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className={`text-sm font-medium ${user.averageScore >= 80 ? 'text-green-600' : user.averageScore >= 60 ? 'text-yellow-600' : 'text-slate-600'}`}>
+                    <div className={`text-sm font-medium ${user.averageScore >= 80 ? 'text-green-600' : user.averageScore >= 60 ? 'text-yellow-600' : 'text-black'}`}>
                       {user.averageScore}%
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-slate-700">
-                      {user.completedLevels} <span className="text-slate-600">/ {user.unlockedLevels}</span>
+                    <div className="text-sm text-black">
+                      {user.completedLevels} <span className="text-black">/ {user.unlockedLevels}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -285,7 +285,7 @@ const UserStatsTable = ({
                           style={{ width: `${user.completionRate}%` }}
                         ></div>
                       </div>
-                      <span className="text-xs text-slate-500">
+                      <span className="text-xs text-black">
                         {user.completionRate}%
                       </span>
                     </div>
@@ -296,16 +296,16 @@ const UserStatsTable = ({
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-slate-600">
+                    <div className="text-sm text-black">
                       {formatTime(user.avgTimeMinutes)}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-slate-600">
+                    <div className="text-sm text-black">
                       {user.totalAttempts}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
                     {formatDate(user.lastPlayed)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
@@ -328,16 +328,16 @@ const UserStatsTable = ({
         <div className="px-6 py-4 bg-slate-50 border-t border-slate-200">
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 text-center text-xs">
             <div>
-              <div className="text-slate-500 uppercase tracking-wider font-semibold mb-1">Total Score</div>
-              <div className="font-bold text-slate-800 text-sm">
+              <div className="text-black uppercase tracking-wider font-semibold mb-1">Total Score</div>
+              <div className="font-bold text-black text-sm">
                 {processedUsers
                   .reduce((sum, u) => sum + u.totalScore, 0)
                   .toLocaleString()}
               </div>
             </div>
             <div>
-              <div className="text-slate-500 uppercase tracking-wider font-semibold mb-1">Avg Rate</div>
-              <div className="font-bold text-slate-800 text-sm">
+              <div className="text-black uppercase tracking-wider font-semibold mb-1">Avg Rate</div>
+              <div className="font-bold text-black text-sm">
                 {Math.round(
                   processedUsers.reduce((sum, u) => sum + u.completionRate, 0) /
                   processedUsers.length
@@ -346,14 +346,14 @@ const UserStatsTable = ({
               </div>
             </div>
             <div>
-              <div className="text-slate-500 uppercase tracking-wider font-semibold mb-1">Badges</div>
-              <div className="font-bold text-slate-800 text-sm">
+              <div className="text-black uppercase tracking-wider font-semibold mb-1">Badges</div>
+              <div className="font-bold text-black text-sm">
                 {processedUsers.reduce((sum, u) => sum + u.achievementCount, 0)}
               </div>
             </div>
             <div>
-              <div className="text-slate-500 uppercase tracking-wider font-semibold mb-1">Levels</div>
-              <div className="font-bold text-slate-800 text-sm">
+              <div className="text-black uppercase tracking-wider font-semibold mb-1">Levels</div>
+              <div className="font-bold text-black text-sm">
                 {processedUsers.reduce((sum, u) => sum + u.completedLevels, 0)}
               </div>
             </div>

@@ -240,14 +240,14 @@ export default function Home({
                     <div className="text-center">
                       <h3
                         className={`text-xl font-black mb-2 transition-colors ${isChapterUnlocked
-                          ? "text-black group-hover:text-gray-900"
-                          : "text-gray-500"
+                          ? "text-black group-hover:text-black"
+                          : "text-black"
                           }`}
                       >
                         {chapter.title}
                       </h3>
                       <p
-                        className={`text-sm mb-4 leading-relaxed ${isChapterUnlocked ? "text-black" : "text-gray-400"
+                        className={`text-sm mb-4 leading-relaxed ${isChapterUnlocked ? "text-black" : "text-black"
                           }`}
                       >
                         {chapter.description}
@@ -256,7 +256,7 @@ export default function Home({
                       {/* Lesson count */}
                       <div className="flex items-center justify-center space-x-2 mb-4">
                         <span
-                          className={`text-xs font-bold uppercase tracking-wide ${isChapterUnlocked ? "text-black" : "text-gray-400"
+                          className={`text-xs font-bold uppercase tracking-wide ${isChapterUnlocked ? "text-black" : "text-black"
                             }`}
                         >
                           {totalLevels} Lessons
@@ -271,7 +271,7 @@ export default function Home({
                       <button
                         className={`w-full font-black py-3 px-6 rounded-2xl transition-all duration-200 border-b-4 active:border-b-2 uppercase tracking-wide text-sm ${isChapterUnlocked
                           ? `bg-gradient-to-r ${chapter.color} text-white border-opacity-50 border-gray-700 hover:shadow-lg`
-                          : "bg-gray-300 text-gray-500 border-gray-400 cursor-not-allowed"
+                          : "bg-gray-300 text-black border-gray-400 cursor-not-allowed"
                           }`}
                         disabled={!isChapterUnlocked}
                       >

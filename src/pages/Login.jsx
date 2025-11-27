@@ -134,7 +134,7 @@ export default function Login({ setToken }) {
             <div>
               <label
                 htmlFor="username"
-                className="block text-gray-700 font-bold mb-3 text-lg"
+                className="block text-black font-bold mb-3 text-lg"
               >
                 Username
               </label>
@@ -147,7 +147,7 @@ export default function Login({ setToken }) {
                   })}
                   placeholder="Enter your username"
                   className={`w-full px-6 ${isTouchDevice ? "py-5" : "py-4"
-                    } bg-gray-50 border-3 border-gray-200 rounded-2xl text-gray-800 placeholder-gray-400 focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100 focus:bg-white hover:border-gray-300 transition-all duration-300 text-lg font-medium shadow-inner min-h-[48px]`}
+                    } bg-gray-50 border-3 border-gray-200 rounded-2xl text-black placeholder-gray-600 focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100 focus:bg-white hover:border-gray-300 transition-all duration-300 text-lg font-medium shadow-inner min-h-[48px]`}
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   disabled={isLoading}
@@ -167,7 +167,7 @@ export default function Login({ setToken }) {
             <div>
               <label
                 htmlFor="password"
-                className="block text-gray-700 font-bold mb-3 text-lg"
+                className="block text-black font-bold mb-3 text-lg"
               >
                 Password
               </label>
@@ -180,7 +180,7 @@ export default function Login({ setToken }) {
                   })}
                   placeholder="Enter your password"
                   className={`w-full px-6 ${isTouchDevice ? "py-5" : "py-4"
-                    } bg-gray-50 border-3 border-gray-200 rounded-2xl text-gray-800 placeholder-gray-400 focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100 focus:bg-white hover:border-gray-300 transition-all duration-300 text-lg font-medium shadow-inner min-h-[48px]`}
+                    } bg-gray-50 border-3 border-gray-200 rounded-2xl text-black placeholder-gray-600 focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100 focus:bg-white hover:border-gray-300 transition-all duration-300 text-lg font-medium shadow-inner min-h-[48px]`}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isLoading}
@@ -246,7 +246,7 @@ export default function Login({ setToken }) {
 
           {/* Register Link */}
           <div className="mt-8 text-center">
-            <p className="text-gray-600 font-medium mb-4">
+            <p className="text-black font-medium mb-4">
               New to our learning adventure?
             </p>
             <Link
@@ -269,8 +269,8 @@ export default function Login({ setToken }) {
             <div className="flex items-center space-x-2">
               <span className="text-2xl">💡</span>
               <div>
-                <p className="text-sm font-bold text-gray-800">Did you know?</p>
-                <p className="text-xs text-gray-600">
+                <p className="text-sm font-bold text-black">Did you know?</p>
+                <p className="text-xs text-black">
                   Jose Rizal could speak 22 languages!
                 </p>
               </div>

@@ -281,6 +281,7 @@ app.post('/api/progress/complete_level', authenticateToken, (req, res) => {
 
                 const previousScore = currentProgress ? currentProgress.score : 0;
                 const newScore = Math.max(previousScore, score);
+                const isNewCompletion = !currentProgress || !currentProgress.is_completed;
 
                 // Update or Insert - mark as completed
                 const updateQuery = `
@@ -293,39 +294,78 @@ app.post('/api/progress/complete_level', authenticateToken, (req, res) => {
                 db.run(updateQuery, [userId, chapter, level, newScore, newScore], function (err) {
                     if (err) return res.status(500).json({ error: err.message });
 
-                    const newBadges = [];
+                    // Update user statistics
+                    db.get('SELECT * FROM user_statistics WHERE user_id = ?', [userId], (err, stats) => {
+                        if (err) return res.status(500).json({ error: err.message });
 
-                    // Check for Chapter Completion
-                    db.get('SELECT COUNT(*) as count FROM user_progress WHERE user_id = ? AND chapter_id = ? AND is_completed = 1',
-                        [userId, chapter], (err, row) => {
-                            const completedCount = row ? row.count : 0;
-                            const chapterComplete = completedCount >= 5;
+                        // Calculate new statistics
+                        db.all('SELECT score FROM user_progress WHERE user_id = ? AND is_completed = 1', [userId], (err, completedLevels) => {
+                            if (err) return res.status(500).json({ error: err.message });
 
-                            if (chapterComplete) {
-                                // Award Chapter Badge
-                                const badgeType = `chapter_${chapter}_complete`;
-                                const badgeName = `Chapter ${chapter} Master`;
-                                db.run('INSERT OR IGNORE INTO user_badges (user_id, badge_type, badge_name) VALUES (?, ?, ?)',
-                                    [userId, badgeType, badgeName], function (err) {
-                                        if (!err && this.changes > 0) newBadges.push(badgeType);
+                            const totalLevelsCompleted = completedLevels.length;
+                            const totalScore = completedLevels.reduce((sum, l) => sum + l.score, 0);
+                            const averageScore = totalLevelsCompleted > 0 ? totalScore / totalLevelsCompleted : 0;
 
-                                        // Send response
-                                        res.json({
-                                            success: true,
-                                            message: 'Level completed',
-                                            newBadges,
-                                            chapterComplete
-                                        });
+                            // Update or insert user statistics
+                            const statsQuery = `
+                INSERT INTO user_statistics (user_id, total_levels_completed, total_score, average_score, last_played_date, updated_at)
+                VALUES (?, ?, ?, ?, DATE('now'), CURRENT_TIMESTAMP)
+                ON CONFLICT(user_id) 
+                DO UPDATE SET total_levels_completed=?, total_score=?, average_score=?, last_played_date=DATE('now'), updated_at=CURRENT_TIMESTAMP
+              `;
+
+                            db.run(statsQuery, [
+                                userId, totalLevelsCompleted, totalScore, averageScore,
+                                totalLevelsCompleted, totalScore, averageScore
+                            ], (err) => {
+                                if (err) console.error('Error updating statistics:', err);
+
+                                const newBadges = [];
+
+                                // Check for Chapter Completion
+                                db.get('SELECT COUNT(*) as count FROM user_progress WHERE user_id = ? AND chapter_id = ? AND is_completed = 1',
+                                    [userId, chapter], (err, row) => {
+                                        const completedCount = row ? row.count : 0;
+                                        const chapterComplete = completedCount >= 5;
+
+                                        if (chapterComplete) {
+                                            // Award Chapter Badge
+                                            const badgeType = `chapter_${chapter}_complete`;
+                                            const badgeName = `Chapter ${chapter} Master`;
+                                            db.run('INSERT OR IGNORE INTO user_badges (user_id, badge_type, badge_name) VALUES (?, ?, ?)',
+                                                [userId, badgeType, badgeName], function (err) {
+                                                    if (!err && this.changes > 0) newBadges.push(badgeType);
+
+                                                    // Send response
+                                                    res.json({
+                                                        success: true,
+                                                        message: 'Level completed',
+                                                        newBadges,
+                                                        chapterComplete,
+                                                        statistics: {
+                                                            totalLevelsCompleted,
+                                                            totalScore,
+                                                            averageScore: Math.round(averageScore)
+                                                        }
+                                                    });
+                                                });
+                                        } else {
+                                            res.json({
+                                                success: true,
+                                                message: 'Level completed',
+                                                newBadges,
+                                                chapterComplete: false,
+                                                statistics: {
+                                                    totalLevelsCompleted,
+                                                    totalScore,
+                                                    averageScore: Math.round(averageScore)
+                                                }
+                                            });
+                                        }
                                     });
-                            } else {
-                                res.json({
-                                    success: true,
-                                    message: 'Level completed',
-                                    newBadges,
-                                    chapterComplete: false
-                                });
-                            }
+                            });
                         });
+                    });
                 });
             });
     });

@@ -131,10 +131,10 @@ export default function Chapter4({ username, onLogout }) {
                 📚
               </div>
             </div>
-            <h2 className="text-4xl font-black text-gray-800 mb-4">
+            <h2 className="text-4xl font-black text-black mb-4">
               Noli Me Tangere
             </h2>
-            <p className="text-lg text-gray-600 font-medium max-w-2xl mx-auto mb-6">
+            <p className="text-lg text-black font-medium max-w-2xl mx-auto mb-6">
               Explore Rizal's masterpiece through interactive games and discover
               the story behind his famous novel
             </p>
@@ -142,7 +142,7 @@ export default function Chapter4({ username, onLogout }) {
             {/* Progress indicator */}
             <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg max-w-md mx-auto border-2 border-pink-200">
               <div className="flex items-center justify-between mb-2">
-                <span className="font-bold text-gray-800">
+                <span className="font-bold text-black">
                   Chapter Progress
                 </span>
                 <span className="text-pink-600 font-bold text-sm">
@@ -243,14 +243,14 @@ export default function Chapter4({ username, onLogout }) {
                   <div className="text-center">
                     <h3
                       className={`text-xl font-black mb-2 transition-colors ${levelUnlocked
-                        ? "text-gray-800 group-hover:text-gray-900"
-                        : "text-gray-500"
+                        ? "text-black group-hover:text-black"
+                        : "text-black"
                         }`}
                     >
                       {level.title}
                     </h3>
                     <p
-                      className={`text-sm mb-4 leading-relaxed ${levelUnlocked ? "text-gray-600" : "text-gray-400"
+                      className={`text-sm mb-4 leading-relaxed ${levelUnlocked ? "text-black" : "text-black"
                         }`}
                     >
                       {level.description}
@@ -274,7 +274,7 @@ export default function Chapter4({ username, onLogout }) {
                           ? "text-green-600"
                           : levelUnlocked
                             ? "text-pink-600"
-                            : "text-gray-500"
+                            : "text-black"
                           }`}
                       >
                         {levelCompleted
@@ -291,7 +291,7 @@ export default function Chapter4({ username, onLogout }) {
                         ? "bg-gradient-to-r from-green-500 to-green-600 text-white border-green-700 hover:shadow-lg hover:scale-105"
                         : levelUnlocked
                           ? "bg-gradient-to-r from-pink-500 to-rose-600 text-white border-rose-700 hover:shadow-lg hover:scale-105"
-                          : "bg-gray-300 text-gray-500 border-gray-400 cursor-not-allowed opacity-60"
+                          : "bg-gray-300 text-black border-gray-400 cursor-not-allowed opacity-60"
                         }`}
                       disabled={!levelUnlocked}
                     >
@@ -310,7 +310,7 @@ export default function Chapter4({ username, onLogout }) {
                     <div className="text-center text-white px-4">
                       <div className="text-4xl mb-2">🔒</div>
                       <p className="text-sm font-bold mb-1">Locked</p>
-                      <p className="text-xs text-gray-300">
+                      <p className="text-xs text-white">
                         {level.id === 1
                           ? "Start here!"
                           : `Complete Level ${level.id - 1} to unlock`}

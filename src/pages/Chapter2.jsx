@@ -233,14 +233,14 @@ export default function Chapter2({ username, onLogout }) {
                       <div className="text-center">
                         <h3
                           className={`text-xl font-black mb-2 transition-colors ${levelUnlocked
-                            ? "text-black group-hover:text-gray-900"
-                            : "text-gray-500"
+                            ? "text-black group-hover:text-black"
+                            : "text-black"
                             }`}
                         >
                           {level.title}
                         </h3>
                         <p
-                          className={`text-sm mb-4 leading-relaxed ${levelUnlocked ? "text-black" : "text-gray-400"
+                          className={`text-sm mb-4 leading-relaxed ${levelUnlocked ? "text-black" : "text-black"
                             }`}
                         >
                           {level.description}
@@ -264,7 +264,7 @@ export default function Chapter2({ username, onLogout }) {
                               ? "text-green-600"
                               : levelUnlocked
                                 ? "text-orange-600"
-                                : "text-gray-500"
+                                : "text-black"
                               }`}
                           >
                             {levelCompleted
@@ -281,7 +281,7 @@ export default function Chapter2({ username, onLogout }) {
                             ? "bg-gradient-to-r from-green-500 to-green-600 text-white border-green-700 hover:shadow-lg hover:scale-105"
                             : levelUnlocked
                               ? "bg-gradient-to-r from-orange-500 to-amber-600 text-white border-amber-700 hover:shadow-lg hover:scale-105"
-                              : "bg-gray-300 text-gray-500 border-gray-400 cursor-not-allowed opacity-60"
+                              : "bg-gray-300 text-black border-gray-400 cursor-not-allowed opacity-60"
                             }`}
                           disabled={!levelUnlocked}
                         >
@@ -300,7 +300,7 @@ export default function Chapter2({ username, onLogout }) {
                         <div className="text-center text-white px-4 transform group-hover:scale-110 transition-transform duration-300">
                           <div className="text-4xl mb-2 drop-shadow-lg">🔒</div>
                           <p className="text-sm font-bold mb-1 drop-shadow-md">Locked</p>
-                          <p className="text-xs text-gray-200 drop-shadow-sm">
+                          <p className="text-xs text-white drop-shadow-sm">
                             {level.id === 1
                               ? "Start here!"
                               : `Complete Level ${level.id - 1} to unlock`}

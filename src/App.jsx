@@ -719,9 +719,13 @@ function App() {
               token ? (
                 <CharacterConnectionsGame
                   username={username}
-                  onComplete={(score) =>
-                    handleLevelComplete(4, 1, score !== undefined ? score : 100)
-                  }
+                  onComplete={async (score) => {
+                    await handleLevelComplete(4, 1, score !== undefined ? score : 100);
+                    // Auto-progress to next level after 3 seconds
+                    setTimeout(() => {
+                      window.location.href = '/chapter/4/level/2';
+                    }, 3000);
+                  }}
                 />
               ) : (
                 <Navigate to="/login" />
@@ -734,9 +738,13 @@ function App() {
               token ? (
                 <PlotReconstructionGame
                   username={username}
-                  onComplete={(score) =>
-                    handleLevelComplete(4, 2, score !== undefined ? score : 100)
-                  }
+                  onComplete={async (score) => {
+                    await handleLevelComplete(4, 2, score !== undefined ? score : 100);
+                    // Auto-progress to next level after 3 seconds
+                    setTimeout(() => {
+                      window.location.href = '/chapter/4/level/3';
+                    }, 3000);
+                  }}
                 />
               ) : (
                 <Navigate to="/login" />
@@ -749,9 +757,13 @@ function App() {
               token ? (
                 <SymbolismHuntGame
                   username={username}
-                  onComplete={(score) =>
-                    handleLevelComplete(4, 3, score !== undefined ? score : 100)
-                  }
+                  onComplete={async (score) => {
+                    await handleLevelComplete(4, 3, score !== undefined ? score : 100);
+                    // Auto-progress to next level after 3 seconds
+                    setTimeout(() => {
+                      window.location.href = '/chapter/4/level/4';
+                    }, 3000);
+                  }}
                 />
               ) : (
                 <Navigate to="/login" />
@@ -764,9 +776,13 @@ function App() {
               token ? (
                 <QuoteUnscrambleGame
                   username={username}
-                  onComplete={(score) =>
-                    handleLevelComplete(4, 4, score !== undefined ? score : 100)
-                  }
+                  onComplete={async (score) => {
+                    await handleLevelComplete(4, 4, score !== undefined ? score : 100);
+                    // Auto-progress to next level after 3 seconds
+                    setTimeout(() => {
+                      window.location.href = '/chapter/4/level/5';
+                    }, 3000);
+                  }}
                 />
               ) : (
                 <Navigate to="/login" />
@@ -779,9 +795,13 @@ function App() {
               token ? (
                 <SceneExplorerGame
                   username={username}
-                  onComplete={(score) =>
-                    handleLevelComplete(4, 5, score !== undefined ? score : 100)
-                  }
+                  onComplete={async (score) => {
+                    await handleLevelComplete(4, 5, score !== undefined ? score : 100);
+                    // Auto-progress back to chapter after 3 seconds (last level)
+                    setTimeout(() => {
+                      window.location.href = '/chapter/4';
+                    }, 3000);
+                  }}
                 />
               ) : (
                 <Navigate to="/login" />

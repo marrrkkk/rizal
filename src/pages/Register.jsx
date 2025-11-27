@@ -107,7 +107,7 @@ export default function Register({ setToken }) {
           <form onSubmit={handleRegister} className="space-y-6">
             {/* Username Field */}
             <div>
-              <label className="block text-gray-700 font-bold mb-3 text-lg">
+              <label className="block text-black font-bold mb-3 text-lg">
                 Choose your username
               </label>
               <div className="relative group">
@@ -115,7 +115,7 @@ export default function Register({ setToken }) {
                   type="text"
                   placeholder="Pick something cool!"
                   className={`w-full px-6 ${isTouchDevice ? "py-5" : "py-4"
-                    } bg-gray-50 border-3 border-gray-200 rounded-2xl text-gray-800 placeholder-gray-400 focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 focus:bg-white hover:border-gray-300 transition-all duration-300 text-lg font-medium shadow-inner`}
+                    } bg-gray-50 border-3 border-gray-200 rounded-2xl text-black placeholder-gray-600 focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 focus:bg-white hover:border-gray-300 transition-all duration-300 text-lg font-medium shadow-inner`}
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
@@ -131,7 +131,7 @@ export default function Register({ setToken }) {
 
             {/* Password Field */}
             <div>
-              <label className="block text-gray-700 font-bold mb-3 text-lg">
+              <label className="block text-black font-bold mb-3 text-lg">
                 Create a password
               </label>
               <div className="relative group">
@@ -139,7 +139,7 @@ export default function Register({ setToken }) {
                   type="password"
                   placeholder="Make it super secure!"
                   className={`w-full px-6 ${isTouchDevice ? "py-5" : "py-4"
-                    } bg-gray-50 border-3 border-gray-200 rounded-2xl text-gray-800 placeholder-gray-400 focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 focus:bg-white hover:border-gray-300 transition-all duration-300 text-lg font-medium shadow-inner`}
+                    } bg-gray-50 border-3 border-gray-200 rounded-2xl text-black placeholder-gray-600 focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 focus:bg-white hover:border-gray-300 transition-all duration-300 text-lg font-medium shadow-inner`}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -210,7 +210,7 @@ export default function Register({ setToken }) {
 
           {/* Login Link */}
           <div className="mt-8 text-center">
-            <p className="text-gray-600 font-medium mb-4">
+            <p className="text-black font-medium mb-4">
               Already part of our community?
             </p>
             <Link
@@ -229,8 +229,8 @@ export default function Register({ setToken }) {
             <div className="flex items-center space-x-2">
               <span className="text-2xl">🎯</span>
               <div>
-                <p className="text-sm font-bold text-gray-800">Fun Fact!</p>
-                <p className="text-xs text-gray-600">
+                <p className="text-sm font-bold text-black">Fun Fact!</p>
+                <p className="text-xs text-black">
                   Jose Rizal wrote his first novel at age 26!
                 </p>
               </div>

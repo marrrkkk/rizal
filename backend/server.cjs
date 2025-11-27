@@ -390,6 +390,56 @@ app.delete('/api/admin/users/:id', authenticateAdmin, (req, res) => {
     });
 });
 
+app.put('/api/admin/users/:id', authenticateAdmin, (req, res) => {
+    const userId = req.params.id;
+    const { username, email } = req.body;
+    // Note: Email is not in the schema currently, but we can update username
+    db.run('UPDATE users SET username = ? WHERE id = ?', [username, userId], function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ success: true, message: 'User updated' });
+    });
+});
+
+app.post('/api/admin/users/:id/reset', authenticateAdmin, (req, res) => {
+    const userId = req.params.id;
+    db.serialize(() => {
+        db.run('DELETE FROM user_progress WHERE user_id = ?', [userId]);
+        db.run('DELETE FROM user_badges WHERE user_id = ?', [userId]);
+
+        // Re-initialize progress
+        const insertPromises = [];
+        for (let chapter = 1; chapter <= 6; chapter++) {
+            for (let level = 1; level <= 5; level++) {
+                insertPromises.push(
+                    new Promise((resolve, reject) => {
+                        db.run(
+                            'INSERT INTO user_progress (user_id, chapter_id, level_id, is_unlocked) VALUES (?, ?, ?, 1)',
+                            [userId, chapter, level],
+                            (err) => {
+                                if (err) reject(err);
+                                else resolve();
+                            }
+                        );
+                    })
+                );
+            }
+        }
+
+        Promise.all(insertPromises)
+            .then(() => res.json({ success: true, message: 'User progress reset' }))
+            .catch(err => res.status(500).json({ error: err.message }));
+    });
+});
+
+app.put('/api/admin/users/:id/admin', authenticateAdmin, (req, res) => {
+    const userId = req.params.id;
+    const { isAdmin } = req.body;
+    db.run('UPDATE users SET is_admin = ? WHERE id = ?', [isAdmin ? 1 : 0, userId], function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ success: true, message: 'Admin status updated' });
+    });
+});
+
 app.get('/api/admin/users/:id', authenticateAdmin, (req, res) => {
     const userId = req.params.id;
 

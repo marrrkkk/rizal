@@ -15,13 +15,14 @@ export default function CharacterConnectionsGame({
     <DndProvider backend={HTML5Backend}>
       <CharacterConnectionsContent
         username={username}
+        onLogout={onLogout}
         onComplete={onComplete}
       />
     </DndProvider>
   );
 }
 
-function CharacterConnectionsContent({ username, onComplete }) {
+function CharacterConnectionsContent({ username, onLogout, onComplete }) {
   const [connections, setConnections] = useState([
     {
       id: 1,
@@ -148,11 +149,10 @@ function CharacterConnectionsContent({ username, onComplete }) {
     return (
       <div
         ref={drag}
-        className={`p-4 rounded-lg shadow-md cursor-move transition-all duration-200 ${
-          character.matched
+        className={`p-4 rounded-lg shadow-md cursor-move transition-all duration-200 ${character.matched
             ? "bg-green-100 border-2 border-green-500"
             : "bg-white hover:shadow-lg"
-        } ${isDragging ? "opacity-50" : "opacity-100"}`}
+          } ${isDragging ? "opacity-50" : "opacity-100"}`}
         style={{
           opacity: isDragging ? 0.5 : 1,
           cursor: character.matched ? "default" : "move",
@@ -180,13 +180,12 @@ function CharacterConnectionsContent({ username, onComplete }) {
     return (
       <div
         ref={drop}
-        className={`p-4 rounded-lg border-2 border-dashed transition-all duration-200 ${
-          isOver
+        className={`p-4 rounded-lg border-2 border-dashed transition-all duration-200 ${isOver
             ? "bg-blue-50 border-blue-300"
             : isMatched
-            ? "bg-green-50 border-green-300"
-            : "bg-gray-50 border-gray-200"
-        }`}
+              ? "bg-green-50 border-green-300"
+              : "bg-gray-50 border-gray-200"
+          }`}
       >
         {isMatched ? (
           <div className="text-center">

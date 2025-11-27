@@ -4,16 +4,17 @@ import { useResponsive } from "../utils/responsiveUtils";
 import { getUserAchievements } from "../utils/achievementSystem";
 import { getUserIdFromUsername } from "../utils/auth";
 import { EPIC_ACHIEVEMENTS } from "../utils/achievementConfig";
-import {
-  getButtonClasses,
-  getCardClasses,
-  transitions,
-} from "../utils/designSystem";
-import {
-  getInteractiveFeedback,
-  getFocusClasses,
-} from "../utils/interactiveFeedback";
-import { getTouchTarget, getFocusRing } from "../utils/accessibility";
+
+// Icons
+const Icons = {
+  Home: (props) => <svg {...props} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>,
+  Chart: (props) => <svg {...props} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" /></svg>,
+  Settings: (props) => <svg {...props} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>,
+  User: (props) => <svg {...props} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>,
+  Logout: (props) => <svg {...props} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>,
+  ChevronDown: (props) => <svg {...props} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>,
+  Book: (props) => <svg {...props} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+};
 
 const Navbar = ({
   username,
@@ -80,298 +81,168 @@ const Navbar = ({
 
   return (
     <header
-      className="bg-white shadow-xl sticky top-0 z-50 border-b-4 border-gradient-to-r from-green-400 via-emerald-400 to-green-500 backdrop-blur-sm"
+      className="bg-white shadow-lg sticky top-0 z-50 border-b-4 border-green-400"
       role="banner"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo and Brand */}
+          {/* Left: Logo and Brand */}
           <div
-            className={`flex items-center space-x-3 cursor-pointer ${getInteractiveFeedback(
-              "subtle"
-            )} ${getFocusRing()}`}
+            className="flex items-center space-x-3 cursor-pointer group"
             onClick={handleHomeClick}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                handleHomeClick();
-              }
-            }}
-            aria-label="Go to home page"
           >
-            <div className="relative">
-              <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
-                <span className="text-white text-lg font-bold">📚</span>
-              </div>
-              {/* Progress ring */}
-              <div className="absolute -inset-1">
-                <svg
-                  className="w-12 h-12 transform -rotate-90"
-                  viewBox="0 0 36 36"
-                >
-                  <path
-                    className="text-gray-200"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    fill="none"
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  />
-                  <path
-                    className="text-green-500"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeDasharray={`${completionPercentage}, 100`}
-                    strokeLinecap="round"
-                    fill="none"
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  />
-                </svg>
-              </div>
+            <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg border-2 border-white group-hover:scale-105 transition-transform duration-200">
+              <Icons.Book className="w-6 h-6 text-white" />
             </div>
-
             <div className="hidden sm:block">
-              <h1 className="text-lg font-black text-gray-800">
+              <h1 className="text-lg font-black text-gray-800 leading-tight">
                 Rizal Adventure
               </h1>
-              <p className="text-xs text-gray-600 font-medium">
-                Learning Journey
-              </p>
             </div>
           </div>
 
-          {/* Center - Progress Summary (Desktop) */}
-          {!isMobile && (
-            <div className="hidden md:flex items-center space-x-6 bg-gray-50 rounded-full px-4 py-2">
-              <div className="text-center">
-                <div className="text-lg font-bold text-green-600">
-                  {overallProgress.completedLevels || 0}
-                </div>
-                <div className="text-xs text-gray-600 font-medium">
-                  Completed
-                </div>
-              </div>
-              <div className="w-px h-8 bg-gray-300"></div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-blue-600">
-                  {completionPercentage}%
-                </div>
-                <div className="text-xs text-gray-600 font-medium">
-                  Progress
-                </div>
-              </div>
-              <div className="w-px h-8 bg-gray-300"></div>
-              <div
-                className="text-center relative group cursor-pointer"
-                onClick={() => navigate("/user-stats")}
-              >
-                <div className="text-lg font-bold text-purple-600 flex items-center justify-center">
-                  {achievementCount}
-                  {latestAchievement && (
-                    <span className="ml-1 text-sm animate-bounce">
-                      {latestAchievement.icon}
-                    </span>
-                  )}
-                </div>
-                <div className="text-xs text-gray-600 font-medium">
-                  Achievements
-                </div>
+          {/* Right: Actions & User Menu */}
+          <div className="flex items-center space-x-2 sm:space-x-4">
 
-                {/* Latest Achievement Tooltip */}
-                {latestAchievement && (
-                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50">
-                    <div
-                      className={`bg-gradient-to-br ${latestAchievement.color} text-white px-3 py-2 rounded-lg shadow-xl text-xs whitespace-nowrap`}
-                    >
-                      <div className="font-bold">{latestAchievement.name}</div>
-                      <div className="text-xs opacity-90">
-                        Latest Achievement
-                      </div>
-                    </div>
-                    <div className="w-2 h-2 bg-purple-600 transform rotate-45 absolute left-1/2 -translate-x-1/2 -bottom-1"></div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Right Side - User Menu */}
-          <div className="flex items-center space-x-2">
-
-
-            {/* Quick Actions */}
-            <div className="flex items-center space-x-1">
-              {onShowAnalytics && (
-                <button
-                  onClick={onShowAnalytics}
-                  className="p-2 text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-full transition-all duration-200"
-                  title="Learning Analytics"
-                >
-                  <span className="text-lg">📊</span>
-                </button>
-              )}
-
+            {/* Analytics Button (Desktop/Tablet) */}
+            {onShowAnalytics && (
               <button
-                onClick={() => navigate("/admin")}
-                className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all duration-200"
-                title="Admin Dashboard"
+                onClick={onShowAnalytics}
+                className="p-2 text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-all duration-200"
+                title="Learning Analytics"
               >
-                <span className="text-lg">⚙️</span>
+                <Icons.Chart className="w-6 h-6" />
               </button>
-            </div>
+            )}
 
-            {/* User Menu */}
+            {/* Admin Button */}
+            <button
+              onClick={() => navigate("/admin")}
+              className="p-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200"
+              title="Admin Dashboard"
+            >
+              <Icons.Settings className="w-6 h-6" />
+            </button>
+
+            {/* User Menu Button */}
             <div className="relative">
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center space-x-2 bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-2 rounded-full hover:from-green-600 hover:to-green-700 hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                className="group flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white pl-2 pr-3 py-1.5 rounded-full font-bold transition-all duration-200 shadow-md hover:shadow-lg border-b-2 border-green-700 active:border-b-0 active:translate-y-0.5"
               >
-                <div className="w-6 h-6 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                   <span className="text-sm font-bold">
                     {username?.charAt(0).toUpperCase() || "U"}
                   </span>
                 </div>
-                {!isMobile && (
-                  <span className="font-semibold text-sm">
-                    {username || "User"}
-                  </span>
-                )}
-                <svg
-                  className={`w-4 h-4 transition-transform duration-200 ${showUserMenu ? "rotate-180" : ""
-                    }`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
+                <span className="hidden sm:inline text-sm font-bold">
+                  {username || "User"}
+                </span>
+                <Icons.ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showUserMenu ? "rotate-180" : ""}`} />
               </button>
 
               {/* Dropdown Menu */}
               {showUserMenu && (
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border-2 border-gray-100 py-2 z-50 animate-slide-down">
-                  {/* User Info */}
-                  <div className="px-4 py-3 border-b border-gray-100">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center relative">
-                        <span className="text-white font-bold">
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setShowUserMenu(false)}
+                  ></div>
+                  <div className="absolute right-0 mt-2 w-60 bg-white rounded-2xl shadow-xl border-2 border-gray-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-200 origin-top-right">
+                    {/* User Info Header */}
+                    <div className="px-4 py-3 border-b border-gray-100 mb-2">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white font-bold shadow-sm">
                           {username?.charAt(0).toUpperCase() || "U"}
-                        </span>
-                        {/* Achievement Badge Indicator */}
-                        {achievementCount > 0 && (
-                          <div className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-xs font-bold text-white border-2 border-white shadow-lg">
-                            {achievementCount}
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <div className="font-semibold text-gray-800">
-                          {username || "User"}
                         </div>
-                        <div className="text-sm text-gray-600">
-                          {completionPercentage}% Complete
-                        </div>
-                        {/* Latest Achievement Display */}
-                        {latestAchievement && (
-                          <div className="text-xs text-purple-600 font-medium mt-1 flex items-center">
-                            <span className="mr-1">
-                              {latestAchievement.icon}
-                            </span>
-                            <span className="truncate">
-                              {latestAchievement.name}
-                            </span>
+                        <div className="overflow-hidden">
+                          <div className="font-bold text-gray-800 truncate">
+                            {username || "User"}
                           </div>
-                        )}
+                          <div className="text-xs text-green-600 font-medium">
+                            {completionPercentage}% Complete
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Menu Items */}
-                  <div className="py-1">
-                    <button
-                      onClick={handleHomeClick}
-                      className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 hover:text-green-700 transition-all duration-200 flex items-center space-x-2 rounded-lg mx-2"
-                    >
-                      <span>🏠</span>
-                      <span className="font-medium">Home</span>
-                    </button>
+                    {/* Menu Items */}
+                    <div className="space-y-1 px-2">
+                      <button
+                        onClick={handleHomeClick}
+                        className="w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-colors"
+                      >
+                        <Icons.Home className="w-5 h-5 text-gray-600" />
+                        <span>Home</span>
+                      </button>
 
-                    <button
-                      onClick={handleUserStatsClick}
-                      className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700 transition-all duration-200 flex items-center space-x-2 rounded-lg mx-2"
-                    >
-                      <span>📈</span>
-                      <span className="font-medium">My Stats</span>
-                    </button>
+                      <button
+                        onClick={handleUserStatsClick}
+                        className="w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-colors"
+                      >
+                        <Icons.User className="w-5 h-5 text-gray-600" />
+                        <span>My Stats</span>
+                      </button>
 
-                    {onShowAnalytics && (
+                      {onShowAnalytics && (
+                        <button
+                          onClick={() => {
+                            onShowAnalytics();
+                            setShowUserMenu(false);
+                          }}
+                          className="w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-colors"
+                        >
+                          <Icons.Chart className="w-5 h-5 text-gray-600" />
+                          <span>Analytics</span>
+                        </button>
+                      )}
+
                       <button
                         onClick={() => {
-                          onShowAnalytics();
+                          navigate("/admin");
                           setShowUserMenu(false);
                         }}
-                        className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 hover:text-purple-700 transition-all duration-200 flex items-center space-x-2 rounded-lg mx-2"
+                        className="w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-colors"
                       >
-                        <span>📊</span>
-                        <span className="font-medium">Analytics</span>
+                        <Icons.Settings className="w-5 h-5 text-gray-600" />
+                        <span>Settings</span>
                       </button>
-                    )}
+                    </div>
 
-                    <button
-                      onClick={() => {
-                        navigate("/admin");
-                        setShowUserMenu(false);
-                      }}
-                      className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 hover:text-gray-800 transition-all duration-200 flex items-center space-x-2 rounded-lg mx-2"
-                    >
-                      <span>⚙️</span>
-                      <span className="font-medium">Settings</span>
-                    </button>
+                    {/* Logout */}
+                    <div className="border-t border-gray-100 mt-2 pt-2 px-2">
+                      <button
+                        onClick={() => {
+                          onLogout();
+                          setShowUserMenu(false);
+                        }}
+                        className="w-full flex items-center space-x-3 px-3 py-2 text-sm font-bold text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+                      >
+                        <Icons.Logout className="w-5 h-5" />
+                        <span>Logout</span>
+                      </button>
+                    </div>
                   </div>
-
-                  {/* Logout */}
-                  <div className="border-t border-gray-100 pt-1 mt-1">
-                    <button
-                      onClick={() => {
-                        onLogout();
-                        setShowUserMenu(false);
-                      }}
-                      className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-gradient-to-r hover:from-red-50 hover:to-red-100 hover:text-red-700 transition-all duration-200 flex items-center space-x-2 rounded-lg mx-2 font-medium"
-                    >
-                      <span>🚪</span>
-                      <span>Logout</span>
-                    </button>
-                  </div>
-                </div>
+                </>
               )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Mobile Progress Bar */}
+      {/* Mobile Progress Bar (Optional - keeping it slim) */}
       {isMobile && (
-        <div className="bg-gray-50 px-4 py-2 border-t border-gray-200">
-          <div className="flex items-center justify-between text-xs">
-            <span className="font-medium text-gray-600">
-              Progress: {overallProgress.completedLevels || 0}/
-              {overallProgress.totalLevels || 30}
-            </span>
-            <span className="font-bold text-green-600">
+        <div className="bg-gray-50 px-4 py-1 border-t border-gray-100">
+          <div className="flex items-center space-x-3">
+            <span className="text-xs font-bold text-green-600 w-10">
               {completionPercentage}%
             </span>
-          </div>
-          <div className="mt-1 w-full bg-gray-200 rounded-full h-2">
-            <div
-              className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-500"
-              style={{ width: `${completionPercentage}%` }}
-            ></div>
+            <div className="flex-1 bg-gray-200 rounded-full h-1.5">
+              <div
+                className="bg-green-500 h-1.5 rounded-full transition-all duration-500"
+                style={{ width: `${completionPercentage}%` }}
+              ></div>
+            </div>
           </div>
         </div>
       )}

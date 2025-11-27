@@ -40,78 +40,65 @@ export const getCurrentUserFromToken = () => {
   }
 };
 
-// API methods for authentication
+// API methods for authentication and data access
 const api = {
-  // Login endpoint
-  post: async (endpoint, data) => {
-    if (endpoint === "/auth/login") {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Login failed");
-      }
-
-      const result = await response.json();
-      setAuthToken(result.token);
-      return { data: result };
-    }
-
-    if (endpoint === "/auth/register") {
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Registration failed");
-      }
-
-      const result = await response.json();
-
-      // After registration, log the user in
-      if (result.success) {
-        const loginResponse = await fetch(`${API_BASE_URL}/auth/login`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username: data.username, password: data.password }),
-        });
-
-        if (loginResponse.ok) {
-          const loginResult = await loginResponse.json();
-          setAuthToken(loginResult.token);
-          return { data: loginResult };
-        }
-      }
-
-      return { data: result };
-    }
-
-    throw new Error(`Unknown endpoint: ${endpoint}`);
-  },
-
-  // Get endpoint (for future use)
-  get: async (endpoint) => {
+  // Helper for making requests
+  request: async (endpoint, method = 'GET', data = null) => {
     const token = getAuthToken();
-    if (!token) {
-      throw new Error("Not authenticated");
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
     }
 
-    // Add more endpoints as needed
-    throw new Error(`Unknown endpoint: ${endpoint}`);
+    const config = {
+      method,
+      headers,
+    };
+
+    if (data) {
+      config.body = JSON.stringify(data);
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+
+      // Handle 401 Unauthorized (token expired or invalid)
+      if (response.status === 401) {
+        clearAuthToken();
+        // Optionally redirect to login, but let the caller handle it for now
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Request failed with status ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      // Auto-manage token if present in response
+      if (result.token) {
+        setAuthToken(result.token);
+      }
+
+      // Return in the format expected by the application { data: result }
+      return { data: result };
+    } catch (error) {
+      console.error(`API Error (${method} ${endpoint}):`, error);
+      throw error;
+    }
   },
+
+  // HTTP Methods
+  get: (endpoint) => api.request(endpoint, 'GET'),
+
+  post: (endpoint, data) => api.request(endpoint, 'POST', data),
+
+  put: (endpoint, data) => api.request(endpoint, 'PUT', data),
+
+  delete: (endpoint) => api.request(endpoint, 'DELETE'),
 };
 
 export default api;

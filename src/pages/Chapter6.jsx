@@ -4,10 +4,12 @@ import { useProgressAPI } from "../hooks/useProgressAPI";
 import { getCurrentUserFromToken } from "../utils/api";
 import { createNavigationHelper } from "../utils/navigationHelper";
 import MusicControl from "../components/MusicControl";
+import ChapterHeader from "../components/ChapterHeader";
 
 export default function Chapter6({ username, onLogout }) {
   const navigate = useNavigate();
   const navigationHelper = createNavigationHelper(navigate);
+  const { progressData, getChapterProgress, isLevelUnlocked, isLevelCompleted, loading } = useProgressAPI();
   const [userId, setUserId] = useState(null);
 
   // Get chapter progress
@@ -106,50 +108,14 @@ export default function Chapter6({ username, onLogout }) {
         <div className="absolute top-1/2 left-1/4 w-10 h-10 bg-orange-300 rounded-full opacity-10"></div>
       </div>
 
-      {/* Duolingo-style Header */}
-      <header className="bg-white shadow-lg sticky top-0 z-10 border-b-4 border-red-400">
-        <div className="w-full px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={handleBackToHome}
-              className="w-12 h-12 bg-gray-500 hover:bg-gray-600 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg border-b-2 border-gray-700 active:border-b-0"
-            >
-              <svg
-                className="w-6 h-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-            </button>
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-pink-600 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
-                <span className="text-white font-bold text-xl">6</span>
-              </div>
-              <div>
-                <h1 className="text-2xl font-black text-black">
-                  Exile and Legacy
-                </h1>
-                <p className="text-sm text-black font-medium">
-                  5 lessons • Chapter 6
-                </p>
-              </div>
-            </div>
-          </div>
-          <button
-            onClick={onLogout}
-            className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-full font-bold transition-all duration-200 shadow-lg border-b-2 border-red-700 active:border-b-0"
-          >
-            Exit
-          </button>
-        </div>
-      </header>
+      {/* Modern Chapter Header */}
+      <ChapterHeader
+        chapterNumber={6}
+        chapterTitle="Exile and Legacy"
+        totalLessons={5}
+        onLogout={onLogout}
+        themeColor="red"
+      />
 
       {/* Main Content */}
       <main className="w-full px-6 py-8">
@@ -208,7 +174,8 @@ export default function Chapter6({ username, onLogout }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto relative z-10">
           {levels.map((level, index) => {
             // Use the unified progress API to check unlock status
-            const levelUnlocked = isLevelUnlocked(6, level.id);
+            // All levels are unlocked in this chapter
+            const levelUnlocked = true; // Override to unlock all levels
             const levelCompleted = isLevelCompleted(6, level.id);
             const levelScore = progressData?.chapters?.[6]?.scores?.[level.id] || 0;
 

@@ -1,26 +1,33 @@
 import { useState, useEffect } from "react";
 import {
   getDetailedLeaderboard,
-  refreshLeaderboard,
 } from "../utils/leaderboardManager";
 import AdminLoadingState from "./AdminLoadingState";
 import AdminErrorMessage from "./AdminErrorMessage";
 
+// Icons
+const Icons = {
+  Crown: (props) => <svg {...props} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>,
+  Medal: (props) => <svg {...props} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
+  Trophy: (props) => <svg {...props} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>,
+  Star: (props) => <svg {...props} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>,
+  User: (props) => <svg {...props} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>,
+};
+
 /**
- * LeaderboardWidget - Displays top 5 students with rankings
- * Shows student names, scores, completion rates, and achievement badges
- * Features special styling for 1st, 2nd, and 3rd place
+ * LeaderboardWidget - Displays top students with rankings
+ * Minimalist Design Update
  */
 const LeaderboardWidget = ({
   limit = 5,
   autoRefresh = false,
   refreshInterval = 30000,
+  compact = false
 }) => {
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
-  const [retryCount, setRetryCount] = useState(0);
 
   // Load leaderboard data
   const loadLeaderboard = async () => {
@@ -30,7 +37,6 @@ const LeaderboardWidget = ({
       const data = await getDetailedLeaderboard(limit);
       setLeaderboard(data);
       setLastUpdated(new Date());
-      setRetryCount(0); // Reset retry count on success
     } catch (err) {
       console.error("Failed to load leaderboard:", err);
       setError(err.message || "Failed to load leaderboard data");
@@ -39,9 +45,8 @@ const LeaderboardWidget = ({
     }
   };
 
-  // Manual refresh handler with retry tracking
+  // Manual refresh handler
   const handleRefresh = async () => {
-    setRetryCount((prev) => prev + 1);
     await loadLeaderboard();
   };
 
@@ -66,138 +71,103 @@ const LeaderboardWidget = ({
     switch (rank) {
       case 1:
         return {
-          bg: "bg-gradient-to-r from-yellow-400 to-yellow-500",
-          text: "text-yellow-900",
-          icon: "👑",
-          border: "border-yellow-400",
-          shadow: "shadow-yellow-200",
+          bg: "bg-yellow-50",
+          text: "text-yellow-700",
+          badge: "bg-yellow-100 text-yellow-800",
+          icon: Icons.Trophy,
+          border: "border-yellow-200",
         };
       case 2:
         return {
-          bg: "bg-gradient-to-r from-gray-300 to-gray-400",
-          text: "text-gray-900",
-          icon: "🥈",
-          border: "border-gray-400",
-          shadow: "shadow-gray-200",
+          bg: "bg-slate-50",
+          text: "text-slate-700",
+          badge: "bg-slate-200 text-slate-800",
+          icon: Icons.Medal,
+          border: "border-slate-200",
         };
       case 3:
         return {
-          bg: "bg-gradient-to-r from-orange-400 to-orange-500",
-          text: "text-orange-900",
-          icon: "🥉",
-          border: "border-orange-400",
-          shadow: "shadow-orange-200",
+          bg: "bg-orange-50",
+          text: "text-orange-700",
+          badge: "bg-orange-100 text-orange-800",
+          icon: Icons.Medal,
+          border: "border-orange-200",
         };
       default:
         return {
-          bg: "bg-gradient-to-r from-blue-50 to-blue-100",
-          text: "text-blue-900",
-          icon: "🎯",
-          border: "border-blue-200",
-          shadow: "shadow-blue-100",
+          bg: "bg-white",
+          text: "text-slate-600",
+          badge: "bg-slate-100 text-slate-600",
+          icon: null,
+          border: "border-slate-100",
         };
     }
   };
 
-  // Format time display
-  const formatTime = (minutes) => {
-    if (minutes < 60) {
-      return `${minutes}m`;
-    }
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return `${hours}h ${mins}m`;
-  };
-
   if (loading && leaderboard.length === 0) {
-    return (
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-bold text-gray-800 flex items-center">
-            <span className="text-2xl mr-2">🏆</span>
-            Top Students
-          </h3>
-        </div>
-        <AdminLoadingState type="spinner" message="Loading leaderboard..." />
-      </div>
-    );
+    return <AdminLoadingState type="spinner" message="Loading leaderboard..." />;
   }
 
   if (error) {
     return (
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-bold text-gray-800 flex items-center">
-            <span className="text-2xl mr-2">🏆</span>
-            Top Students
-          </h3>
-        </div>
-        <AdminErrorMessage
-          error={error}
-          onRetry={handleRefresh}
-          title="Failed to Load Leaderboard"
-          showDetails={false}
-        />
-      </div>
+      <AdminErrorMessage
+        error={error}
+        onRetry={handleRefresh}
+        title="Failed to Load Leaderboard"
+        showDetails={false}
+      />
     );
   }
 
   if (leaderboard.length === 0) {
     return (
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-bold text-gray-800 flex items-center">
-            <span className="text-2xl mr-2">🏆</span>
-            Top Students
-          </h3>
+      <div className="text-center py-12 bg-slate-50 rounded-xl border border-slate-200 border-dashed">
+        <div className="flex justify-center mb-3">
+          <Icons.User className="w-12 h-12 text-slate-300" />
         </div>
-        <div className="text-center py-12">
-          <div className="text-6xl mb-4">🎓</div>
-          <p className="text-gray-600">
-            No students have completed any levels yet.
-          </p>
-          <p className="text-sm text-gray-500 mt-2">
-            Be the first to appear on the leaderboard!
-          </p>
-        </div>
+        <p className="text-slate-600 font-medium">No students ranked yet</p>
+        <p className="text-sm text-slate-500">Be the first to complete a level!</p>
+      </div>
+    );
+  }
+
+  if (compact) {
+    return (
+      <div className="space-y-3">
+        {leaderboard.map((student) => {
+          const rankStyle = getRankStyle(student.rank);
+          const RankIcon = rankStyle.icon;
+
+          return (
+            <div
+              key={student.userId}
+              className={`flex items-center justify-between p-3 rounded-lg border ${rankStyle.border} ${rankStyle.bg}`}
+            >
+              <div className="flex items-center gap-3">
+                <div className={`w-8 h-8 flex items-center justify-center rounded-full font-bold text-sm ${rankStyle.badge}`}>
+                  {student.rank <= 3 && RankIcon ? <RankIcon className="w-5 h-5" /> : student.rank}
+                </div>
+                <div>
+                  <div className="font-bold text-slate-800 text-sm">{student.username}</div>
+                  <div className="text-xs text-slate-500">{student.totalScore.toLocaleString()} pts</div>
+                </div>
+              </div>
+              <div className="text-xs font-medium text-slate-600 bg-white px-2 py-1 rounded border border-slate-100">
+                {student.completionRate}%
+              </div>
+            </div>
+          );
+        })}
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-bold text-gray-800 flex items-center">
-          <span className="text-2xl mr-2">🏆</span>
-          Top Students
-        </h3>
-        <div className="flex items-center space-x-2">
-          {lastUpdated && (
-            <span className="text-xs text-gray-500">
-              Updated {lastUpdated.toLocaleTimeString()}
-            </span>
-          )}
-          <button
-            onClick={handleRefresh}
-            disabled={loading}
-            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
-            title="Refresh leaderboard"
-          >
-            <svg
-              className={`w-5 h-5 ${loading ? "animate-spin" : ""}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-              />
-            </svg>
-          </button>
+      <div className="flex items-center justify-between mb-2">
+        <div className="text-sm text-slate-500">
+          {lastUpdated && `Updated ${lastUpdated.toLocaleTimeString()}`}
         </div>
       </div>
 
@@ -205,124 +175,72 @@ const LeaderboardWidget = ({
       <div className="space-y-3">
         {leaderboard.map((student) => {
           const rankStyle = getRankStyle(student.rank);
-          const isTopThree = student.rank <= 3;
+          const RankIcon = rankStyle.icon;
 
           return (
             <div
               key={student.userId}
               className={`
-                relative rounded-xl border-2 ${rankStyle.border} ${
-                rankStyle.shadow
-              } 
-                shadow-lg transition-all duration-300 hover:scale-102 hover:shadow-xl
-                ${isTopThree ? "p-4" : "p-3"}
+                relative rounded-xl border ${rankStyle.border} ${rankStyle.bg}
+                p-4 transition-all hover:shadow-md
               `}
             >
-              {/* Rank Badge */}
-              <div className="flex items-start space-x-4">
-                <div
-                  className={`
-                    flex-shrink-0 ${rankStyle.bg} ${rankStyle.text} 
-                    rounded-lg flex items-center justify-center font-bold
-                    ${isTopThree ? "w-16 h-16 text-2xl" : "w-12 h-12 text-lg"}
-                  `}
-                >
-                  {isTopThree ? rankStyle.icon : `#${student.rank}`}
+              <div className="flex items-center gap-4">
+                {/* Rank */}
+                <div className={`
+                  flex-shrink-0 w-12 h-12 flex items-center justify-center 
+                  rounded-xl font-bold text-xl ${rankStyle.badge}
+                `}>
+                  {student.rank <= 3 && RankIcon ? <RankIcon className="w-6 h-6" /> : student.rank}
                 </div>
 
-                {/* Student Info */}
+                {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4
-                      className={`font-bold truncate ${
-                        isTopThree ? "text-lg" : "text-base"
-                      }`}
-                    >
+                  <div className="flex items-center justify-between mb-1">
+                    <h4 className="font-bold text-slate-800 truncate">
                       {student.username}
                     </h4>
-                    <div className="flex items-center space-x-1">
-                      {student.badges &&
-                        student.badges.slice(0, 3).map((badge, idx) => (
-                          <span
-                            key={idx}
-                            className="text-lg"
-                            title={badge.name}
-                          >
-                            {getBadgeIcon(badge.type)}
-                          </span>
-                        ))}
-                      {student.badges && student.badges.length > 3 && (
-                        <span className="text-xs text-gray-500 font-medium">
-                          +{student.badges.length - 3}
+                    <div className="flex items-center gap-1">
+                      {student.badges && student.badges.slice(0, 3).map((badge, idx) => (
+                        <span key={idx} title={badge.name} className="text-slate-600">
+                          <Icons.Star className="w-4 h-4 text-yellow-500" />
                         </span>
-                      )}
+                      ))}
                     </div>
                   </div>
 
-                  {/* Stats Grid */}
-                  <div className="grid grid-cols-3 gap-2 text-sm">
-                    <div className="bg-white/50 rounded-lg p-2">
-                      <p className="text-xs text-gray-600 mb-1">Total Score</p>
-                      <p className="font-bold text-blue-600">
-                        {student.totalScore.toLocaleString()}
-                      </p>
+                  <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <span className="text-slate-500 text-xs block">Score</span>
+                      <span className="font-bold text-blue-600">{student.totalScore.toLocaleString()}</span>
                     </div>
-                    <div className="bg-white/50 rounded-lg p-2">
-                      <p className="text-xs text-gray-600 mb-1">Completion</p>
-                      <p className="font-bold text-green-600">
-                        {student.completionRate}%
-                      </p>
+                    <div>
+                      <span className="text-slate-500 text-xs block">Progress</span>
+                      <span className="font-bold text-green-600">{student.completionRate}%</span>
                     </div>
-                    <div className="bg-white/50 rounded-lg p-2">
-                      <p className="text-xs text-gray-600 mb-1">Avg Time</p>
-                      <p className="font-bold text-purple-600">
-                        {formatTime(student.avgTimeMinutes)}
-                      </p>
+                    <div>
+                      <span className="text-slate-500 text-xs block">Avg Time</span>
+                      <span className="font-bold text-purple-600">{formatTime(student.avgTimeMinutes)}</span>
                     </div>
-                  </div>
-
-                  {/* Additional Stats */}
-                  <div className="flex items-center justify-between mt-2 text-xs text-gray-600">
-                    <span>📚 {student.completedLevels} levels completed</span>
-                    <span>🏅 {student.achievementCount} achievements</span>
                   </div>
                 </div>
               </div>
-
-              {/* Top 3 Special Effects */}
-              {isTopThree && (
-                <div className="absolute -top-1 -right-1">
-                  <div className={`${rankStyle.bg} rounded-full p-1 shadow-lg`}>
-                    <span className="text-xs font-bold">{rankStyle.icon}</span>
-                  </div>
-                </div>
-              )}
             </div>
           );
         })}
-      </div>
-
-      {/* Footer Info */}
-      <div className="mt-4 pt-4 border-t border-gray-200">
-        <p className="text-xs text-gray-500 text-center">
-          Rankings based on total score, completion rate, and achievements
-        </p>
       </div>
     </div>
   );
 };
 
-// Helper function to get badge icon based on type
-const getBadgeIcon = (type) => {
-  const icons = {
-    milestone: "⭐",
-    chapter: "🌟",
-    performance: "💎",
-    ultimate: "👑",
-    speed: "⚡",
-    mastery: "📚",
-  };
-  return icons[type] || "🏅";
+// Format time display
+const formatTime = (minutes) => {
+  if (minutes < 60) {
+    return `${minutes}m`;
+  }
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  return `${hours}h ${mins}m`;
 };
 
 export default LeaderboardWidget;

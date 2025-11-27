@@ -7,6 +7,7 @@ import ProgressDashboard from "../components/ProgressDashboard";
 import CompletionCertificate from "../components/CompletionCertificate";
 import { createNavigationHelper } from "../utils/navigationHelper";
 import MusicControl from "../components/MusicControl";
+import ChapterHeader from "../components/ChapterHeader";
 
 export default function Chapter1({ username, onLogout }) {
   const navigate = useNavigate();
@@ -80,50 +81,14 @@ export default function Chapter1({ username, onLogout }) {
         <div className="absolute top-1/2 left-1/4 w-10 h-10 bg-purple-300 rounded-full opacity-10"></div>
       </div>
 
-      {/* Duolingo-style Header */}
-      <header className="bg-white shadow-lg sticky top-0 z-10 border-b-4 border-blue-400">
-        <div className="w-full px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={handleBackToHome}
-              className="w-12 h-12 bg-gray-500 hover:bg-gray-600 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg border-b-2 border-gray-700 active:border-b-0"
-            >
-              <svg
-                className="w-6 h-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-            </button>
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
-                <span className="text-white font-bold text-xl">1</span>
-              </div>
-              <div>
-                <h1 className="text-2xl font-black text-black">
-                  Childhood in Calamba
-                </h1>
-                <p className="text-sm text-black font-medium">
-                  5 lessons • Chapter 1
-                </p>
-              </div>
-            </div>
-          </div>
-          <button
-            onClick={onLogout}
-            className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-full font-bold transition-all duration-200 shadow-lg border-b-2 border-red-700 active:border-b-0"
-          >
-            Exit
-          </button>
-        </div>
-      </header>
+      {/* Modern Chapter Header */}
+      <ChapterHeader
+        chapterNumber={1}
+        chapterTitle="Childhood in Calamba"
+        totalLessons={5}
+        onLogout={onLogout}
+        themeColor="blue"
+      />
 
       {/* Main Content */}
       <main className="w-full px-6 py-8">

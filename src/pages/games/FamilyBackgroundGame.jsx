@@ -170,11 +170,8 @@ export default function FamilyBackgroundGame({ username, onLogout }) {
     setTimeout(() => {
       if (answerIndex === games[currentGame].correct) {
         setScore(score + 25);
-        nextGame();
-      } else {
-        setSelectedAnswer(null);
-        setShowQuizResult(false);
       }
+      nextGame();
     }, 2000);
   };
 
@@ -304,31 +301,29 @@ export default function FamilyBackgroundGame({ username, onLogout }) {
               key={index}
               onClick={() => handleQuizAnswer(index)}
               disabled={showQuizResult}
-              className={`p-6 rounded-2xl border-4 transition-all duration-200 text-left font-semibold ${
-                showQuizResult
+              className={`p-6 rounded-2xl border-4 transition-all duration-200 text-left font-semibold ${showQuizResult
                   ? index === game.correct
                     ? "bg-green-100 border-green-400 text-green-800"
                     : index === selectedAnswer
-                    ? "bg-red-100 border-red-400 text-red-800"
-                    : "bg-gray-100 border-gray-300 text-black"
+                      ? "bg-red-100 border-red-400 text-red-800"
+                      : "bg-gray-100 border-gray-300 text-black"
                   : selectedAnswer === index
-                  ? "bg-purple-100 border-purple-400 text-purple-800"
-                  : "bg-gray-50 border-gray-200 text-black hover:bg-purple-50 hover:border-purple-300"
-              }`}
+                    ? "bg-purple-100 border-purple-400 text-purple-800"
+                    : "bg-gray-50 border-gray-200 text-black hover:bg-purple-50 hover:border-purple-300"
+                }`}
             >
               <div className="flex items-center">
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center mr-4 font-bold ${
-                    showQuizResult
+                  className={`w-8 h-8 rounded-full flex items-center justify-center mr-4 font-bold ${showQuizResult
                       ? index === game.correct
                         ? "bg-green-500 text-white"
                         : index === selectedAnswer
-                        ? "bg-red-500 text-white"
-                        : "bg-gray-300 text-black"
+                          ? "bg-red-500 text-white"
+                          : "bg-gray-300 text-black"
                       : selectedAnswer === index
-                      ? "bg-purple-500 text-white"
-                      : "bg-gray-300 text-black"
-                  }`}
+                        ? "bg-purple-500 text-white"
+                        : "bg-gray-300 text-black"
+                    }`}
                 >
                   {String.fromCharCode(65 + index)}
                 </div>
@@ -340,11 +335,10 @@ export default function FamilyBackgroundGame({ username, onLogout }) {
         {showQuizResult && (
           <div className="mt-8 text-center">
             <div
-              className={`inline-flex items-center space-x-3 px-6 py-4 rounded-2xl font-black text-lg shadow-lg ${
-                selectedAnswer === game.correct
+              className={`inline-flex items-center space-x-3 px-6 py-4 rounded-2xl font-black text-lg shadow-lg ${selectedAnswer === game.correct
                   ? "bg-gradient-to-r from-green-400 to-emerald-500 text-white animate-bounce"
                   : "bg-gradient-to-r from-orange-400 to-red-500 text-white"
-              }`}
+                }`}
             >
               <span className="text-2xl">
                 {selectedAnswer === game.correct ? "🎉" : "💪"}
@@ -371,11 +365,10 @@ export default function FamilyBackgroundGame({ username, onLogout }) {
           <div
             key={card.uniqueId}
             onClick={() => handleMemoryCardClick(index)}
-            className={`aspect-square rounded-xl cursor-pointer transition-all duration-300 ${
-              flippedCards.includes(index) || matchedCards.includes(index)
+            className={`aspect-square rounded-xl cursor-pointer transition-all duration-300 ${flippedCards.includes(index) || matchedCards.includes(index)
                 ? "bg-white border-2 border-purple-300"
                 : "bg-gradient-to-br from-purple-400 to-purple-600 hover:from-purple-500 hover:to-purple-700"
-            }`}
+              }`}
           >
             {flippedCards.includes(index) || matchedCards.includes(index) ? (
               <div className="h-full flex flex-col items-center justify-center p-2">
@@ -428,14 +421,13 @@ export default function FamilyBackgroundGame({ username, onLogout }) {
                     onChange={(e) =>
                       handleFamilyTreeAnswer(position.id, e.target.value)
                     }
-                    className={`w-full text-sm border rounded px-2 py-1 ${
-                      familyTreeAnswers[position.id] ===
-                      game.correct[position.id]
+                    className={`w-full text-sm border rounded px-2 py-1 ${familyTreeAnswers[position.id] ===
+                        game.correct[position.id]
                         ? "border-green-400 bg-green-50 text-green-800"
                         : familyTreeAnswers[position.id]
-                        ? "border-red-400 bg-red-50 text-red-800"
-                        : "border-gray-300"
-                    }`}
+                          ? "border-red-400 bg-red-50 text-red-800"
+                          : "border-gray-300"
+                      }`}
                   >
                     <option value="">Choose...</option>
                     {game.options.map((option, index) => (
@@ -516,11 +508,10 @@ export default function FamilyBackgroundGame({ username, onLogout }) {
               <button
                 key={item.id}
                 onClick={() => handleMatchingClick(item)}
-                className={`w-full p-3 rounded-xl text-left transition-all duration-200 ${
-                  selectedMatching.some((s) => s.id === item.id)
+                className={`w-full p-3 rounded-xl text-left transition-all duration-200 ${selectedMatching.some((s) => s.id === item.id)
                     ? "bg-blue-200 border-2 border-blue-400"
                     : "bg-orange-50 hover:bg-orange-100 border-2 border-orange-200"
-                }`}
+                  }`}
               >
                 {item.text}
               </button>
@@ -538,11 +529,10 @@ export default function FamilyBackgroundGame({ username, onLogout }) {
               <button
                 key={item.id}
                 onClick={() => handleMatchingClick(item)}
-                className={`w-full p-3 rounded-xl text-left transition-all duration-200 ${
-                  selectedMatching.some((s) => s.id === item.id)
+                className={`w-full p-3 rounded-xl text-left transition-all duration-200 ${selectedMatching.some((s) => s.id === item.id)
                     ? "bg-blue-200 border-2 border-blue-400"
                     : "bg-green-50 hover:bg-green-100 border-2 border-green-200"
-                }`}
+                  }`}
               >
                 {item.text}
               </button>

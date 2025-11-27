@@ -56,11 +56,12 @@ class NavigationHelper {
     }
 
     // Check if level is unlocked (unless forced)
-    if (!force && !isLevelUnlocked(chapterId, levelId)) {
+    // Lock check removed to allow playing all levels
+    /* if (!force && !isLevelUnlocked(chapterId, levelId)) {
       console.warn(`Level ${levelId} of chapter ${chapterId} is locked`);
       this.showLockedLevelMessage(chapterId, levelId);
       return false;
-    }
+    } */
 
     this.navigate(ROUTES.LEVEL(chapterId, levelId));
     return true;

@@ -186,17 +186,9 @@ export default function JoseBirthGame({ username, onLogout, onComplete }) {
     setTimeout(() => {
       if (isCorrect) {
         setScore(score + Math.max(25 - hintsUsed * 5, 10)); // Reduce score for hints but keep minimum
-        nextGame();
-      } else {
-        // Show encouragement after multiple attempts
-        if (attempts >= 2) {
-          setShowEncouragement(true);
-          setTimeout(() => setShowEncouragement(false), 3000);
-        }
-        // Allow retry
-        setSelectedAnswer(null);
-        setShowQuizResult(false);
       }
+      // Proceed to next game regardless of answer
+      nextGame();
       setFeedbackMessage(null);
     }, delay);
   }, 300);
@@ -294,31 +286,29 @@ export default function JoseBirthGame({ username, onLogout, onComplete }) {
               key={index}
               onClick={() => handleQuizAnswer(index)}
               disabled={showQuizResult}
-              className={`p-6 rounded-2xl border-4 transition-all duration-200 text-left font-semibold ${
-                showQuizResult
+              className={`p-6 rounded-2xl border-4 transition-all duration-200 text-left font-semibold ${showQuizResult
                   ? index === game.correct
                     ? "bg-green-100 border-green-400 text-green-800"
                     : index === selectedAnswer
-                    ? "bg-red-100 border-red-400 text-red-800"
-                    : "bg-gray-100 border-gray-300 text-black"
+                      ? "bg-red-100 border-red-400 text-red-800"
+                      : "bg-gray-100 border-gray-300 text-black"
                   : selectedAnswer === index
-                  ? "bg-blue-100 border-blue-400 text-blue-800"
-                  : "bg-gray-50 border-gray-200 text-black hover:bg-blue-50 hover:border-blue-300"
-              }`}
+                    ? "bg-blue-100 border-blue-400 text-blue-800"
+                    : "bg-gray-50 border-gray-200 text-black hover:bg-blue-50 hover:border-blue-300"
+                }`}
             >
               <div className="flex items-center">
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center mr-4 font-bold ${
-                    showQuizResult
+                  className={`w-8 h-8 rounded-full flex items-center justify-center mr-4 font-bold ${showQuizResult
                       ? index === game.correct
                         ? "bg-green-500 text-white"
                         : index === selectedAnswer
-                        ? "bg-red-500 text-white"
-                        : "bg-gray-300 text-black"
+                          ? "bg-red-500 text-white"
+                          : "bg-gray-300 text-black"
                       : selectedAnswer === index
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-300 text-black"
-                  }`}
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-300 text-black"
+                    }`}
                 >
                   {String.fromCharCode(65 + index)}
                 </div>
@@ -330,11 +320,10 @@ export default function JoseBirthGame({ username, onLogout, onComplete }) {
         {showQuizResult && (
           <div className="mt-8 text-center">
             <div
-              className={`inline-flex items-center space-x-3 px-6 py-4 rounded-2xl font-black text-lg shadow-lg ${
-                selectedAnswer === game.correct
+              className={`inline-flex items-center space-x-3 px-6 py-4 rounded-2xl font-black text-lg shadow-lg ${selectedAnswer === game.correct
                   ? "bg-gradient-to-r from-green-400 to-emerald-500 text-white animate-bounce"
                   : "bg-gradient-to-r from-orange-400 to-red-500 text-white"
-              }`}
+                }`}
             >
               <span className="text-2xl">
                 {selectedAnswer === game.correct ? "🎉" : "💪"}
@@ -372,13 +361,12 @@ export default function JoseBirthGame({ username, onLogout, onComplete }) {
               data-index={index}
               onDrop={handlePuzzleDrop}
               onDragOver={(e) => e.preventDefault()}
-              className={`min-w-[120px] h-14 rounded-xl flex items-center justify-center font-bold text-lg transition-all duration-300 ${
-                puzzlePieces.find(
-                  (p) => p.text === game.pieces[index] && p.placed
-                )
+              className={`min-w-[120px] h-14 rounded-xl flex items-center justify-center font-bold text-lg transition-all duration-300 ${puzzlePieces.find(
+                (p) => p.text === game.pieces[index] && p.placed
+              )
                   ? "bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow-lg scale-105 animate-pulse"
                   : "bg-white border-2 border-gray-300 text-black hover:border-blue-400 hover:bg-blue-50"
-              }`}
+                }`}
             >
               {puzzlePieces.find(
                 (p) => p.text === game.pieces[index] && p.placed
@@ -443,13 +431,12 @@ export default function JoseBirthGame({ username, onLogout, onComplete }) {
                 <select
                   value={blanksAnswers[index] || ""}
                   onChange={(e) => handleBlanksAnswer(index, e.target.value)}
-                  className={`mx-2 px-4 py-2 border-2 rounded-xl font-bold text-center min-w-[160px] transition-all duration-300 ${
-                    blanksAnswers[index] === game.blanks[index]
+                  className={`mx-2 px-4 py-2 border-2 rounded-xl font-bold text-center min-w-[160px] transition-all duration-300 ${blanksAnswers[index] === game.blanks[index]
                       ? "border-green-400 bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 shadow-lg animate-pulse"
                       : blanksAnswers[index]
-                      ? "border-red-400 bg-gradient-to-r from-red-100 to-pink-100 text-red-800 shadow-lg"
-                      : "border-amber-400 bg-white hover:border-amber-500 hover:shadow-md"
-                  }`}
+                        ? "border-red-400 bg-gradient-to-r from-red-100 to-pink-100 text-red-800 shadow-lg"
+                        : "border-amber-400 bg-white hover:border-amber-500 hover:shadow-md"
+                    }`}
                 >
                   <option value="">Choose...</option>
                   {game.options[index].map((option, optIndex) => (
@@ -479,8 +466,8 @@ export default function JoseBirthGame({ username, onLogout, onComplete }) {
           {Object.keys(blanksAnswers).filter(
             (key) => blanksAnswers[key] === game.blanks[key]
           ).length === game.blanks.length && (
-            <span className="text-2xl animate-bounce">🎉</span>
-          )}
+              <span className="text-2xl animate-bounce">🎉</span>
+            )}
         </div>
       </div>
     </div>
@@ -509,10 +496,10 @@ export default function JoseBirthGame({ username, onLogout, onComplete }) {
       finalPercentage >= 90
         ? "🌟 Outstanding! You're a true José Rizal expert!"
         : finalPercentage >= 75
-        ? "🏆 Excellent work! You know José's story so well!"
-        : finalPercentage >= 60
-        ? "👍 Great job! You're learning so much about our hero!"
-        : "💪 Wonderful effort! Every step helps you learn more!";
+          ? "🏆 Excellent work! You know José's story so well!"
+          : finalPercentage >= 60
+            ? "👍 Great job! You're learning so much about our hero!"
+            : "💪 Wonderful effort! Every step helps you learn more!";
 
     return (
       <ErrorBoundary onGoBack={handleBackToChapter}>

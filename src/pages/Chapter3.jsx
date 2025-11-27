@@ -31,30 +31,40 @@ export default function Chapter3({ username, onLogout }) {
       title: "European Journey",
       description: "Follow Rizal's travels across Europe",
       path: "/chapter/3/level/1",
+      icon: "✈️",
+      color: "from-blue-400 to-sky-600",
     },
     {
       id: 2,
       title: "Literary Crossroads",
       description: "Solve the crossword about Rizal's works",
       path: "/chapter/3/level/2",
+      icon: "📝",
+      color: "from-purple-400 to-violet-600",
     },
     {
       id: 3,
       title: "Letters Abroad",
       description: "Match Rizal's correspondences with their recipients",
       path: "/chapter/3/level/3",
+      icon: "✉️",
+      color: "from-amber-400 to-orange-500",
     },
     {
       id: 4,
       title: "European Quiz",
       description: "Test your knowledge of Rizal's time in Europe",
       path: "/chapter/3/level/4",
+      icon: "🎓",
+      color: "from-emerald-400 to-green-600",
     },
     {
       id: 5,
       title: "Travel Map",
       description: "Trace Rizal's journey across Europe",
       path: "/chapter/3/level/5",
+      icon: "🗺️",
+      color: "from-rose-400 to-pink-600",
     },
   ];
 
@@ -248,11 +258,12 @@ export default function Chapter3({ username, onLogout }) {
                       {/* Level icon with Duolingo-style design */}
                       <div className="relative mb-4">
                         <div
-                          className={`w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center shadow-lg mx-auto border-4 border-white ${levelUnlocked ? "group-hover:scale-110" : ""
+                          className={`w-20 h-20 bg-gradient-to-br ${level.color
+                            } rounded-full flex items-center justify-center shadow-lg mx-auto border-4 border-white ${levelUnlocked ? "group-hover:scale-110" : ""
                             } transition-transform duration-300`}
                         >
-                          <span className="text-white font-black text-2xl">
-                            {level.id}
+                          <span className="text-3xl">
+                            {level.icon}
                           </span>
                         </div>
                         {/* Completion stars */}
@@ -267,14 +278,14 @@ export default function Chapter3({ username, onLogout }) {
                       <div className="text-center">
                         <h3
                           className={`text-xl font-black mb-2 transition-colors ${levelUnlocked
-                            ? "text-gray-800 group-hover:text-gray-900"
+                            ? "text-black group-hover:text-gray-900"
                             : "text-gray-500"
                             }`}
                         >
                           {level.title}
                         </h3>
                         <p
-                          className={`text-sm mb-4 leading-relaxed ${levelUnlocked ? "text-gray-600" : "text-gray-400"
+                          className={`text-sm mb-4 leading-relaxed ${levelUnlocked ? "text-black" : "text-gray-400"
                             }`}
                         >
                           {level.description}

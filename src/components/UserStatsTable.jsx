@@ -1,11 +1,17 @@
 /**
  * UserStatsTable Component
  * Displays comprehensive user statistics with sorting and filtering
+ * Minimalist Design Update
  */
 
 import { useState, useMemo } from "react";
 import AdminLoadingState from "./AdminLoadingState";
 import AdminErrorMessage from "./AdminErrorMessage";
+
+// Icons
+const Icons = {
+  Search: (props) => <svg {...props} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>,
+};
 
 const UserStatsTable = ({
   users,
@@ -99,7 +105,7 @@ const UserStatsTable = ({
 
   // Get sort indicator
   const getSortIndicator = (field) => {
-    if (sortField !== field) return "↕️";
+    if (sortField !== field) return null;
     return sortDirection === "asc" ? "↑" : "↓";
   };
 
@@ -135,36 +141,39 @@ const UserStatsTable = ({
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
       {/* Header with filters */}
-      <div className="p-6 border-b border-gray-200">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="p-6 border-b border-slate-200 bg-white">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h3 className="text-xl font-bold text-gray-800 flex items-center">
-              <span className="text-2xl mr-2">📊</span>
+            <h3 className="text-lg font-bold text-slate-800">
               User Statistics
             </h3>
-            <p className="text-sm text-gray-600 mt-1">
-              {processedUsers.length}{" "}
-              {processedUsers.length === 1 ? "user" : "users"} displayed
+            <p className="text-sm text-slate-500 mt-1">
+              Showing {processedUsers.length} users
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
             {/* Search */}
-            <input
-              type="text"
-              placeholder="Search users..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600">
+                <Icons.Search className="w-4 h-4" />
+              </span>
+              <input
+                type="text"
+                placeholder="Search users..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-64"
+              />
+            </div>
 
             {/* Completion Filter */}
             <select
               value={filterCompleted}
               onChange={(e) => setFilterCompleted(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
             >
               <option value="all">All Progress</option>
               <option value="active">Active Users</option>
@@ -177,7 +186,7 @@ const UserStatsTable = ({
             <select
               value={filterAchievements}
               onChange={(e) => setFilterAchievements(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
             >
               <option value="all">All Badges</option>
               <option value="withBadges">With Badges</option>
@@ -190,119 +199,44 @@ const UserStatsTable = ({
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b border-gray-200">
+        <table className="w-full text-left border-collapse">
+          <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort("username")}
-              >
-                <div className="flex items-center space-x-1">
-                  <span>Username</span>
-                  <span className="text-gray-400">
-                    {getSortIndicator("username")}
-                  </span>
-                </div>
-              </th>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort("totalScore")}
-              >
-                <div className="flex items-center space-x-1">
-                  <span>Total Score</span>
-                  <span className="text-gray-400">
-                    {getSortIndicator("totalScore")}
-                  </span>
-                </div>
-              </th>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort("averageScore")}
-              >
-                <div className="flex items-center space-x-1">
-                  <span>Avg Score</span>
-                  <span className="text-gray-400">
-                    {getSortIndicator("averageScore")}
-                  </span>
-                </div>
-              </th>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort("completedLevels")}
-              >
-                <div className="flex items-center space-x-1">
-                  <span>Completed</span>
-                  <span className="text-gray-400">
-                    {getSortIndicator("completedLevels")}
-                  </span>
-                </div>
-              </th>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort("completionRate")}
-              >
-                <div className="flex items-center space-x-1">
-                  <span>Rate</span>
-                  <span className="text-gray-400">
-                    {getSortIndicator("completionRate")}
-                  </span>
-                </div>
-              </th>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort("achievementCount")}
-              >
-                <div className="flex items-center space-x-1">
-                  <span>Badges</span>
-                  <span className="text-gray-400">
-                    {getSortIndicator("achievementCount")}
-                  </span>
-                </div>
-              </th>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort("avgTimeMinutes")}
-              >
-                <div className="flex items-center space-x-1">
-                  <span>Avg Time</span>
-                  <span className="text-gray-400">
-                    {getSortIndicator("avgTimeMinutes")}
-                  </span>
-                </div>
-              </th>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort("totalAttempts")}
-              >
-                <div className="flex items-center space-x-1">
-                  <span>Attempts</span>
-                  <span className="text-gray-400">
-                    {getSortIndicator("totalAttempts")}
-                  </span>
-                </div>
-              </th>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort("lastPlayed")}
-              >
-                <div className="flex items-center space-x-1">
-                  <span>Last Played</span>
-                  <span className="text-gray-400">
-                    {getSortIndicator("lastPlayed")}
-                  </span>
-                </div>
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                Actions
-              </th>
+              {[
+                { id: 'username', label: 'User' },
+                { id: 'totalScore', label: 'Score' },
+                { id: 'averageScore', label: 'Avg Score' },
+                { id: 'completedLevels', label: 'Progress' },
+                { id: 'completionRate', label: 'Rate' },
+                { id: 'achievementCount', label: 'Badges' },
+                { id: 'avgTimeMinutes', label: 'Time/Lvl' },
+                { id: 'totalAttempts', label: 'Attempts' },
+                { id: 'lastPlayed', label: 'Last Active' },
+                { id: 'actions', label: '' }
+              ].map((col) => (
+                <th
+                  key={col.id}
+                  className={`px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider ${col.id !== 'actions' ? 'cursor-pointer hover:bg-slate-100 hover:text-slate-700' : ''}`}
+                  onClick={() => col.id !== 'actions' && handleSort(col.id)}
+                >
+                  <div className="flex items-center gap-1">
+                    {col.label}
+                    {col.id !== 'actions' && (
+                      <span className={`text-slate-600 ${sortField === col.id ? 'text-blue-500' : ''}`}>
+                        {getSortIndicator(col.id) || '↕'}
+                      </span>
+                    )}
+                  </div>
+                </th>
+              ))}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white divide-y divide-slate-100">
             {processedUsers.length === 0 ? (
               <tr>
                 <td colSpan="10" className="px-6 py-12 text-center">
-                  <div className="text-gray-500">
-                    <span className="text-4xl mb-2 block">🔍</span>
+                  <div className="text-slate-500 flex flex-col items-center">
+                    <Icons.Search className="w-12 h-12 mb-2 text-slate-300" />
                     <p>No users found matching your criteria</p>
                   </div>
                 </td>
@@ -311,82 +245,75 @@ const UserStatsTable = ({
               processedUsers.map((user) => (
                 <tr
                   key={user.userId}
-                  className="hover:bg-gray-50 transition-colors"
+                  className="hover:bg-slate-50 transition-colors group"
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold mr-3">
+                      <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-600 font-bold text-xs mr-3">
                         {user.username.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="text-sm font-medium text-slate-900 group-hover:text-blue-600 transition-colors">
                           {user.username}
                         </div>
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-slate-500">
                           {user.email}
                         </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-bold text-blue-600">
+                    <div className="text-sm font-medium text-slate-700">
                       {user.totalScore.toLocaleString()}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-semibold text-green-600">
+                    <div className={`text-sm font-medium ${user.averageScore >= 80 ? 'text-green-600' : user.averageScore >= 60 ? 'text-yellow-600' : 'text-slate-600'}`}>
                       {user.averageScore}%
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {user.completedLevels}/{user.unlockedLevels}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {user.completedChapters} chapters
+                    <div className="text-sm text-slate-700">
+                      {user.completedLevels} <span className="text-slate-600">/ {user.unlockedLevels}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-16 bg-slate-100 rounded-full h-1.5 overflow-hidden">
                         <div
-                          className="bg-green-500 h-2 rounded-full"
+                          className="bg-blue-500 h-1.5 rounded-full"
                           style={{ width: `${user.completionRate}%` }}
                         ></div>
                       </div>
-                      <span className="text-sm text-gray-700">
+                      <span className="text-xs text-slate-500">
                         {user.completionRate}%
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                      🏅 {user.achievementCount}
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-50 text-purple-700 border border-purple-100">
+                      {user.achievementCount}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
+                    <div className="text-sm text-slate-600">
                       {formatTime(user.avgTimeMinutes)}
                     </div>
-                    <div className="text-xs text-gray-500">per level</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
+                    <div className="text-sm text-slate-600">
                       {user.totalAttempts}
                     </div>
-                    <div className="text-xs text-gray-500">
-                      {user.totalHintsUsed} hints
-                    </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
                     {formatDate(user.lastPlayed)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                     <button
                       onClick={() => onUserClick && onUserClick(user)}
-                      className="text-blue-600 hover:text-blue-800 font-medium"
+                      className="text-blue-600 hover:text-blue-800 font-medium hover:underline"
                     >
-                      View Details
+                      Details
                     </button>
                   </td>
                 </tr>
@@ -398,55 +325,36 @@ const UserStatsTable = ({
 
       {/* Summary footer */}
       {processedUsers.length > 0 && (
-        <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-center text-sm">
+        <div className="px-6 py-4 bg-slate-50 border-t border-slate-200">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 text-center text-xs">
             <div>
-              <div className="text-gray-600">Total Score</div>
-              <div className="font-bold text-blue-600">
+              <div className="text-slate-500 uppercase tracking-wider font-semibold mb-1">Total Score</div>
+              <div className="font-bold text-slate-800 text-sm">
                 {processedUsers
                   .reduce((sum, u) => sum + u.totalScore, 0)
                   .toLocaleString()}
               </div>
             </div>
             <div>
-              <div className="text-gray-600">Avg Completion</div>
-              <div className="font-bold text-green-600">
+              <div className="text-slate-500 uppercase tracking-wider font-semibold mb-1">Avg Rate</div>
+              <div className="font-bold text-slate-800 text-sm">
                 {Math.round(
                   processedUsers.reduce((sum, u) => sum + u.completionRate, 0) /
-                    processedUsers.length
+                  processedUsers.length
                 )}
                 %
               </div>
             </div>
             <div>
-              <div className="text-gray-600">Total Badges</div>
-              <div className="font-bold text-purple-600">
+              <div className="text-slate-500 uppercase tracking-wider font-semibold mb-1">Badges</div>
+              <div className="font-bold text-slate-800 text-sm">
                 {processedUsers.reduce((sum, u) => sum + u.achievementCount, 0)}
               </div>
             </div>
             <div>
-              <div className="text-gray-600">Total Levels</div>
-              <div className="font-bold text-orange-600">
+              <div className="text-slate-500 uppercase tracking-wider font-semibold mb-1">Levels</div>
+              <div className="font-bold text-slate-800 text-sm">
                 {processedUsers.reduce((sum, u) => sum + u.completedLevels, 0)}
-              </div>
-            </div>
-            <div>
-              <div className="text-gray-600">Avg Time</div>
-              <div className="font-bold text-indigo-600">
-                {formatTime(
-                  Math.round(
-                    processedUsers.reduce(
-                      (sum, u) => sum + u.avgTimeMinutes,
-                      0
-                    ) / processedUsers.length
-                  )
-                )}
-              </div>
-            </div>
-            <div>
-              <div className="text-gray-600">Total Attempts</div>
-              <div className="font-bold text-red-600">
-                {processedUsers.reduce((sum, u) => sum + u.totalAttempts, 0)}
               </div>
             </div>
           </div>

@@ -826,6 +826,7 @@ function App() {
               token ? (
                 <LigaTimelineGame
                   username={username}
+                  onLogout={handleLogout}
                   onComplete={(score) =>
                     handleLevelComplete(5, 1, score !== undefined ? score : 100)
                   }

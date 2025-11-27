@@ -454,6 +454,71 @@ app.get('/api/admin/stats', authenticateAdmin, (req, res) => {
     });
 });
 
+// Real Analytics Endpoint
+app.get('/api/admin/analytics', authenticateAdmin, (req, res) => {
+    const analytics = {};
+    const period = req.query.period || '7d';
+    const days = period === '30d' ? 30 : period === '90d' ? 90 : 7;
+
+    // User Growth (last N days)
+    db.all(`
+        SELECT DATE(created_at) as date, COUNT(*) as users
+        FROM users
+        WHERE created_at >= DATE('now', '-${days} days')
+        GROUP BY DATE(created_at)
+        ORDER BY date DESC
+    `, (err, userGrowth) => {
+        if (err) return res.status(500).json({ error: err.message });
+        analytics.userGrowth = userGrowth;
+
+        // Game Completions by Chapter
+        db.all(`
+            SELECT 
+                'Chapter ' || chapter_id as chapter,
+                COUNT(*) as completions
+            FROM user_progress
+            WHERE is_completed = 1
+            GROUP BY chapter_id
+            ORDER BY chapter_id
+        `, (err, gameCompletions) => {
+            if (err) return res.status(500).json({ error: err.message });
+            analytics.gameCompletions = gameCompletions;
+
+            // Average Scores by Level (first 5 levels only for display)
+            db.all(`
+                SELECT 
+                    'Chapter ' || chapter_id || ' - Level ' || level_id as level,
+                    ROUND(AVG(score)) as avgScore
+                FROM user_progress
+                WHERE is_completed = 1 AND score > 0
+                GROUP BY chapter_id, level_id
+                ORDER BY chapter_id, level_id
+                LIMIT 10
+            `, (err, averageScores) => {
+                if (err) return res.status(500).json({ error: err.message });
+                analytics.averageScores = averageScores;
+
+                // Daily Active Users (users who completed levels each day)
+                db.all(`
+                    SELECT 
+                        DATE(completion_date) as date,
+                        COUNT(DISTINCT user_id) as activeUsers
+                    FROM user_progress
+                    WHERE completion_date >= DATE('now', '-${days} days')
+                    AND is_completed = 1
+                    GROUP BY DATE(completion_date)
+                    ORDER BY date DESC
+                `, (err, dailyActivity) => {
+                    if (err) return res.status(500).json({ error: err.message });
+                    analytics.dailyActivity = dailyActivity;
+
+                    res.json(analytics);
+                });
+            });
+        });
+    });
+});
+
 app.delete('/api/admin/users/:id', authenticateAdmin, (req, res) => {
     const userId = req.params.id;
     db.run('DELETE FROM users WHERE id = ?', [userId], function (err) {

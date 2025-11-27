@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import adminApiSeparate from "../utils/adminApiSeparate";
 import sessionManager from "../utils/SessionManager";
 import sessionValidationService from "../utils/SessionValidationService";
+import AnalyticsCharts from "../components/AnalyticsCharts";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -583,97 +584,7 @@ const AdminDashboard = () => {
         );
 
       case "analytics":
-        return (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-gray-800">Analytics & Reports</h2>
-              <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="7d">Last 7 days</option>
-                <option value="30d">Last 30 days</option>
-                <option value="90d">Last 90 days</option>
-              </select>
-            </div>
-
-            {/* Analytics Cards */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* User Growth */}
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <h3 className="text-lg font-bold text-gray-800 mb-4">User Growth</h3>
-                <div className="space-y-3">
-                  {analytics?.userGrowth?.map((item, index) => (
-                    <div key={index} className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">{item.date}</span>
-                      <span className="font-medium">{item.users} users</span>
-                    </div>
-                  )) || (
-                      <div className="text-center py-4 text-gray-500">No data available</div>
-                    )}
-                </div>
-              </div>
-
-              {/* Game Completions */}
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <h3 className="text-lg font-bold text-gray-800 mb-4">Game Completions</h3>
-                <div className="space-y-3">
-                  {analytics?.gameCompletions?.map((item, index) => (
-                    <div key={index} className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">{item.chapter}</span>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-20 bg-gray-200 rounded-full h-2">
-                          <div
-                            className="bg-blue-500 h-2 rounded-full"
-                            style={{ width: `${(item.completions / 1000) * 100}%` }}
-                          ></div>
-                        </div>
-                        <span className="font-medium text-sm">{item.completions}</span>
-                      </div>
-                    </div>
-                  )) || (
-                      <div className="text-center py-4 text-gray-500">No data available</div>
-                    )}
-                </div>
-              </div>
-
-              {/* Average Scores */}
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <h3 className="text-lg font-bold text-gray-800 mb-4">Average Scores by Level</h3>
-                <div className="space-y-3">
-                  {analytics?.averageScores?.map((item, index) => (
-                    <div key={index} className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">{item.level}</span>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-20 bg-gray-200 rounded-full h-2">
-                          <div
-                            className="bg-green-500 h-2 rounded-full"
-                            style={{ width: `${item.avgScore}%` }}
-                          ></div>
-                        </div>
-                        <span className="font-medium text-sm">{item.avgScore}%</span>
-                      </div>
-                    </div>
-                  )) || (
-                      <div className="text-center py-4 text-gray-500">No data available</div>
-                    )}
-                </div>
-              </div>
-
-              {/* Daily Activity */}
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <h3 className="text-lg font-bold text-gray-800 mb-4">Daily Active Users</h3>
-                <div className="space-y-3">
-                  {analytics?.dailyActivity?.map((item, index) => (
-                    <div key={index} className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">{item.date}</span>
-                      <span className="font-medium">{item.activeUsers} users</span>
-                    </div>
-                  )) || (
-                      <div className="text-center py-4 text-gray-500">No data available</div>
-                    )}
-                </div>
-              </div>
-            </div>
-          </div>
-        );
+        return <AnalyticsCharts analytics={analytics} />;
 
 
 
@@ -685,7 +596,7 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-white shadow-sm border-b sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
@@ -722,32 +633,34 @@ const AdminDashboard = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
 
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex flex-col lg:flex-row gap-8 relative">
           {/* Sidebar */}
-          <div className="lg:w-64">
-            <nav className="bg-white rounded-xl shadow-md p-4">
-              <div className="space-y-2">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg font-medium transition-colors ${activeTab === tab.id
-                      ? "bg-blue-500 text-white"
-                      : "text-gray-700 hover:bg-gray-100"
-                      }`}
-                  >
-                    <span className="text-lg">{tab.icon}</span>
-                    <span>{tab.name}</span>
-                  </button>
-                ))}
-              </div>
-            </nav>
-          </div>
+          <aside className="lg:w-64 flex-shrink-0">
+            <div className="lg:sticky lg:top-24">
+              <nav className="bg-white rounded-xl shadow-md p-4">
+                <div className="space-y-2">
+                  {tabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg font-medium transition-colors ${activeTab === tab.id
+                        ? "bg-blue-500 text-white"
+                        : "text-gray-700 hover:bg-gray-100"
+                        }`}
+                    >
+                      <span className="text-lg">{tab.icon}</span>
+                      <span>{tab.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </nav>
+            </div>
+          </aside>
 
           {/* Main Content */}
-          <div className="flex-1">
+          <main className="flex-1 min-w-0">
             {renderTabContent()}
-          </div>
+          </main>
         </div>
       </div>
     </div>

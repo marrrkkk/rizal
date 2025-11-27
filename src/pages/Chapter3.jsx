@@ -1,17 +1,26 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useProgressAPI } from "../hooks/useProgressAPI";
 import { getCurrentUserFromToken } from "../utils/api";
 import { createNavigationHelper } from "../utils/navigationHelper";
 
 export default function Chapter3({ username, onLogout }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const navigationHelper = createNavigationHelper(navigate);
   const [userId, setUserId] = useState(null);
 
   // Use the unified progress API
-  const { progressData, isLevelUnlocked, isLevelCompleted, getChapterProgress, loading } =
+  const { progressData, isLevelUnlocked, isLevelCompleted, getChapterProgress, loading, refreshProgress } =
     useProgressAPI(username);
+
+  // Refresh progress when returning to chapter page
+  useEffect(() => {
+    if (location.pathname === '/chapter/3' && username) {
+      console.log('🔄 Returned to Chapter 3, refreshing progress...');
+      refreshProgress();
+    }
+  }, [location.pathname, username, refreshProgress]);
 
   // Get chapter progress
   const chapterProgress = progressData ? getChapterProgress(3) : null;
@@ -119,14 +128,14 @@ export default function Chapter3({ username, onLogout }) {
               </svg>
             </button>
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
-                <span className="text-white font-bold text-xl">3</span>
+              <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center shadow-lg border-3 border-white">
+                <span className="text-3xl">✈️</span>
               </div>
               <div>
-                <h1 className="text-2xl font-black text-black">
+                <h1 className="text-2xl font-black text-gray-900">
                   Studies Abroad
                 </h1>
-                <p className="text-sm text-black font-medium">
+                <p className="text-sm text-gray-700 font-semibold">
                   5 lessons • Chapter 3
                 </p>
               </div>

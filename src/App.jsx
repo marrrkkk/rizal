@@ -356,69 +356,22 @@ function App() {
           perfectScore: score === 100,
         });
 
-        // Show level completion notification
-        showLevelCompleteNotification(chapter, level, score);
-
-        // Show immediate success notification with final score
-        showSuccess(`🎉 Level ${level} completed! Final Score: ${finalScore}`, {
-          duration: 3000,
-          icon: "✅",
-        });
-
-        // Show celebration animation
-        setShowCelebration("level");
-
         // Calculate fallback next level if missing
         let nextLevelUnlocked = result.nextLevelUnlocked;
         if (!nextLevelUnlocked && !result.nextChapterUnlocked && level < 5) {
           nextLevelUnlocked = { chapter, level: level + 1 };
         }
 
-        // Show toast notifications for unlocks
-        if (nextLevelUnlocked) {
-          setTimeout(() => {
-            showSuccess(
-              `🔓 Level ${nextLevelUnlocked.level} unlocked in Chapter ${nextLevelUnlocked.chapter}!`,
-              { duration: 4000, icon: "🆕" }
-            );
-          }, 1500);
-        }
-
-        if (result.nextChapterUnlocked) {
-          setTimeout(() => {
-            showInfo(
-              `🚀 New Chapter ${result.nextChapterUnlocked.chapter} unlocked!`,
-              { duration: 5000, icon: "📚" }
-            );
-            // Show chapter unlock notification with celebration
-            setChapterUnlockNotification({
-              chapter: result.nextChapterUnlocked.chapter,
-              chapterName: result.nextChapterUnlocked.chapterName,
-            });
-          }, 2500);
-        }
-
-        // Show quick next level button immediately after celebration
-        const nextLevel =
-          nextLevelUnlocked || result.nextChapterUnlocked;
-        if (nextLevel) {
-          setTimeout(() => {
-            setShowNextLevelButton(nextLevel);
-          }, 500);
-        }
-
-        // Show comprehensive completion modal after celebration
-        setTimeout(() => {
-          setLevelCompletionModal({
-            completedLevel: { chapter, level },
-            score: finalScore, // Use final score instead of raw score
-            rawScore: score, // Keep raw score for reference
-            finalScore: finalScore, // Explicitly include final score
-            nextLevelUnlocked: nextLevelUnlocked,
-            nextChapterUnlocked: result.nextChapterUnlocked,
-            newBadges: result.newBadges || [],
-          });
-        }, 1000);
+        // Show completion modal immediately
+        setLevelCompletionModal({
+          completedLevel: { chapter, level },
+          score: finalScore, // Use final score instead of raw score
+          rawScore: score, // Keep raw score for reference
+          finalScore: finalScore, // Explicitly include final score
+          nextLevelUnlocked: nextLevelUnlocked,
+          nextChapterUnlocked: result.nextChapterUnlocked,
+          newBadges: result.newBadges || [],
+        });
 
         // Show new badge notifications
         if (result.newBadges && result.newBadges.length > 0) {

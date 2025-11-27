@@ -5,7 +5,8 @@ export default function ChapterHeader({
     chapterTitle,
     totalLessons,
     onLogout,
-    themeColor = 'blue' // blue, orange, green, pink, purple, red
+    themeColor = 'blue', // blue, orange, green, pink, purple, red
+    icon = null // emoji icon for the chapter
 }) {
     const navigate = useNavigate();
 
@@ -58,11 +59,11 @@ export default function ChapterHeader({
                     <div className="flex items-center space-x-3 sm:space-x-4">
                         <button
                             onClick={() => navigate('/')}
-                            className="group relative w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg active:scale-95"
+                            className="group relative p-2 hover:bg-gray-100 rounded-lg transition-all duration-200 active:scale-95"
                             title="Back to Home"
                         >
                             <svg
-                                className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700 group-hover:text-gray-900 transition-colors"
+                                className="w-6 h-6 sm:w-7 sm:h-7 text-gray-700 group-hover:text-gray-900 transition-colors"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -82,23 +83,27 @@ export default function ChapterHeader({
 
                         {/* Chapter Info */}
                         <div className="flex items-center space-x-2 sm:space-x-3">
-                            <div className={`w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br ${colors.gradient} rounded-full flex items-center justify-center shadow-lg border-2 border-white`}>
-                                <span className="text-white font-bold text-lg sm:text-xl">{chapterNumber}</span>
+                            <div className={`w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br ${colors.gradient} rounded-full flex items-center justify-center shadow-lg border-3 border-white`}>
+                                {icon ? (
+                                    <span className="text-2xl sm:text-3xl">{icon}</span>
+                                ) : (
+                                    <span className="text-white font-bold text-xl sm:text-2xl">{chapterNumber}</span>
+                                )}
                             </div>
                             <div className="hidden sm:block">
-                                <h1 className="text-xl sm:text-2xl font-black text-gray-800 leading-tight">
+                                <h1 className="text-xl sm:text-2xl font-black text-gray-900 leading-tight">
                                     {chapterTitle}
                                 </h1>
-                                <p className="text-xs sm:text-sm text-gray-600 font-medium">
+                                <p className="text-xs sm:text-sm text-gray-700 font-semibold">
                                     {totalLessons} lessons • Chapter {chapterNumber}
                                 </p>
                             </div>
                             {/* Mobile Title */}
                             <div className="block sm:hidden">
-                                <h1 className="text-lg font-black text-gray-800 leading-tight">
-                                    Ch. {chapterNumber}
+                                <h1 className="text-base font-black text-gray-900 leading-tight">
+                                    {chapterTitle}
                                 </h1>
-                                <p className="text-xs text-gray-600 font-medium">
+                                <p className="text-xs text-gray-700 font-semibold">
                                     {totalLessons} lessons
                                 </p>
                             </div>
@@ -110,11 +115,11 @@ export default function ChapterHeader({
                         {/* Home Button */}
                         <button
                             onClick={() => navigate('/')}
-                            className="group relative w-10 h-10 sm:w-11 sm:h-11 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg active:scale-95"
+                            className="group relative p-2 hover:bg-gray-100 rounded-lg transition-all duration-200 active:scale-95"
                             title="Home"
                         >
                             <svg
-                                className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700 group-hover:text-gray-900"
+                                className="w-6 h-6 sm:w-7 sm:h-7 text-gray-700 group-hover:text-gray-900"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"

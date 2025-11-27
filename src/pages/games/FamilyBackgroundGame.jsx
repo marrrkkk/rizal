@@ -8,7 +8,7 @@ import ErrorBoundary from "../../components/ErrorBoundary";
 import { CharacterPlaceholder } from "../../components/PlaceholderImage";
 import { getChapterTheme, getCelebrationTheme } from "../../theme/config";
 
-export default function FamilyBackgroundGame({ username, onLogout }) {
+export default function FamilyBackgroundGame({ username, onLogout, onComplete }) {
   const navigate = useNavigate();
   const [currentGame, setCurrentGame] = useState(0);
   const [score, setScore] = useState(0);
@@ -278,6 +278,11 @@ export default function FamilyBackgroundGame({ username, onLogout }) {
       setSelectedMatching([]);
     } else {
       setGameCompleted(true);
+      // Call onComplete when all games are finished
+      if (onComplete) {
+        const finalScore = Math.round((score / games.length) * 100);
+        onComplete(finalScore, 0, { attempts: 1, hintsUsed: 0 });
+      }
     }
   };
 

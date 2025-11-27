@@ -1,7 +1,7 @@
 "use client";
 
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { useProgressAPI } from "../hooks/useProgressAPI";
 import ProgressDashboard from "../components/ProgressDashboard";
 import CompletionCertificate from "../components/CompletionCertificate";
@@ -10,13 +10,23 @@ import ChapterHeader from "../components/ChapterHeader";
 
 export default function Chapter1({ username, onLogout }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const navigationHelper = createNavigationHelper(navigate);
   const {
     getChapterProgress,
     isLevelUnlocked,
     isLevelCompleted,
-    loading
+    loading,
+    refreshProgress
   } = useProgressAPI(username);
+
+  // Refresh progress when returning to chapter page
+  useEffect(() => {
+    if (location.pathname === '/chapter/1' && username) {
+      console.log('🔄 Returned to Chapter 1, refreshing progress...');
+      refreshProgress();
+    }
+  }, [location.pathname, username, refreshProgress]);
 
   const [showCertificate, setShowCertificate] = useState(false);
 
@@ -84,6 +94,7 @@ export default function Chapter1({ username, onLogout }) {
       <ChapterHeader
         chapterNumber={1}
         chapterTitle="Childhood in Calamba"
+        icon="🏠"
         totalLessons={5}
         onLogout={onLogout}
         themeColor="blue"

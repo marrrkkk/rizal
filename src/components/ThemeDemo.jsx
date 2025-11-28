@@ -95,8 +95,8 @@ const ThemeDemo = () => {
           currentChapter === 1
             ? "blue"
             : currentChapter === 2
-            ? "yellow"
-            : "green"
+              ? "yellow"
+              : "green"
         }
         showScore={true}
         maxScore={100}
@@ -116,13 +116,11 @@ const ThemeDemo = () => {
               <button
                 key={chapter}
                 onClick={() => setCurrentChapter(chapter)}
-                className={`px-4 py-2 rounded-full font-medium transition-all duration-200 ${
-                  currentChapter === chapter
-                    ? `bg-gradient-to-r ${
-                        getChapterTheme(chapter).primary
-                      } text-white`
-                    : "bg-white text-gray-600 hover:bg-gray-100"
-                }`}
+                className={`px-4 py-2 rounded-full font-medium transition-all duration-200 ${currentChapter === chapter
+                  ? `bg-gradient-to-r ${getChapterTheme(chapter).primary
+                  } text-black`
+                  : "bg-white text-gray-600 hover:bg-gray-100"
+                  }`}
               >
                 Chapter {chapter}
               </button>
@@ -145,8 +143,8 @@ const ThemeDemo = () => {
                 currentChapter === 1
                   ? "blue"
                   : currentChapter === 2
-                  ? "yellow"
-                  : "green"
+                    ? "yellow"
+                    : "green"
               }
               showLabels={true}
               showPercentage={true}
@@ -196,8 +194,8 @@ const ThemeDemo = () => {
                     currentChapter === 1
                       ? "blue"
                       : currentChapter === 2
-                      ? "yellow"
-                      : "green"
+                        ? "yellow"
+                        : "green"
                   }
                   icon={level.icon}
                   estimatedTime={level.estimatedTime}
@@ -252,7 +250,7 @@ const ThemeDemo = () => {
                     <div
                       className={`w-12 h-12 bg-gradient-to-br ${filipinoTheme.colors.primary.blue} rounded-lg mx-auto mb-2 ${className}`}
                     >
-                      <div className="w-full h-full flex items-center justify-center text-white font-bold">
+                      <div className="w-full h-full flex items-center justify-center text-black font-bold">
                         A
                       </div>
                     </div>

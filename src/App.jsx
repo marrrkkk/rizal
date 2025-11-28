@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ErrorBoundary from "./components/ErrorBoundary";
+import WelcomeModal from "./components/WelcomeModal";
 import Home from "./pages/Home";
 import UserStats from "./pages/UserStats";
 import Chapter1 from "./pages/Chapter1";
@@ -97,7 +98,28 @@ function App() {
   const [showAnalyticsDashboard, setShowAnalyticsDashboard] = useState(false);
   const [levelCompletionModal, setLevelCompletionModal] = useState(null);
   const [showNextLevelButton, setShowNextLevelButton] = useState(null);
-  const { preloadResource, isLowEndDevice } = usePerformanceOptimization();
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const { preloadResource, isLowEndDevice} = usePerformanceOptimization();
+
+  // Check if user should see welcome modal (first time login)
+  useEffect(() => {
+    if (username && sessionType === 'user') {
+      const hasSeenWelcome = localStorage.getItem(`welcome_shown_${username}`);
+      console.log('Checking welcome modal for user:', username, 'hasSeenWelcome:', hasSeenWelcome);
+      if (!hasSeenWelcome) {
+        console.log('🎉 First time login detected, showing welcome modal');
+        setShowWelcomeModal(true);
+      }
+    }
+  }, [username, sessionType]);
+  
+  const handleWelcomeClose = () => {
+    console.log('Welcome modal closed, setting localStorage flag');
+    setShowWelcomeModal(false);
+    if (username) {
+      localStorage.setItem(`welcome_shown_${username}`, 'true');
+    }
+  };
 
   // Enhanced badge notification system
   const {
@@ -1073,6 +1095,13 @@ function App() {
             onClose={() => setShowAnalyticsDashboard(false)}
           />
         )}
+
+        {/* Welcome Modal - Only shown on first login after registration */}
+        <WelcomeModal
+          isOpen={showWelcomeModal}
+          onClose={handleWelcomeClose}
+          username={username}
+        />
 
         {/* Progress Debugger (temporary) */}
         {/* {username && <ProgressDebugger username={username} />} */}

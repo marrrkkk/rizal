@@ -58,7 +58,7 @@ const AchievementIndicator = ({
 
       {/* Count Badge */}
       <div
-        className={`absolute -top-1 -right-1 ${classes.badge} bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center font-bold text-white border-2 border-white shadow-lg`}
+        className={`absolute -top-1 -right-1 ${classes.badge} bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center font-bold text-black border-2 border-white shadow-lg`}
       >
         {achievementCount}
       </div>

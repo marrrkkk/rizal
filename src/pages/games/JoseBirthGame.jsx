@@ -33,7 +33,6 @@ import {
   VisualFeedback,
   FeedbackButton,
   AnimatedProgress,
-  CelebrationAnimation as NewCelebrationAnimation,
 } from "../../components/VisualFeedback";
 import {
   getRandomResponse,
@@ -55,7 +54,7 @@ export default function JoseBirthGame({ username, onLogout, onComplete }) {
   const [currentGame, setCurrentGame] = useState(0);
   const [score, setScore] = useState(0);
   const [gameCompleted, setGameCompleted] = useState(false);
-  const [showCelebration, setShowCelebration] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
 
   // Quiz Game State
@@ -257,7 +256,6 @@ export default function JoseBirthGame({ username, onLogout, onComplete }) {
 
   const handleGameComplete = () => {
     setGameCompleted(true);
-    setShowCelebration(true);
 
     // Calculate time spent
     const timeSpent = Date.now() - (window.gameStartTime || Date.now());
@@ -321,7 +319,7 @@ export default function JoseBirthGame({ username, onLogout, onComplete }) {
           <div className="mt-8 text-center">
             <div
               className={`inline-flex items-center space-x-3 px-6 py-4 rounded-2xl font-black text-lg shadow-lg ${selectedAnswer === game.correct
-                  ? "bg-gradient-to-r from-green-400 to-emerald-500 text-white animate-bounce"
+                  ? "bg-gradient-to-r from-green-400 to-emerald-500 text-white"
                   : "bg-gradient-to-r from-orange-400 to-red-500 text-white"
                 }`}
             >
@@ -364,7 +362,7 @@ export default function JoseBirthGame({ username, onLogout, onComplete }) {
               className={`min-w-[120px] h-14 rounded-xl flex items-center justify-center font-bold text-lg transition-all duration-300 ${puzzlePieces.find(
                 (p) => p.text === game.pieces[index] && p.placed
               )
-                  ? "bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow-lg scale-105 animate-pulse"
+                  ? "bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow-lg scale-105"
                   : "bg-white border-2 border-gray-300 text-black hover:border-blue-400 hover:bg-blue-50"
                 }`}
             >
@@ -394,14 +392,14 @@ export default function JoseBirthGame({ username, onLogout, onComplete }) {
               onDragStart={() => setDraggedPiece(piece.id)}
               className="group px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl cursor-move hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-105"
             >
-              <span className="group-hover:animate-pulse">{piece.text}</span>
+              <span>{piece.text}</span>
             </div>
           ))}
       </div>
 
       {puzzlePieces.filter((p) => !p.placed).length === 0 && (
         <div className="text-center mt-6">
-          <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-green-400 to-emerald-500 text-white px-6 py-3 rounded-2xl font-bold animate-bounce">
+          <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-green-400 to-emerald-500 text-white px-6 py-3 rounded-2xl font-bold">
             <span className="text-2xl">🎉</span>
             <span>Perfect! You completed Jose's full name!</span>
           </div>
@@ -432,7 +430,7 @@ export default function JoseBirthGame({ username, onLogout, onComplete }) {
                   value={blanksAnswers[index] || ""}
                   onChange={(e) => handleBlanksAnswer(index, e.target.value)}
                   className={`mx-2 px-4 py-2 border-2 rounded-xl font-bold text-center min-w-[160px] transition-all duration-300 ${blanksAnswers[index] === game.blanks[index]
-                      ? "border-green-400 bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 shadow-lg animate-pulse"
+                      ? "border-green-400 bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 shadow-lg"
                       : blanksAnswers[index]
                         ? "border-red-400 bg-gradient-to-r from-red-100 to-pink-100 text-red-800 shadow-lg"
                         : "border-amber-400 bg-white hover:border-amber-500 hover:shadow-md"
@@ -466,7 +464,7 @@ export default function JoseBirthGame({ username, onLogout, onComplete }) {
           {Object.keys(blanksAnswers).filter(
             (key) => blanksAnswers[key] === game.blanks[key]
           ).length === game.blanks.length && (
-              <span className="text-2xl animate-bounce">🎉</span>
+              <span className="text-2xl">🎉</span>
             )}
         </div>
       </div>
@@ -506,19 +504,12 @@ export default function JoseBirthGame({ username, onLogout, onComplete }) {
         <div
           className={`min-h-screen w-full bg-gradient-to-br ${chapterTheme.background} flex items-center justify-center p-6`}
         >
-          {/* Celebration Animation */}
-          {showCelebration && (
-            <NewCelebrationAnimation
-              type="confetti"
-              duration={3000}
-              onComplete={() => setShowCelebration(false)}
-            />
-          )}
+
 
           <div className="text-center">
             <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 sm:p-12 shadow-2xl max-w-2xl mx-auto border border-white/20">
               {/* Celebration Icon */}
-              <div className="text-8xl mb-6 animate-bounce">🎂</div>
+              <div className="text-8xl mb-6">🎂</div>
 
               {/* Title with child-friendly language */}
               <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">
@@ -630,10 +621,10 @@ export default function JoseBirthGame({ username, onLogout, onComplete }) {
     <div className="min-h-screen w-full bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 relative overflow-hidden">
       {/* Duolingo-style floating elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-16 h-16 bg-yellow-300 rounded-full opacity-10 animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-12 h-12 bg-pink-300 rounded-full opacity-15 animate-bounce"></div>
+        <div className="absolute top-20 left-10 w-16 h-16 bg-yellow-300 rounded-full opacity-10"></div>
+        <div className="absolute top-40 right-20 w-12 h-12 bg-pink-300 rounded-full opacity-15"></div>
         <div className="absolute bottom-32 left-20 w-20 h-20 bg-blue-300 rounded-full opacity-10"></div>
-        <div className="absolute bottom-20 right-10 w-14 h-14 bg-green-300 rounded-full opacity-15 animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-14 h-14 bg-green-300 rounded-full opacity-15"></div>
         <div className="absolute top-1/2 left-1/4 w-10 h-10 bg-purple-300 rounded-full opacity-10"></div>
       </div>
 

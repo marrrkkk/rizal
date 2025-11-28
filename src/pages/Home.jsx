@@ -1,5 +1,5 @@
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { createNavigationHelper } from "../utils/navigationHelper";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { useResponsive } from "../utils/responsiveUtils.jsx";
@@ -7,7 +7,7 @@ import { usePerformanceOptimization } from "../hooks/usePerformanceOptimization"
 import { useProgressAPI } from "../hooks/useProgressAPI";
 import LoadingSpinner from "../components/LoadingSpinner";
 import Navbar from "../components/Navbar";
-import SoundToggle from "../components/SoundToggle";
+import SimpleToast from "../components/SimpleToast";
 
 export default function Home({
   username,
@@ -15,9 +15,15 @@ export default function Home({
   onShowAnalytics,
 }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const navigationHelper = createNavigationHelper(navigate);
   const { isTouchDevice, isMobile } = useResponsive();
   const { debounce } = usePerformanceOptimization();
+  
+  // Toast state
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [pendingChapter, setPendingChapter] = useState(null);
 
   // Use the progress API hook
   const {
@@ -26,8 +32,65 @@ export default function Home({
     error,
     isLevelUnlocked,
     getChapterProgress,
-    getOverallProgress,
+    refreshProgress,
   } = useProgressAPI(username);
+
+  // Refresh progress whenever we navigate to home page
+  useEffect(() => {
+    if (location.pathname === '/' && username) {
+      console.log('🔄 Navigated to home, refreshing progress...');
+      refreshProgress();
+    }
+  }, [location.pathname, username, refreshProgress]);
+
+  // Refresh progress when component mounts or becomes visible
+  useEffect(() => {
+    if (username) {
+      console.log('🔄 Home page mounted/updated, refreshing progress...');
+      refreshProgress();
+    }
+
+    // Also refresh when page becomes visible (user returns from another tab/page)
+    const handleVisibilityChange = () => {
+      if (!document.hidden && username) {
+        console.log('🔄 Page visible, refreshing progress...');
+        refreshProgress();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [username, refreshProgress]);
+
+  // Force refresh when navigating back to home (e.g., from completion modal)
+  useEffect(() => {
+    const handleFocus = () => {
+      if (username) {
+        console.log('🔄 Window focused, refreshing progress...');
+        refreshProgress();
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [username, refreshProgress]);
+
+  // Helper function to check if user completed the previous chapter
+  const hasCompletedPreviousChapter = (chapterNumber) => {
+    if (chapterNumber <= 1) return true; // Chapter 1 has no previous chapter
+
+    const previousChapter = chapterNumber - 1;
+    const chapterProgress = getChapterProgress(previousChapter);
+
+    // Check if at least one level in the previous chapter is completed
+    return chapterProgress?.completedLevels > 0;
+  };
 
   const chapters = [
     {
@@ -91,7 +154,19 @@ export default function Home({
       chapter.id === 1 || isLevelUnlocked(chapter.id, 1);
 
     if (isChapterUnlocked) {
-      navigationHelper.goToChapter(chapter.id);
+      // Check if user is skipping chapters (trying to access chapter > 1 without completing previous ones)
+      const shouldShowSpoilerWarning = chapter.id > 1 && !hasCompletedPreviousChapter(chapter.id);
+
+      if (shouldShowSpoilerWarning) {
+        // Show spoiler warning toast with action button
+        console.log('🚨 Showing spoiler warning for chapter', chapter.id);
+        setToastMessage(`Skip to Chapter ${chapter.id}? You haven't completed previous chapters yet.`);
+        setPendingChapter(chapter);
+        setShowToast(true);
+      } else {
+        // Navigate directly
+        navigationHelper.goToChapter(chapter.id);
+      }
     } else {
       const message = "Complete previous chapters to unlock this one!";
       if (
@@ -138,17 +213,40 @@ export default function Home({
         />
         <div className="flex items-center justify-center h-96">
           <div className="bg-white rounded-3xl p-8 shadow-xl max-w-md mx-auto text-center border-4 border-red-200">
-            <div className="text-6xl mb-4">⚠️</div>
-            <h2 className="text-2xl font-black text-black mb-4">
-              Error Loading Progress
-            </h2>
-            <p className="text-black mb-6">{error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-semibold"
-            >
-              Retry
-            </button>
+            {error?.includes('disabled') || error?.includes('401') ? (
+              <>
+                <div className="text-6xl mb-4">🚫</div>
+                <h2 className="text-2xl font-black text-red-600 mb-4">
+                  Account Disabled
+                </h2>
+                <p className="text-gray-700 mb-4">
+                  Your account has been disabled by an administrator.
+                </p>
+                <p className="text-gray-600 text-sm mb-6">
+                  Please contact support if you believe this is an error.
+                </p>
+                <button
+                  onClick={onLogout}
+                  className="bg-red-500 hover:bg-red-600 text-[#000000] px-6 py-3 rounded-xl font-semibold transition-colors"
+                >
+                  Return to Login
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="text-6xl mb-4">⚠️</div>
+                <h2 className="text-2xl font-black text-black mb-4">
+                  Error Loading Progress
+                </h2>
+                <p className="text-black mb-6">{error}</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-semibold transition-colors"
+                >
+                  Retry
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -163,6 +261,23 @@ export default function Home({
           onLogout={onLogout}
           onShowAnalytics={onShowAnalytics}
           progressData={progressData}
+        />
+
+        {/* Toast Notification */}
+        <SimpleToast
+          message={toastMessage}
+          isVisible={showToast}
+          onClose={() => {
+            setShowToast(false);
+            setPendingChapter(null);
+          }}
+          duration={0}
+          actionLabel={pendingChapter ? "Continue Anyway" : null}
+          onAction={() => {
+            if (pendingChapter) {
+              navigationHelper.goToChapter(pendingChapter.id);
+            }
+          }}
         />
 
         {/* Main Content - Only Chapters */}
@@ -290,9 +405,6 @@ export default function Home({
             })}
           </div>
         </main>
-
-        {/* Sound Toggle Button */}
-        <SoundToggle />
       </div>
     </ErrorBoundary>
   );

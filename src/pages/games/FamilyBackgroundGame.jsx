@@ -8,12 +8,12 @@ import ErrorBoundary from "../../components/ErrorBoundary";
 import { CharacterPlaceholder } from "../../components/PlaceholderImage";
 import { getChapterTheme, getCelebrationTheme } from "../../theme/config";
 
-export default function FamilyBackgroundGame({ username, onLogout }) {
+export default function FamilyBackgroundGame({ username, onLogout, onComplete }) {
   const navigate = useNavigate();
   const [currentGame, setCurrentGame] = useState(0);
   const [score, setScore] = useState(0);
   const [gameCompleted, setGameCompleted] = useState(false);
-  const [showCelebration, setShowCelebration] = useState(false);
+
 
   // Quiz Game State
   const [selectedAnswer, setSelectedAnswer] = useState(null);
@@ -278,7 +278,11 @@ export default function FamilyBackgroundGame({ username, onLogout }) {
       setSelectedMatching([]);
     } else {
       setGameCompleted(true);
-      setShowCelebration(true);
+      // Call onComplete when all games are finished
+      if (onComplete) {
+        const finalScore = Math.round((score / games.length) * 100);
+        onComplete(finalScore, 0, { attempts: 1, hintsUsed: 0 });
+      }
     }
   };
 
@@ -336,7 +340,7 @@ export default function FamilyBackgroundGame({ username, onLogout }) {
           <div className="mt-8 text-center">
             <div
               className={`inline-flex items-center space-x-3 px-6 py-4 rounded-2xl font-black text-lg shadow-lg ${selectedAnswer === game.correct
-                  ? "bg-gradient-to-r from-green-400 to-emerald-500 text-white animate-bounce"
+                  ? "bg-gradient-to-r from-green-400 to-emerald-500 text-white"
                   : "bg-gradient-to-r from-orange-400 to-red-500 text-white"
                 }`}
             >
@@ -577,11 +581,7 @@ export default function FamilyBackgroundGame({ username, onLogout }) {
         >
           <div className="text-center">
             <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-12 shadow-2xl max-w-2xl mx-auto border border-white/20">
-              {showCelebration && (
-                <div className={`text-6xl mb-6 ${celebrationTheme.animation}`}>
-                  👨‍👩‍👧‍👦
-                </div>
-              )}
+
               <h1 className="text-4xl font-bold text-gray-800 mb-4">
                 👨‍👩‍👧‍👦 Family Expert!
               </h1>
@@ -628,10 +628,10 @@ export default function FamilyBackgroundGame({ username, onLogout }) {
     <div className="min-h-screen w-full bg-gradient-to-br from-purple-100 via-pink-100 to-rose-100 relative overflow-hidden">
       {/* Duolingo-style floating elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-16 h-16 bg-yellow-300 rounded-full opacity-10 animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-12 h-12 bg-blue-300 rounded-full opacity-15 animate-bounce"></div>
+        <div className="absolute top-20 left-10 w-16 h-16 bg-yellow-300 rounded-full opacity-10"></div>
+        <div className="absolute top-40 right-20 w-12 h-12 bg-blue-300 rounded-full opacity-15"></div>
         <div className="absolute bottom-32 left-20 w-20 h-20 bg-purple-300 rounded-full opacity-10"></div>
-        <div className="absolute bottom-20 right-10 w-14 h-14 bg-pink-300 rounded-full opacity-15 animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-14 h-14 bg-pink-300 rounded-full opacity-15"></div>
         <div className="absolute top-1/2 left-1/4 w-10 h-10 bg-rose-300 rounded-full opacity-10"></div>
       </div>
 

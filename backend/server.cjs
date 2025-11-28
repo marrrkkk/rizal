@@ -39,6 +39,9 @@ function initializeDatabase() {
 
         // Migration: Add is_admin column if missing
         db.run("ALTER TABLE users ADD COLUMN is_admin INTEGER DEFAULT 0", () => { });
+        
+        // Migration: Add is_active column if missing
+        db.run("ALTER TABLE users ADD COLUMN is_active INTEGER DEFAULT 1", () => { });
 
         // User progress table
         db.run(`CREATE TABLE IF NOT EXISTS user_progress (
@@ -93,8 +96,21 @@ const authenticateToken = (req, res, next) => {
 
     jwt.verify(token, SECRET_KEY, (err, user) => {
         if (err) return res.sendStatus(403);
-        req.user = user;
-        next();
+        
+        // For non-admin users, check if account is still active
+        if (!user.isAdmin) {
+            db.get('SELECT is_active FROM users WHERE id = ?', [user.id], (dbErr, userRecord) => {
+                if (dbErr) return res.status(500).json({ error: dbErr.message });
+                if (!userRecord || userRecord.is_active === 0) {
+                    return res.status(401).json({ error: 'Account has been disabled' });
+                }
+                req.user = user;
+                next();
+            });
+        } else {
+            req.user = user;
+            next();
+        }
     });
 };
 
@@ -128,6 +144,11 @@ app.post('/api/auth/login', (req, res) => {
         if (err) return res.status(500).json({ error: err.message });
         if (!user) return res.status(401).json({ error: 'User not found' });
 
+        // Check if user account is active (unless it's admin)
+        if (user.is_admin !== 1 && user.is_active === 0) {
+            return res.status(401).json({ error: 'Account is disabled. Please contact administrator.' });
+        }
+
         // In a real app, use bcrypt.compare. For this demo/migration, we might need to handle plain text if that's what was used,
         // or bcrypt if the PHP app used it. The PHP code used password_verify.
         // Let's assume we are starting fresh or using bcrypt.
@@ -140,11 +161,11 @@ app.post('/api/auth/login', (req, res) => {
 
         if (!valid) return res.status(401).json({ error: 'Invalid password' });
 
-        const token = jwt.sign({ username: user.username, id: user.id }, SECRET_KEY, { expiresIn: '24h' });
+        const token = jwt.sign({ username: user.username, id: user.id, isAdmin: user.is_admin === 1 }, SECRET_KEY, { expiresIn: '24h' });
         res.json({
             success: true,
             token,
-            user: { id: user.id, username: user.username }
+            user: { id: user.id, username: user.username, isAdmin: user.is_admin === 1 }
         });
     });
 });
@@ -377,11 +398,22 @@ app.post('/api/progress/initialize_progress', authenticateToken, (req, res) => {
     res.json({ success: true });
 });
 
+// Admin status check endpoint
+app.get('/api/admin/check', authenticateToken, (req, res) => {
+    db.get('SELECT is_admin FROM users WHERE id = ?', [req.user.id], (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!row || row.is_admin !== 1) {
+            return res.status(403).json({ error: 'Admin access required', isAdmin: false });
+        }
+        res.json({ isAdmin: true, message: 'Admin access confirmed' });
+    });
+});
+
 // Admin Routes
 app.get('/api/admin/users', authenticateAdmin, (req, res) => {
     const query = `
       SELECT 
-        u.id, u.username, u.created_at, u.is_admin,
+        u.id, u.username, u.created_at, u.is_admin, u.is_active,
         COUNT(DISTINCT CASE WHEN p.is_completed = 1 THEN p.chapter_id || '-' || p.level_id END) as completed_levels,
         COUNT(DISTINCT CASE WHEN p.is_completed = 1 THEN p.chapter_id END) as completed_chapters,
         COALESCE(SUM(p.score), 0) as total_score,
@@ -417,6 +449,71 @@ app.get('/api/admin/stats', authenticateAdmin, (req, res) => {
                 stats.totalBadges = row.count;
 
                 res.json(stats);
+            });
+        });
+    });
+});
+
+// Real Analytics Endpoint
+app.get('/api/admin/analytics', authenticateAdmin, (req, res) => {
+    const analytics = {};
+    const period = req.query.period || '7d';
+    const days = period === '30d' ? 30 : period === '90d' ? 90 : 7;
+
+    // User Growth (last N days)
+    db.all(`
+        SELECT DATE(created_at) as date, COUNT(*) as users
+        FROM users
+        WHERE created_at >= DATE('now', '-${days} days')
+        GROUP BY DATE(created_at)
+        ORDER BY date DESC
+    `, (err, userGrowth) => {
+        if (err) return res.status(500).json({ error: err.message });
+        analytics.userGrowth = userGrowth;
+
+        // Game Completions by Chapter
+        db.all(`
+            SELECT 
+                'Chapter ' || chapter_id as chapter,
+                COUNT(*) as completions
+            FROM user_progress
+            WHERE is_completed = 1
+            GROUP BY chapter_id
+            ORDER BY chapter_id
+        `, (err, gameCompletions) => {
+            if (err) return res.status(500).json({ error: err.message });
+            analytics.gameCompletions = gameCompletions;
+
+            // Average Scores by Level (first 5 levels only for display)
+            db.all(`
+                SELECT 
+                    'Chapter ' || chapter_id || ' - Level ' || level_id as level,
+                    ROUND(AVG(score)) as avgScore
+                FROM user_progress
+                WHERE is_completed = 1 AND score > 0
+                GROUP BY chapter_id, level_id
+                ORDER BY chapter_id, level_id
+                LIMIT 10
+            `, (err, averageScores) => {
+                if (err) return res.status(500).json({ error: err.message });
+                analytics.averageScores = averageScores;
+
+                // Daily Active Users (users who completed levels each day)
+                db.all(`
+                    SELECT 
+                        DATE(completion_date) as date,
+                        COUNT(DISTINCT user_id) as activeUsers
+                    FROM user_progress
+                    WHERE completion_date >= DATE('now', '-${days} days')
+                    AND is_completed = 1
+                    GROUP BY DATE(completion_date)
+                    ORDER BY date DESC
+                `, (err, dailyActivity) => {
+                    if (err) return res.status(500).json({ error: err.message });
+                    analytics.dailyActivity = dailyActivity;
+
+                    res.json(analytics);
+                });
             });
         });
     });
@@ -480,6 +577,38 @@ app.put('/api/admin/users/:id/admin', authenticateAdmin, (req, res) => {
     });
 });
 
+app.put('/api/admin/users/:id/status', authenticateAdmin, (req, res) => {
+    const userId = req.params.id;
+    const { status } = req.body;
+    
+    // Check if user is admin - admins cannot be disabled
+    db.get('SELECT is_admin FROM users WHERE id = ?', [userId], (err, user) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        
+        if (user.is_admin === 1) {
+            return res.status(400).json({ error: 'Cannot disable admin user' });
+        }
+        
+        // Convert status to integer: handle boolean, string, or number
+        let isActive;
+        if (typeof status === 'boolean') {
+            isActive = status ? 1 : 0;
+        } else if (typeof status === 'string') {
+            isActive = status === 'active' ? 1 : 0;
+        } else if (typeof status === 'number') {
+            isActive = status === 1 ? 1 : 0;
+        } else {
+            return res.status(400).json({ error: 'Invalid status value' });
+        }
+        
+        db.run('UPDATE users SET is_active = ? WHERE id = ?', [isActive, userId], function (err) {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ success: true, message: 'User status updated', isActive });
+        });
+    });
+});
+
 app.get('/api/admin/users/:id', authenticateAdmin, (req, res) => {
     const userId = req.params.id;
 
@@ -506,6 +635,66 @@ app.get('/api/admin/users/:id', authenticateAdmin, (req, res) => {
 });
 
 
+// Ensure admin user exists
+function ensureAdminExists() {
+    db.get('SELECT * FROM users WHERE is_admin = 1', (err, admin) => {
+        if (err) {
+            console.error('Error checking for admin:', err);
+            return;
+        }
+        
+        if (!admin) {
+            // Check if there's a user named 'admin'
+            db.get('SELECT * FROM users WHERE username = ?', ['admin'], async (err, user) => {
+                if (err) {
+                    console.error('Error checking for admin user:', err);
+                    return;
+                }
+                
+                if (user) {
+                    // Make existing 'admin' user an admin
+                    db.run('UPDATE users SET is_admin = 1 WHERE username = ?', ['admin'], (err) => {
+                        if (err) {
+                            console.error('Error making admin user admin:', err);
+                        } else {
+                            console.log('✅ Made existing "admin" user an admin');
+                        }
+                    });
+                } else {
+                    // Create admin user with default password
+                    const defaultPassword = 'admin123';
+                    const hashedPassword = require('bcryptjs').hashSync(defaultPassword, 10);
+                    
+                    db.run('INSERT INTO users (username, password, is_admin) VALUES (?, ?, 1)', 
+                        ['admin', hashedPassword], function(err) {
+                        if (err) {
+                            console.error('Error creating admin user:', err);
+                        } else {
+                            console.log('✅ Created admin user with username: admin, password: admin123');
+                            console.log('⚠️  Please change the default password after first login');
+                            
+                            // Initialize progress for admin user
+                            const userId = this.lastID;
+                            for (let chapter = 1; chapter <= 6; chapter++) {
+                                for (let level = 1; level <= 5; level++) {
+                                    db.run(
+                                        'INSERT INTO user_progress (user_id, chapter_id, level_id, is_unlocked) VALUES (?, ?, ?, 1)',
+                                        [userId, chapter, level]
+                                    );
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        } else {
+            console.log('✅ Admin user exists:', admin.username);
+        }
+    });
+}
+
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
+    // Ensure admin exists after server starts
+    setTimeout(ensureAdminExists, 1000);
 });

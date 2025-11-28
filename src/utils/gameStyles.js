@@ -152,12 +152,12 @@ export const getQuizOptionStyles = (
 // Celebration animation styles
 export const getCelebrationStyles = (type = "default") => {
   const celebrations = {
-    default: "animate-bounce",
-    pulse: "animate-pulse",
-    spin: "animate-spin",
-    wiggle: "animate-wiggle",
-    fadeIn: "animate-fade-in",
-    scaleIn: "animate-scale-in",
+    default: "",
+    pulse: "",
+    spin: "",
+    wiggle: "",
+    fadeIn: "",
+    scaleIn: "",
   };
 
   return celebrations[type] || celebrations.default;

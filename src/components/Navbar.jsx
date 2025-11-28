@@ -103,27 +103,6 @@ const Navbar = ({
 
           {/* Right: Actions & User Menu */}
           <div className="flex items-center space-x-2 sm:space-x-4">
-
-            {/* Analytics Button (Desktop/Tablet) */}
-            {onShowAnalytics && (
-              <button
-                onClick={onShowAnalytics}
-                className="p-2 text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-all duration-200"
-                title="Learning Analytics"
-              >
-                <Icons.Chart className="w-6 h-6" />
-              </button>
-            )}
-
-            {/* Admin Button */}
-            <button
-              onClick={() => navigate("/admin")}
-              className="p-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200"
-              title="Admin Dashboard"
-            >
-              <Icons.Settings className="w-6 h-6" />
-            </button>
-
             {/* User Menu Button */}
             <div className="relative">
               <button
@@ -197,16 +176,7 @@ const Navbar = ({
                         </button>
                       )}
 
-                      <button
-                        onClick={() => {
-                          navigate("/admin");
-                          setShowUserMenu(false);
-                        }}
-                        className="w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-colors"
-                      >
-                        <Icons.Settings className="w-5 h-5 text-gray-600" />
-                        <span>Settings</span>
-                      </button>
+
                     </div>
 
                     {/* Logout */}

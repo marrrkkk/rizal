@@ -20,19 +20,15 @@ export const filipinoTheme = {
       info: "from-blue-400 to-indigo-500",
     },
     text: {
-      primary: "text-gray-800",
-      secondary: "text-gray-600",
-      muted: "text-gray-500",
-      light: "text-gray-400",
+      primary: "text-black",
+      secondary: "text-black",
+      muted: "text-gray-900",
+      light: "text-gray-800",
     },
   },
   animations: {
-    bounce: "animate-bounce",
-    pulse: "animate-pulse",
     fadeIn: "animate-fade-in",
     slideUp: "animate-slide-up",
-    wiggle: "animate-wiggle",
-    scaleIn: "animate-scale-in",
   },
   transitions: {
     fast: "transition-all duration-150",
@@ -142,22 +138,18 @@ export const getCelebrationTheme = (type = "default") => {
   const celebrations = {
     default: {
       colors: filipinoTheme.colors.gradients.success,
-      animation: filipinoTheme.animations.bounce,
       icon: "🎉",
     },
     completion: {
       colors: filipinoTheme.colors.gradients.success,
-      animation: filipinoTheme.animations.pulse,
       icon: "🏆",
     },
     milestone: {
       colors: filipinoTheme.colors.primary.yellow,
-      animation: filipinoTheme.animations.scaleIn,
       icon: "⭐",
     },
     perfect: {
       colors: "from-yellow-400 to-orange-500",
-      animation: filipinoTheme.animations.wiggle,
       icon: "🌟",
     },
   };

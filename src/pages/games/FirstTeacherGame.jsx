@@ -4,12 +4,12 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ScenePlaceholder } from "../../components/PlaceholderImage";
 
-export default function FirstTeacherGame({ username, onLogout }) {
+export default function FirstTeacherGame({ username, onLogout, onComplete }) {
   const navigate = useNavigate();
   const [currentGame, setCurrentGame] = useState(0);
   const [score, setScore] = useState(0);
   const [gameCompleted, setGameCompleted] = useState(false);
-  const [showCelebration, setShowCelebration] = useState(false);
+
 
   // Quiz Game State
   const [selectedAnswer, setSelectedAnswer] = useState(null);
@@ -150,23 +150,40 @@ export default function FirstTeacherGame({ username, onLogout }) {
   };
 
   const handleReadingAnswer = (questionIndex, answerIndex) => {
+    // Don't allow re-answering
+    if (readingAnswers[questionIndex] !== undefined) {
+      return;
+    }
+
+    console.log('Reading answer clicked:', questionIndex, answerIndex);
+    
     const newAnswers = { ...readingAnswers, [questionIndex]: answerIndex };
     setReadingAnswers(newAnswers);
 
     const question = games[3].questions[questionIndex];
+    console.log('Question correct answer:', question.correct, 'Selected:', answerIndex);
+    
     if (answerIndex === question.correct) {
-      setScore(score + 20);
+      const newScore = score + 20;
+      console.log('Correct! New score:', newScore);
+      setScore(newScore);
+    } else {
+      console.log('Wrong answer!');
     }
 
-    // Check if all questions are answered correctly
-    const allCorrect = games[3].questions.every(
-      (q, index) => newAnswers[index] === q.correct
-    );
-    if (
-      allCorrect &&
-      Object.keys(newAnswers).length === games[3].questions.length
-    ) {
-      setTimeout(() => nextGame(), 1000);
+    // Check if all questions are answered
+    if (Object.keys(newAnswers).length === games[3].questions.length) {
+      console.log('All questions answered! Checking if all correct...');
+      const allCorrect = games[3].questions.every(
+        (q, index) => newAnswers[index] === q.correct
+      );
+      console.log('All correct?', allCorrect);
+      
+      // Move to next game regardless of correctness after a delay
+      setTimeout(() => {
+        console.log('Moving to next game...');
+        nextGame();
+      }, 1500);
     }
   };
 
@@ -179,7 +196,10 @@ export default function FirstTeacherGame({ username, onLogout }) {
       setReadingAnswers({});
     } else {
       setGameCompleted(true);
-      setShowCelebration(true);
+      // Call onComplete when all games are finished
+      if (onComplete) {
+        onComplete(score, 0, { attempts: 1, hintsUsed: 0 });
+      }
     }
   };
 
@@ -198,16 +218,16 @@ export default function FirstTeacherGame({ username, onLogout }) {
             key={index}
             onClick={() => handleQuizAnswer(index)}
             disabled={showQuizResult}
-            className={`p-6 rounded-2xl border-4 transition-all duration-200 text-left font-semibold ${
+            className={`p-6 rounded-2xl border-4 transition-all duration-200 text-left font-semibold cursor-pointer ${
               showQuizResult
                 ? index === game.correct
                   ? "bg-green-100 border-green-400 text-green-800"
                   : index === selectedAnswer
                   ? "bg-red-100 border-red-400 text-red-800"
-                  : "bg-gray-100 border-gray-300 text-black"
+                  : "bg-gray-100 border-gray-300 text-gray-800"
                 : selectedAnswer === index
                 ? "bg-rose-100 border-rose-400 text-rose-800"
-                : "bg-gray-50 border-gray-200 text-black hover:bg-rose-50 hover:border-rose-300"
+                : "bg-white border-gray-300 text-gray-800 hover:bg-rose-50 hover:border-rose-400 hover:scale-105 shadow-md active:scale-95"
             }`}
           >
             <div className="flex items-center">
@@ -218,15 +238,15 @@ export default function FirstTeacherGame({ username, onLogout }) {
                       ? "bg-green-500 text-white"
                       : index === selectedAnswer
                       ? "bg-red-500 text-white"
-                      : "bg-gray-300 text-black"
+                      : "bg-gray-400 text-white"
                     : selectedAnswer === index
                     ? "bg-rose-500 text-white"
-                    : "bg-gray-300 text-black"
+                    : "bg-gray-400 text-white"
                 }`}
               >
                 {String.fromCharCode(65 + index)}
               </div>
-              <span className="text-lg text-black">{option}</span>
+              <span className="text-lg text-gray-800">{option}</span>
             </div>
           </button>
         ))}
@@ -386,26 +406,35 @@ export default function FirstTeacherGame({ username, onLogout }) {
       {/* Questions */}
       <div className="space-y-6">
         {game.questions.map((question, qIndex) => (
-          <div key={qIndex} className="bg-white rounded-xl p-6 shadow-md">
+          <div key={`q-${qIndex}-${readingAnswers[qIndex] || 'unanswered'}`} className="bg-white rounded-xl p-6 shadow-md">
             <h5 className="text-lg font-semibold text-gray-800 mb-4">
               {qIndex + 1}. {question.question}
             </h5>
             <div className="grid grid-cols-1 gap-3">
-              {question.options.map((option, oIndex) => (
-                <button
-                  key={oIndex}
-                  onClick={() => handleReadingAnswer(qIndex, oIndex)}
-                  className={`p-3 rounded-lg text-left transition-all duration-200 ${
-                    readingAnswers[qIndex] === oIndex
-                      ? oIndex === question.correct
-                        ? "bg-green-100 border-2 border-green-400 text-green-800"
-                        : "bg-red-100 border-2 border-red-400 text-red-800"
-                      : "bg-gray-50 hover:bg-blue-50 border-2 border-gray-200 hover:border-blue-300"
-                  }`}
-                >
-                  {option}
-                </button>
-              ))}
+              {question.options.map((option, oIndex) => {
+                const isSelected = readingAnswers[qIndex] === oIndex;
+                const isCorrect = oIndex === question.correct;
+                const isAnswered = readingAnswers[qIndex] !== undefined;
+                
+                return (
+                  <button
+                    key={oIndex}
+                    onClick={() => handleReadingAnswer(qIndex, oIndex)}
+                    disabled={isAnswered}
+                    className={`p-4 rounded-lg text-left transition-all duration-200 font-medium ${
+                      isSelected
+                        ? isCorrect
+                          ? "bg-green-100 border-2 border-green-400 text-green-800 cursor-default"
+                          : "bg-red-100 border-2 border-red-400 text-red-800 cursor-default"
+                        : isAnswered
+                        ? "bg-gray-100 border-2 border-gray-300 text-gray-500 cursor-not-allowed"
+                        : "bg-white hover:bg-blue-50 border-2 border-gray-300 hover:border-blue-400 hover:scale-105 active:scale-95 shadow-sm cursor-pointer"
+                    }`}
+                  >
+                    {option}
+                  </button>
+                );
+              })}
             </div>
           </div>
         ))}
@@ -434,9 +463,7 @@ export default function FirstTeacherGame({ username, onLogout }) {
       <div className="min-h-screen w-full bg-gradient-to-br from-rose-50 via-pink-50 to-red-100 flex items-center justify-center p-6">
         <div className="text-center">
           <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 shadow-xl max-w-2xl mx-auto">
-            {showCelebration && (
-              <div className="text-6xl mb-6 animate-bounce">👩‍🏫</div>
-            )}
+
             <h1 className="text-4xl font-bold text-gray-800 mb-4">
               Learning Champion!
             </h1>
@@ -469,10 +496,10 @@ export default function FirstTeacherGame({ username, onLogout }) {
     <div className="min-h-screen w-full bg-gradient-to-br from-rose-100 via-pink-100 to-red-100 relative overflow-hidden">
       {/* Duolingo-style floating elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-16 h-16 bg-yellow-300 rounded-full opacity-10 animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-12 h-12 bg-blue-300 rounded-full opacity-15 animate-bounce"></div>
+        <div className="absolute top-20 left-10 w-16 h-16 bg-yellow-300 rounded-full opacity-10"></div>
+        <div className="absolute top-40 right-20 w-12 h-12 bg-blue-300 rounded-full opacity-15"></div>
         <div className="absolute bottom-32 left-20 w-20 h-20 bg-rose-300 rounded-full opacity-10"></div>
-        <div className="absolute bottom-20 right-10 w-14 h-14 bg-pink-300 rounded-full opacity-15 animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-14 h-14 bg-pink-300 rounded-full opacity-15"></div>
         <div className="absolute top-1/2 left-1/4 w-10 h-10 bg-red-300 rounded-full opacity-10"></div>
       </div>
 

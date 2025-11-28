@@ -8,7 +8,7 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
   const [currentGame, setCurrentGame] = useState(0);
   const [score, setScore] = useState(0);
   const [gameCompleted, setGameCompleted] = useState(false);
-  const [showCelebration, setShowCelebration] = useState(false);
+
 
   // Book Creation Workshop State
   const [bookElements, setBookElements] = useState({
@@ -310,7 +310,6 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
       setAdventureChoices([]);
     } else {
       setGameCompleted(true);
-      setShowCelebration(true);
 
       // Call the onComplete callback if provided
       if (onComplete) {
@@ -325,7 +324,7 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
 
   const renderWorkshopGame = (game) => (
     <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl max-w-5xl mx-auto">
-      <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+      <h3 className="text-2xl font-bold text-black mb-6 text-center">
         Jose's Book Creation Workshop
       </h3>
 
@@ -339,8 +338,8 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white rounded-xl p-4">
-            <h4 className="font-semibold text-gray-800 mb-2">Story Elements</h4>
-            <div className="space-y-2 text-sm">
+            <h4 className="font-semibold text-black mb-2">Story Elements</h4>
+            <div className="space-y-2 text-sm text-black">
               <p>
                 <strong>Character:</strong> {bookElements.character || "..."}
               </p>
@@ -353,7 +352,7 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
             </div>
           </div>
           <div className="bg-white rounded-xl p-4 text-center">
-            <h4 className="font-semibold text-gray-800 mb-2">Illustration</h4>
+            <h4 className="font-semibold text-black mb-2">Illustration</h4>
             <div className="text-6xl">{bookElements.illustration || "🎨"}</div>
           </div>
         </div>
@@ -363,7 +362,7 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {Object.entries(availableElements).map(([elementType, options]) => (
           <div key={elementType} className="bg-white rounded-xl p-4 shadow-md">
-            <h4 className="font-semibold text-gray-800 mb-3 capitalize">
+            <h4 className="font-semibold text-black mb-3 capitalize">
               {elementType === "illustrations"
                 ? "Illustration"
                 : elementType.slice(0, -1)}
@@ -446,7 +445,7 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
 
     return (
       <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl max-w-4xl mx-auto">
-        <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+        <h3 className="text-2xl font-bold text-black mb-6 text-center">
           Jose's Reading Adventure
         </h3>
 
@@ -454,7 +453,7 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
         <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-8 mb-6">
           <div className="text-center mb-6">
             <div className="text-8xl mb-4">{scene.image}</div>
-            <p className="text-lg text-gray-700 leading-relaxed">
+            <p className="text-lg text-black leading-relaxed">
               {scene.text}
             </p>
           </div>
@@ -472,7 +471,7 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
                     {index + 1}
                   </div>
                   <div>
-                    <p className="font-medium text-gray-800">{choice.text}</p>
+                    <p className="font-medium text-black">{choice.text}</p>
                     <p className="text-sm text-purple-600">
                       Skill: {choice.skill}
                     </p>
@@ -486,7 +485,7 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
         {/* Adventure Progress */}
         {adventureChoices.length > 0 && (
           <div className="bg-white rounded-xl p-4 shadow-md">
-            <h4 className="font-semibold text-gray-800 mb-3">
+            <h4 className="font-semibold text-black mb-3">
               Your Adventure Journey:
             </h4>
             <div className="flex flex-wrap gap-2">
@@ -507,7 +506,7 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
 
   const renderCollectionGame = (game) => (
     <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl max-w-6xl mx-auto">
-      <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+      <h3 className="text-2xl font-bold text-black mb-6 text-center">
         Jose's Word Collection Garden
       </h3>
 
@@ -523,7 +522,7 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
             style={{
               left: `${wordObj.x}%`,
               top: `${wordObj.y}%`,
-              animation: `float 3s ease-in-out infinite ${wordObj.id * 0.5}s`,
+
             }}
             onClick={() => handleWordCollect(wordObj.id)}
           >
@@ -559,7 +558,7 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Collected Words */}
         <div className="bg-white rounded-xl p-4 shadow-md">
-          <h4 className="font-semibold text-gray-800 mb-3">
+          <h4 className="font-semibold text-black mb-3">
             Collected Words ({collectedWords.length})
           </h4>
           <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
@@ -584,7 +583,7 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
 
         {/* Story Combinations */}
         <div className="bg-white rounded-xl p-4 shadow-md">
-          <h4 className="font-semibold text-gray-800 mb-3">
+          <h4 className="font-semibold text-black mb-3">
             Story Ideas Created ({wordCombinations.length})
           </h4>
           <div className="space-y-2 max-h-32 overflow-y-auto">
@@ -600,23 +599,13 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
         </div>
       </div>
 
-      <style jsx>{`
-        @keyframes float {
-          0%,
-          100% {
-            transform: translate(-50%, -50%) translateY(0px);
-          }
-          50% {
-            transform: translate(-50%, -50%) translateY(-10px);
-          }
-        }
-      `}</style>
+
     </div>
   );
 
   const renderTheaterGame = (game) => (
     <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl max-w-6xl mx-auto">
-      <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+      <h3 className="text-2xl font-bold text-black mb-6 text-center">
         Jose's Story Theater
       </h3>
 
@@ -626,7 +615,7 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
           🎭
         </div>
         <div className="bg-white rounded-xl p-6 mt-8">
-          <h4 className="text-lg font-bold text-gray-800 mb-4 text-center">
+          <h4 className="text-lg font-bold text-black mb-4 text-center">
             Your Story So Far:
           </h4>
 
@@ -645,7 +634,7 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
                   </span>
                 ))}
                 {theaterStory.characters.length === 0 && (
-                  <span className="text-gray-500 italic">
+                  <span className="text-black italic">
                     Choose characters below...
                   </span>
                 )}
@@ -661,7 +650,7 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
                     {theaterStory.plot[0]}
                   </span>
                 ) : (
-                  <span className="text-gray-500 italic">
+                  <span className="text-black italic">
                     Choose a problem below...
                   </span>
                 )}
@@ -677,7 +666,7 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
                     {theaterStory.ending}
                   </span>
                 ) : (
-                  <span className="text-gray-500 italic">
+                  <span className="text-black italic">
                     Choose an ending below...
                   </span>
                 )}
@@ -691,7 +680,7 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Characters */}
         <div className="bg-white rounded-xl p-4 shadow-md">
-          <h4 className="font-semibold text-gray-800 mb-3">
+          <h4 className="font-semibold text-black mb-3">
             Choose Characters (Pick 2)
           </h4>
           <div className="space-y-2">
@@ -715,7 +704,7 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
                   <span className="text-2xl">{char.emoji}</span>
                   <div>
                     <div className="font-medium">{char.name}</div>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-black">
                       {char.personality}
                     </div>
                   </div>
@@ -727,7 +716,7 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
 
         {/* Conflicts */}
         <div className="bg-white rounded-xl p-4 shadow-md">
-          <h4 className="font-semibold text-gray-800 mb-3">Choose a Problem</h4>
+          <h4 className="font-semibold text-black mb-3">Choose a Problem</h4>
           <div className="space-y-2">
             {game.storyElements.conflicts.map((conflict, index) => (
               <button
@@ -748,7 +737,7 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
 
         {/* Solutions */}
         <div className="bg-white rounded-xl p-4 shadow-md">
-          <h4 className="font-semibold text-gray-800 mb-3">Choose an Ending</h4>
+          <h4 className="font-semibold text-black mb-3">Choose an Ending</h4>
           <div className="space-y-2">
             {game.storyElements.solutions.map((solution, index) => (
               <button
@@ -791,13 +780,11 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
       <div className="min-h-screen w-full bg-gradient-to-br from-amber-50 via-orange-50 to-red-100 flex items-center justify-center p-6">
         <div className="text-center">
           <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 shadow-xl max-w-2xl mx-auto">
-            {showCelebration && (
-              <div className="text-6xl mb-6 animate-bounce">📚✨</div>
-            )}
-            <h1 className="text-4xl font-bold text-gray-800 mb-4">
+
+            <h1 className="text-4xl font-bold text-black mb-4">
               Master Storyteller!
             </h1>
-            <p className="text-xl text-gray-600 mb-6">
+            <p className="text-xl text-black mb-6">
               Incredible! You've helped Jose discover the magic of reading and
               storytelling! You created books, went on reading adventures,
               collected magical words, and directed amazing stories. Just like
@@ -869,7 +856,7 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
               <h1 className="text-2xl font-bold text-gray-800">
                 Love for Reading
               </h1>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-black">
                 Level 5 - Jose's Creative Journey
               </p>
             </div>
@@ -895,7 +882,7 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
         {/* Progress */}
         <div className="mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <span className="text-sm font-medium text-gray-600">
+            <span className="text-sm font-medium text-black">
               Creative Journey Progress
             </span>
           </div>
@@ -905,7 +892,7 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
               style={{ width: `${((currentGame + 1) / games.length) * 100}%` }}
             ></div>
           </div>
-          <p className="text-center text-sm text-gray-600 mt-2">
+          <p className="text-center text-sm text-black mt-2">
             Activity {currentGame + 1} of {games.length}
           </p>
         </div>
@@ -915,7 +902,7 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
           <h2 className="text-3xl font-bold text-gray-800 mb-2">
             {games[currentGame].title}
           </h2>
-          <p className="text-gray-600">{games[currentGame].description}</p>
+          <p className="text-black">{games[currentGame].description}</p>
         </div>
 
         {/* Current Game */}
@@ -926,7 +913,7 @@ export default function LoveForReadingGame({ username, onLogout, onComplete }) {
           <h3 className="text-xl font-bold text-center text-gray-800 mb-4">
             Jose's Creative Spirit
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-600">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-black">
             <div className="flex items-start space-x-3">
               <span className="text-2xl">📖</span>
               <div>

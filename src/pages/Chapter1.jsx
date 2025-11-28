@@ -1,23 +1,32 @@
 "use client";
 
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { useProgressAPI } from "../hooks/useProgressAPI";
 import ProgressDashboard from "../components/ProgressDashboard";
 import CompletionCertificate from "../components/CompletionCertificate";
 import { createNavigationHelper } from "../utils/navigationHelper";
-import MusicControl from "../components/MusicControl";
 import ChapterHeader from "../components/ChapterHeader";
 
 export default function Chapter1({ username, onLogout }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const navigationHelper = createNavigationHelper(navigate);
   const {
     getChapterProgress,
     isLevelUnlocked,
     isLevelCompleted,
-    loading
+    loading,
+    refreshProgress
   } = useProgressAPI(username);
+
+  // Refresh progress when returning to chapter page
+  useEffect(() => {
+    if (location.pathname === '/chapter/1' && username) {
+      console.log('🔄 Returned to Chapter 1, refreshing progress...');
+      refreshProgress();
+    }
+  }, [location.pathname, username, refreshProgress]);
 
   const [showCertificate, setShowCertificate] = useState(false);
 
@@ -71,7 +80,7 @@ export default function Chapter1({ username, onLogout }) {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 relative overflow-hidden">
+    <div className="min-h-screen w-full bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 relative overflow-hidden chapter1-container">
       {/* Duolingo-style floating elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-16 h-16 bg-yellow-300 rounded-full opacity-10 animate-pulse"></div>
@@ -85,6 +94,7 @@ export default function Chapter1({ username, onLogout }) {
       <ChapterHeader
         chapterNumber={1}
         chapterTitle="Childhood in Calamba"
+        icon="🏠"
         totalLessons={5}
         onLogout={onLogout}
         themeColor="blue"
@@ -107,10 +117,10 @@ export default function Chapter1({ username, onLogout }) {
                 👶
               </div>
             </div>
-            <h2 className="text-4xl font-black text-black mb-4">
+            <h2 className="text-4xl font-black text-gray-900 mb-4">
               Childhood in Calamba
             </h2>
-            <p className="text-lg text-black font-medium max-w-2xl mx-auto mb-6">
+            <p className="text-lg text-gray-900 font-medium max-w-2xl mx-auto mb-6">
               Discover the early years of Jose Rizal in his hometown of Calamba,
               Laguna
             </p>
@@ -118,7 +128,7 @@ export default function Chapter1({ username, onLogout }) {
             {/* Progress indicator */}
             <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg max-w-md mx-auto border-2 border-blue-200">
               <div className="flex items-center justify-between mb-2">
-                <span className="font-bold text-black">Chapter Progress</span>
+                <span className="font-bold text-gray-900">Chapter Progress</span>
                 <span className="text-blue-600 font-bold text-sm">
                   {chapterProgress ? chapterProgress.completedLevels : 0}/5 complete
                 </span>
@@ -208,18 +218,10 @@ export default function Chapter1({ username, onLogout }) {
 
                   {/* Level info */}
                   <div className="text-center">
-                    <h3
-                      className={`text-xl font-black mb-2 transition-colors ${isUnlocked
-                        ? "text-black group-hover:text-black"
-                        : "text-black"
-                        }`}
-                    >
+                    <h3 className="text-xl font-black mb-2 transition-colors text-gray-900">
                       {level.title}
                     </h3>
-                    <p
-                      className={`text-sm mb-4 leading-relaxed ${isUnlocked ? "text-black" : "text-black"
-                        }`}
-                    >
+                    <p className="text-sm mb-4 leading-relaxed text-gray-900">
                       {level.description}
                     </p>
 
@@ -317,15 +319,15 @@ export default function Chapter1({ username, onLogout }) {
 
         {/* Chapter Info */}
         <div className="mt-16 bg-white/60 backdrop-blur-sm rounded-3xl p-8 shadow-lg max-w-4xl mx-auto">
-          <h3 className="text-2xl font-bold text-center text-black mb-6">
+          <h3 className="text-2xl font-bold text-center text-gray-900 mb-6">
             About This Chapter
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <h4 className="text-lg font-semibold text-black mb-3">
+              <h4 className="text-lg font-semibold text-gray-900 mb-3">
                 What You'll Learn
               </h4>
-              <ul className="space-y-2 text-black">
+              <ul className="space-y-2 text-gray-900">
                 <li className="flex items-start space-x-2">
                   <span className="text-blue-500 mt-1">•</span>
                   <span>Jose Rizal's birth and early family life</span>
@@ -349,7 +351,7 @@ export default function Chapter1({ username, onLogout }) {
               </ul>
             </div>
             <div>
-              <h4 className="text-lg font-semibold text-black mb-3">
+              <h4 className="text-lg font-semibold text-gray-900 mb-3">
                 Key Highlights
               </h4>
               <div className="space-y-3">
@@ -359,7 +361,7 @@ export default function Chapter1({ username, onLogout }) {
                       1861
                     </span>
                   </div>
-                  <span className="text-black">
+                  <span className="text-gray-900">
                     Year Jose Rizal was born
                   </span>
                 </div>
@@ -367,7 +369,7 @@ export default function Chapter1({ username, onLogout }) {
                   <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
                     <span className="text-green-600 font-bold text-sm">3</span>
                   </div>
-                  <span className="text-black">
+                  <span className="text-gray-900">
                     Age when he learned to read
                   </span>
                 </div>
@@ -377,7 +379,7 @@ export default function Chapter1({ username, onLogout }) {
                       👩
                     </span>
                   </div>
-                  <span className="text-black">
+                  <span className="text-gray-900">
                     His mother was his first teacher
                   </span>
                 </div>
@@ -387,7 +389,7 @@ export default function Chapter1({ username, onLogout }) {
                       📚
                     </span>
                   </div>
-                  <span className="text-black">
+                  <span className="text-gray-900">
                     Loved reading from a very young age
                   </span>
                 </div>
@@ -396,9 +398,6 @@ export default function Chapter1({ username, onLogout }) {
           </div>
         </div>
       </main>
-
-      {/* Background Music Control */}
-      <MusicControl chapterId={1} />
     </div>
   );
 }

@@ -1,16 +1,24 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useProgressAPI } from "../hooks/useProgressAPI";
 import { getCurrentUserFromToken } from "../utils/api";
 import { createNavigationHelper } from "../utils/navigationHelper";
-import MusicControl from "../components/MusicControl";
 import ChapterHeader from "../components/ChapterHeader";
 
 export default function Chapter6({ username, onLogout }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const navigationHelper = createNavigationHelper(navigate);
-  const { progressData, getChapterProgress, isLevelUnlocked, isLevelCompleted, loading } = useProgressAPI();
+  const { progressData, getChapterProgress, isLevelUnlocked, isLevelCompleted, loading, refreshProgress } = useProgressAPI();
   const [userId, setUserId] = useState(null);
+
+  // Refresh progress when returning to chapter page
+  useEffect(() => {
+    if (location.pathname === '/chapter/6' && username) {
+      console.log('🔄 Returned to Chapter 6, refreshing progress...');
+      refreshProgress();
+    }
+  }, [location.pathname, username, refreshProgress]);
 
   // Get chapter progress
   const chapterProgress = progressData ? getChapterProgress(6) : null;
@@ -112,6 +120,7 @@ export default function Chapter6({ username, onLogout }) {
       <ChapterHeader
         chapterNumber={6}
         chapterTitle="Exile and Legacy"
+        icon="⭐"
         totalLessons={5}
         onLogout={onLogout}
         themeColor="red"
@@ -331,9 +340,6 @@ export default function Chapter6({ username, onLogout }) {
           })}
         </div>
       </main>
-
-      {/* Background Music Control */}
-      <MusicControl chapterId={6} />
     </div>
   );
 }

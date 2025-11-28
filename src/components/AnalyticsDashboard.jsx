@@ -119,7 +119,6 @@ const AnalyticsDashboard = ({ username, onClose }) => {
           <nav className="flex space-x-8 px-6">
             {[
               { id: "overview", label: "Overview", icon: "📊" },
-              { id: "leaderboard", label: "Leaderboard", icon: "🏆" },
               { id: "chapters", label: "Chapters", icon: "📚" },
               { id: "patterns", label: "Learning Patterns", icon: "🧠" },
               { id: "achievements", label: "Achievements", icon: "🎖️" },
@@ -172,7 +171,7 @@ const AnalyticsDashboard = ({ username, onClose }) => {
                         Average Score
                       </p>
                       <p className="text-2xl font-bold text-green-800">
-                        {report.summary.averageScore}%
+                        {Math.min(100, Math.round(report.summary.averageScore))}%
                       </p>
                     </div>
                     <div className="text-2xl">⭐</div>
@@ -220,12 +219,12 @@ const AnalyticsDashboard = ({ username, onClose }) => {
                     <div className="bg-gray-200 rounded-full h-4">
                       <div
                         className="bg-gradient-to-r from-blue-500 to-purple-500 h-4 rounded-full transition-all duration-500"
-                        style={{ width: `${report.summary.efficiency}%` }}
+                        style={{ width: `${Math.min(100, report.summary.efficiency)}%` }}
                       ></div>
                     </div>
                   </div>
                   <div className="text-2xl font-bold text-gray-800">
-                    {report.summary.efficiency}%
+                    {Math.min(100, Math.round(report.summary.efficiency))}%
                   </div>
                 </div>
                 <p className="text-sm text-gray-600 mt-2">
@@ -270,25 +269,6 @@ const AnalyticsDashboard = ({ username, onClose }) => {
                   </div>
                 </div>
               )}
-            </div>
-          )}
-
-          {activeTab === "leaderboard" && (
-            <div className="space-y-6">
-              <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold text-gray-800 mb-2">
-                  Top Performers
-                </h3>
-                <p className="text-gray-600">
-                  See how you compare with other students learning about José
-                  Rizal
-                </p>
-              </div>
-              <LeaderboardWidget
-                limit={5}
-                autoRefresh={true}
-                refreshInterval={60000}
-              />
             </div>
           )}
 

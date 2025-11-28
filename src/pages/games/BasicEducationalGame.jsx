@@ -124,10 +124,10 @@ export default function BasicEducationalGame({
         <div className="max-w-4xl mx-auto p-6">
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg text-center">
             <div className="text-6xl mb-4">🎉</div>
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">
+            <h2 className="text-3xl font-bold text-black mb-4">
               Game Complete!
             </h2>
-            <p className="text-lg text-gray-600 mb-6">
+            <p className="text-lg text-black mb-6">
               You've finished learning about José Rizal!
             </p>
 
@@ -187,7 +187,7 @@ export default function BasicEducationalGame({
         {/* Progress */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 mb-6 shadow-lg">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-gray-700">Progress</span>
+            <span className="text-sm font-medium text-black">Progress</span>
             <span className="text-sm font-medium text-blue-700">
               {currentQuestion + 1} / {gameQuestions.length}
             </span>
@@ -217,10 +217,10 @@ export default function BasicEducationalGame({
                     title={currentQ.emoji || "🎓"}
                   />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                <h3 className="text-xl font-semibold text-black mb-4">
                   Question {currentQuestion + 1}
                 </h3>
-                <p className="text-lg text-gray-700">{currentQ.question}</p>
+                <p className="text-lg text-black">{currentQ.question}</p>
               </div>
 
               {/* Answer Options */}
@@ -269,7 +269,7 @@ export default function BasicEducationalGame({
                             <div className="w-2 h-2 bg-white rounded-full"></div>
                           )}
                         </div>
-                        <span className="text-gray-800">{option}</span>
+                        <span className="text-black">{option}</span>
                       </div>
                     </button>
                   );

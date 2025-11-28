@@ -20,7 +20,6 @@ import {
   VisualFeedback,
   FeedbackButton,
   AnimatedProgress,
-  CelebrationAnimation as NewCelebrationAnimation,
 } from "../../components/VisualFeedback";
 import {
   KidsEducationalFact,
@@ -47,7 +46,7 @@ export default function AteneoGame({ username, onLogout, onComplete }) {
   const [showResult, setShowResult] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [isCorrect, setIsCorrect] = useState(null);
-  const [showCelebration, setShowCelebration] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
   const [attempts, setAttempts] = useState(0);
   const [hintsUsed, setHintsUsed] = useState(0);
@@ -146,8 +145,6 @@ export default function AteneoGame({ username, onLogout, onComplete }) {
 
     if (correct) {
       setScore(score + 1);
-      setShowCelebration(true);
-      setTimeout(() => setShowCelebration(false), 1000);
     }
 
     // Show feedback briefly before moving to next question
@@ -201,12 +198,7 @@ export default function AteneoGame({ username, onLogout, onComplete }) {
     return (
       <ErrorBoundary>
         <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-100 relative overflow-hidden">
-          {/* Animated background elements */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-10 left-10 w-20 h-20 bg-orange-200 rounded-full opacity-20 animate-float"></div>
-            <div className="absolute top-32 right-20 w-16 h-16 bg-amber-200 rounded-full opacity-30 animate-float-delayed"></div>
-            <div className="absolute bottom-20 left-1/4 w-24 h-24 bg-yellow-200 rounded-full opacity-25 animate-float"></div>
-          </div>
+
 
           <ResponsiveContainer className="relative z-10 py-8">
             {/* Header */}
@@ -221,24 +213,17 @@ export default function AteneoGame({ username, onLogout, onComplete }) {
             {/* Completion Card */}
             <div className="max-w-2xl mx-auto mt-8">
               <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border-4 border-orange-200">
-                {/* Celebration Animation */}
-                {showCelebration && (
-                  <NewCelebrationAnimation
-                    type="completion"
-                    duration={2000}
-                    onComplete={() => setShowCelebration(false)}
-                  />
-                )}
+
 
                 {/* Success Header */}
                 <div className="text-center mb-8">
-                  <div className="w-24 h-24 bg-gradient-to-br from-orange-400 to-amber-500 rounded-full mx-auto mb-6 flex items-center justify-center shadow-lg animate-bounce">
+                  <div className="w-24 h-24 bg-gradient-to-br from-orange-400 to-amber-500 rounded-full mx-auto mb-6 flex items-center justify-center shadow-lg">
                     <span className="text-4xl text-white">🎓</span>
                   </div>
-                  <h2 className="text-3xl font-black text-gray-800 mb-2">
+                  <h2 className="text-3xl font-black text-black mb-2">
                     Ateneo Quiz Complete!
                   </h2>
-                  <p className="text-lg text-gray-600">
+                  <p className="text-lg text-black">
                     You've learned about Rizal's school years!
                   </p>
                 </div>
@@ -250,7 +235,7 @@ export default function AteneoGame({ username, onLogout, onComplete }) {
                     <p className="text-5xl font-black text-orange-600 mb-2">
                       {finalScore}%
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-black">
                       {score} out of {questions.length} correct
                     </p>
                   </div>
@@ -298,12 +283,7 @@ export default function AteneoGame({ username, onLogout, onComplete }) {
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-100 relative overflow-hidden">
-        {/* Animated background elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-10 left-10 w-20 h-20 bg-orange-200 rounded-full opacity-20 animate-float"></div>
-          <div className="absolute top-32 right-20 w-16 h-16 bg-amber-200 rounded-full opacity-30 animate-float-delayed"></div>
-          <div className="absolute bottom-20 left-1/4 w-24 h-24 bg-yellow-200 rounded-full opacity-25 animate-float"></div>
-        </div>
+
 
         <ResponsiveContainer className="relative z-10 py-8">
           {/* Header */}
@@ -328,21 +308,14 @@ export default function AteneoGame({ username, onLogout, onComplete }) {
           {/* Main Game Content */}
           <div className="max-w-2xl mx-auto">
             <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border-4 border-orange-200">
-              {/* Celebration Animation */}
-              {showCelebration && (
-                <NewCelebrationAnimation
-                  type="success"
-                  duration={1000}
-                  onComplete={() => setShowCelebration(false)}
-                />
-              )}
+
 
               {/* Question Header */}
               <div className="text-center mb-8">
                 <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-amber-500 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg">
                   <span className="text-2xl text-white">🎓</span>
                 </div>
-                <h3 className="text-2xl font-black text-gray-800 mb-4 leading-relaxed">
+                <h3 className="text-2xl font-black text-black mb-4 leading-relaxed">
                   {questions[currentQuestion].question}
                 </h3>
 

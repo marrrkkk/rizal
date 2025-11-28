@@ -25,11 +25,13 @@
     "express": "^5.1.0",
     "jose": "^6.1.2",
     "jsonwebtoken": "^9.0.2",
+    "node-fetch": "^2.7.0",
     "react": "^19.1.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.2",
+    "recharts": "^3.5.0",
     "sql.js": "^1.13.0",
     "sqlite3": "^5.1.7",
     "tailwindcss": "^4.1.10"

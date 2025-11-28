@@ -202,6 +202,12 @@ export const login = async (username, password) => {
     throw new Error("Invalid username or password");
   }
 
+  // Update last_active timestamp
+  executeUpdate(
+    "UPDATE users SET last_active = CURRENT_TIMESTAMP WHERE id = ?",
+    [user.id]
+  );
+
   // Generate JWT token
   const token = await generateToken({
     userId: user.id,

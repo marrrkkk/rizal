@@ -35,6 +35,32 @@ export const initDatabase = async () => {
   }
 };
 
+// Migrate existing database to add new columns
+const migrateDatabase = () => {
+  if (!db) return;
+  
+  try {
+    // Check if last_active column exists
+    const tableInfo = db.exec("PRAGMA table_info(users)");
+    const columns = tableInfo[0]?.values.map(row => row[1]) || [];
+    
+    if (!columns.includes('last_active')) {
+      console.log('Adding last_active column to users table...');
+      db.run("ALTER TABLE users ADD COLUMN last_active DATETIME DEFAULT CURRENT_TIMESTAMP");
+    }
+    
+    if (!columns.includes('is_active')) {
+      console.log('Adding is_active column to users table...');
+      db.run("ALTER TABLE users ADD COLUMN is_active INTEGER DEFAULT 1");
+    }
+    
+    saveDatabase();
+    console.log('Database migration completed');
+  } catch (error) {
+    console.error('Migration error:', error);
+  }
+};
+
 // Initialize database tables
 const initializeTables = async () => {
   if (!db) throw new Error("Database not initialized");
@@ -47,9 +73,14 @@ const initializeTables = async () => {
       email TEXT UNIQUE,
       password_hash TEXT NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      is_admin INTEGER DEFAULT 0
+      last_active DATETIME DEFAULT CURRENT_TIMESTAMP,
+      is_admin INTEGER DEFAULT 0,
+      is_active INTEGER DEFAULT 1
     )
   `);
+  
+  // Run migrations for existing databases
+  migrateDatabase();
 
   // Create user_progress table
   db.run(`
